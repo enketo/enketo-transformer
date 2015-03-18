@@ -1,0 +1,38 @@
+{
+    "name": "enketo-transformer",
+    "version": "1.0.1",
+    "description": "Library that transforms ODK-compliant XForms in a format that enketo-core consumes",
+    "main": "transformer.js",
+    "bugs": {
+        "url": "https://github.com/enketo/enketo-transformer/issues",
+        "email": "martijn@enketo.org"
+    },
+    "scripts": {
+        "test": "mocha test/*.spec.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/enketo/enketo-transformer.git"
+    },
+    "keywords": [
+        "Enketo",
+        "ODK",
+        "OpenRosa",
+        "XSLT",
+        "XSL",
+        "Transformer"
+    ],
+    "author": "Martijn van de Rijdt",
+    "license": "Apache2",
+    "dependencies": {
+        "debug": "2.1.x",
+        "enketo-xslt": "1.0.x",
+        "libxmljs": "0.13.x",
+        "node_xslt": "0.1.x",
+        "q": "1.2.x"
+    },
+    "devDependencies": {
+        "chai": "2.1.x",
+        "chai-as-promised": "4.3.x"
+    }
+}
