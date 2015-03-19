@@ -1,6 +1,6 @@
 {
     "name": "enketo-transformer",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Library that transforms ODK-compliant XForms in a format that enketo-core consumes",
     "main": "transformer.js",
     "bugs": {

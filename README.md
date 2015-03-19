@@ -16,7 +16,7 @@ npm install enketo-transformer --save
 var transformer = require('enketo-transformer');
 var xform = fs.readFileSync( 'path/to/xform.xml' );
   
-var htmlForm = transformer.transform( {
+var result = transformer.transform( {
     xform: xform
 } );
 ```
