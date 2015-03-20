@@ -3,11 +3,15 @@ Enketo Transformer [![Build Status](https://travis-ci.org/enketo/enketo-transfor
 
 NodeJS library that transforms OpenRosa/ODK XForms into a format the Enketo understands.
 
+## Prerequisites
+
+Node v0.10.x is required. There is an [outstanding issue with Node v0.12.x](https://github.com/bsuh/node_xslt/issues/24).
+
+
 ## Install
 
-```
-npm install enketo-transformer --save
-```
+1. Install libxslt and libxml2 with `(sudo) apt-get install libxml2-dev libxslt1-dev`
+2. Install this library with `npm install enketo-transformer --save`
 
 
 ## Use
