@@ -41,6 +41,8 @@ function transform( survey ) {
             survey.model = _replaceMediaSources( result.model, survey.manifest );
             debug( 'post-processing transformation result took ' + ( new Date().getTime() - xsltEndTime ) / 1000 + ' seconds' );
 
+            delete survey.xform;
+
             deferred.resolve( survey );
         } catch ( e ) {
             error = ( e ) ? new Error( e ) : new Error( 'unknown transformation error' );

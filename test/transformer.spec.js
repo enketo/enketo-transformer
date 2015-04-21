@@ -6,7 +6,7 @@ var Q = require( 'q' ),
     chaiAsPromised = require( "chai-as-promised" ),
     expect = chai.expect,
     fs = require( "fs" ),
-    transformer = require( "../transformer" );
+    transformer = require( "../src/transformer" );
 
 chai.use( chaiAsPromised );
 
@@ -14,17 +14,22 @@ describe( 'transformer', function() {
 
     describe( 'transforms valid XForms', function() {
         var xform = fs.readFileSync( './test/forms/widgets.xml' );
-        it( 'without an error', function() {
+        var result = transformer.transform( {
+            xform: xform
+        } );
 
-            var result = transformer.transform( {
-                xform: xform
-            } );
+        it( 'without an error', function() {
             return Q.all( [
                 expect( result ).to.eventually.to.be.an( 'object' ),
                 expect( result ).to.eventually.have.property( 'form' ).and.to.not.be.empty,
                 expect( result ).to.eventually.have.property( 'model' ).and.to.not.be.empty
             ] );
         } );
+
+        it( 'does not include the xform in the response', function() {
+            return expect( result ).to.eventually.not.have.property( 'xform' );
+        } )
+
     } );
 
     describe( 'transforms invalid XForms', function() {
