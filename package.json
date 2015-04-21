@@ -8,6 +8,7 @@
         "email": "martijn@enketo.org"
     },
     "scripts": {
+        "start": "node app.js",
         "test": "mocha test/*.spec.js"
     },
     "repository": {
@@ -28,7 +29,7 @@
         "debug": "^2.1.3",
         "enketo-xslt": "1.0.6",
         "express": "^4.12.3",
-        "libxmljs": "0.13.x",
+        "libxmljs": "0.14.x",
         "node_xslt": "0.1.x",
         "q": "1.2.x",
         "request": "^2.55.0"
