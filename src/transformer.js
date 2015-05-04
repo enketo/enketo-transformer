@@ -14,13 +14,13 @@ _setVersion();
 
 /**
  * Performs XSLT transformation on XForm asynchronously.
- * @param  {string} xform XForm string
- * @return {Function}     promise
+ *
+ * @param  {{xform: string, theme: string}} survey Survey object with at least an xform property
+ * @return {Promise}     promise
  */
 function transform( survey ) {
     var error, errorMsg, doc, formStylesheet, instanceStylesheet, xsltEndTime,
         deferred = Q.defer(),
-        result = {},
         startTime = new Date().getTime();
 
     // make this asynchronous, sort of
@@ -29,16 +29,18 @@ function transform( survey ) {
             doc = transformer.readXmlString( survey.xform );
 
             formStylesheet = transformer.readXsltString( sheets.xslForm );
-            result.form = _stripRoot( transformer.transform( formStylesheet, doc, [ 'wtf', 'why' ] ) );
+            survey.form = _stripRoot( transformer.transform( formStylesheet, doc, [ 'wtf', 'why' ] ) );
 
             instanceStylesheet = transformer.readXsltString( sheets.xslModel );
-            result.model = _stripRoot( transformer.transform( instanceStylesheet, doc, [ 'wtf', 'why' ] ) );
+            survey.model = _stripRoot( transformer.transform( instanceStylesheet, doc, [ 'wtf', 'why' ] ) );
 
             xsltEndTime = new Date().getTime();
             debug( 'form and instance XSLT transformation took ' + ( xsltEndTime - startTime ) / 1000 + ' seconds' );
 
-            survey.form = _replaceMediaSources( result.form, survey.manifest );
-            survey.model = _replaceMediaSources( result.model, survey.manifest );
+            survey.form = _replaceTheme( survey.form, survey.theme );
+
+            survey.form = _replaceMediaSources( survey.form, survey.manifest );
+            survey.model = _replaceMediaSources( survey.model, survey.manifest );
             debug( 'post-processing transformation result took ' + ( new Date().getTime() - xsltEndTime ) / 1000 + ' seconds' );
 
             delete survey.xform;
@@ -57,6 +59,28 @@ function transform( survey ) {
 function _stripRoot( xml ) {
     var xmlDoc = libxmljs.parseXml( xml );
     return xmlDoc.root().get( '*' ).toString( false );
+}
+
+function _replaceTheme( xml, theme ) {
+    var doc, formClassAttr, formClassValue,
+        HAS_THEME = /(theme-)(.*)["'\s]/;
+
+    if ( !theme ) {
+        return xml;
+    }
+
+    doc = libxmljs.parseXml( xml );
+    formClassAttr = doc.root().get( '/form' ).attr( 'class' );
+    formClassValue = formClassAttr.value();
+
+    if ( HAS_THEME.test( formClassValue ) ) {
+        formClassAttr.value( formClassValue.replace( HAS_THEME, '$1' + theme ) );
+    } else {
+        formClassAttr.value( formClassValue + ' ' + 'theme-' + theme );
+    }
+
+    // TODO: probably result in selfclosing tags for empty elements where not allowed in HTML. Check this.
+    return doc.toString();
 }
 
 function _replaceMediaSources( xmlStr, manifest ) {
@@ -91,7 +115,7 @@ function _replaceMediaSources( xmlStr, manifest ) {
         }
     } );
 
-    //TODO: probably result in selfclosing tags for empty elements where not allowed in HTML. Check this.
+    // TODO: probably result in selfclosing tags for empty elements where not allowed in HTML. Check this.
     return doc.toString();
 }
 
