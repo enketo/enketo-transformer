@@ -63,7 +63,7 @@ function _stripRoot( xml ) {
 
 function _replaceTheme( xml, theme ) {
     var doc, formClassAttr, formClassValue,
-        HAS_THEME = /(theme-)(.*)["'\s]/;
+        HAS_THEME = /(theme-)[^"'\s]+/;
 
     if ( !theme ) {
         return xml;
