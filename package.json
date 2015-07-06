@@ -1,6 +1,6 @@
 {
     "name": "enketo-transformer",
-    "version": "1.0.9",
+    "version": "1.1.0",
     "description": "Library that transforms ODK-compliant XForms in a format that enketo-core consumes",
     "main": "src/transformer.js",
     "bugs": {
@@ -24,15 +24,14 @@
         "Transformer"
     ],
     "author": "Martijn van de Rijdt",
-    "license": "Apache2",
+    "license": "Apache-2.0",
     "dependencies": {
-        "debug": "2.1.x",
-        "enketo-xslt": "1.0.8",
+        "debug": "2.2.x",
+        "enketo-xslt": "1.1.0",
         "express": "4.12.x",
-        "libxmljs": "0.14.x",
-        "node_xslt": "0.1.x",
+        "libxslt": "0.4.x",
         "q": "2.0.x",
-        "request": "2.55.x"
+        "request": "2.58.x"
     },
     "devDependencies": {
         "chai": "3.0.x",

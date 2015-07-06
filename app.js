@@ -1,10 +1,12 @@
-var express = require( 'express' ),
-    app = express(),
-    Q = require( 'q' ),
-    request = require( 'request' ),
-    transformer = require( './src/transformer' ),
-    debug = require( 'debug' )( 'app.js' ),
-    config = require( './config/config.json' );
+'use strict';
+
+var express = require( 'express' );
+var app = express();
+var Promise = require( 'q' ).Promise;
+var request = require( 'request' );
+var transformer = require( './src/transformer' );
+var debug = require( 'debug' )( 'app.js' );
+var config = require( './config/config.json' );
 
 for ( var item in config ) {
     app.set( item, config[ item ] );
@@ -46,34 +48,33 @@ app.listen( app.get( 'port' ), function() {
  * @return { Promise }
  */
 function _request( options ) {
-    var error,
-        deferred = Q.defer();
+    var method;
+    var error;
 
-    // set headers
     options.headers = options.headers || {};
     options.headers[ 'X-OpenRosa-Version' ] = '1.0';
 
-    var method = options.method || 'get';
+    method = options.method || 'get';
 
-    request[ method ]( options, function( error, response, body ) {
-        if ( error ) {
-            debug( 'Error occurred when requesting ' + options.url, error );
-            deferred.reject( error );
-        } else if ( response.statusCode === 401 ) {
-            error = new Error( 'Forbidden. Authorization Required.' );
-            error.status = response.statusCode;
-            deferred.reject( error );
-        } else if ( response.statusCode < 200 || response.statusCode >= 300 ) {
-            error = new Error( 'Request to ' + options.url + ' failed.' );
-            error.status = response.statusCode;
-            deferred.reject( error );
-        } else {
-            debug( 'response of request to ' + options.url + ' has status code: ', response.statusCode );
-            deferred.resolve( {
-                xform: body
-            } );
-        }
+    return new Promise( function( resolve, reject ) {
+        request[ method ]( options, function( error, response, body ) {
+            if ( error ) {
+                debug( 'Error occurred when requesting ' + options.url, error );
+                reject( error );
+            } else if ( response.statusCode === 401 ) {
+                error = new Error( 'Forbidden. Authorization Required.' );
+                error.status = response.statusCode;
+                reject( error );
+            } else if ( response.statusCode < 200 || response.statusCode >= 300 ) {
+                error = new Error( 'Request to ' + options.url + ' failed.' );
+                error.status = response.statusCode;
+                reject( error );
+            } else {
+                debug( 'response of request to ' + options.url + ' has status code: ', response.statusCode );
+                resolve( {
+                    xform: body
+                } );
+            }
+        } );
     } );
-
-    return deferred.promise;
 }

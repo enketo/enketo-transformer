@@ -5,8 +5,7 @@ NodeJS library that transforms OpenRosa/ODK XForms into a format the Enketo unde
 
 ## Prerequisites
 
-1. Node v0.10.x is required. There is an [outstanding issue with Node v0.12.x](https://github.com/bsuh/node_xslt/issues/24).
-2. Install libxslt and libxml2 with `(sudo) apt-get install libxml2-dev libxslt1-dev`
+1. Node v0.10.x is required for now. There is an [outstanding issue with Node v0.12.x](https://github.com/albanm/node-libxslt/issues/15).
 
 ## Install as module
 
@@ -49,3 +48,7 @@ var result = transformer.transform( {
 
 * install mocha 
 * run tests with `npm test`
+
+## Develop
+ 
+A vagrant configuration file and provisioning script is included.

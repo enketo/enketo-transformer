@@ -40,7 +40,7 @@ describe( 'transformer', function() {
                 var result = transformer.transform( {
                     xform: xform
                 } );
-                return expect( result ).to.eventually.be.rejectedWith( Error, /parse/ );
+                return expect( result ).to.eventually.be.rejectedWith( Error );
             } );
         } );
     } );
