@@ -24,5 +24,5 @@ echo "***                           Development VM created!                     
 echo "***                                                                               ****"
 echo "***                         vagrant ssh && cd /vagrant                            ****"
 echo "***                              start: npm start                                 ****"
-echo "***                              test: npm test					                ****"
+echo "***                              test: npm test                                   ****"
 echo "**************************************************************************************"

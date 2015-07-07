@@ -7,7 +7,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "trusty"
   config.vm.box_url = "ubuntu/trusty64"
   config.vm.network :forwarded_port, host: 8085, guest: 8085
-  config.vm.network :forwarded_port, host: 35729, guest: 35729
   config.vm.provider :virtualbox do |vb|
       vb.customize ["modifyvm", :id, "--memory", "2024", "--cpus", 4]
   end
