@@ -1,12 +1,12 @@
 /* global describe, require, it*/
 "use strict";
 
-var Q = require( 'q' ),
-    chai = require( "chai" ),
-    chaiAsPromised = require( "chai-as-promised" ),
-    expect = chai.expect,
-    fs = require( "fs" ),
-    transformer = require( "../src/transformer" );
+var Promise = require( 'q' ).Promise;
+var chai = require( "chai" );
+var chaiAsPromised = require( "chai-as-promised" );
+var expect = chai.expect;
+var fs = require( "fs" );
+var transformer = require( "../src/transformer" );
 
 chai.use( chaiAsPromised );
 
@@ -19,7 +19,7 @@ describe( 'transformer', function() {
         } );
 
         it( 'without an error', function() {
-            return Q.all( [
+            return Promise.all( [
                 expect( result ).to.eventually.to.be.an( 'object' ),
                 expect( result ).to.eventually.have.property( 'form' ).and.to.not.be.empty,
                 expect( result ).to.eventually.have.property( 'model' ).and.to.not.be.empty
@@ -74,7 +74,7 @@ describe( 'transformer', function() {
                     theme: false
                 } );
 
-            return Q.all( [
+            return Promise.all( [
                 expect( result1 ).to.eventually.have.property( 'form' ).and.to.contain( 'theme-one' ),
                 expect( result2 ).to.eventually.have.property( 'form' ).and.to.contain( 'theme-one' ),
                 expect( result3 ).to.eventually.have.property( 'form' ).and.to.contain( 'theme-one' ),
@@ -89,13 +89,12 @@ describe( 'transformer', function() {
                     theme: 'mytheme'
                 } );
 
-            return Q.all( [
+            return Promise.all( [
                 expect( result ).to.eventually.have.property( 'form' ).and.to.not.contain( 'theme-one' ),
                 expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'theme-mytheme' )
             ] );
         } );
 
     } );
-
 
 } );
