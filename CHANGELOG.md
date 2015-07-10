@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+------------------------
+##### Fixed
+- directionality of language tag with region (e.g. ar-IR) not determined correctly.
+
 [1.2.0] - 2015-07-10 
 ------------------------
 ##### Added

@@ -72,7 +72,7 @@ function _languagesOnly( obj ) {
  */
 function _getDirectionality( tag ) {
     if ( rtlLangs.some( function( lang ) {
-            return ( tag.length > 3 ) ? lang.toLowerCase() === tag.toLowerCase() : new RegExp( '^' + tag ).test( lang );
+            return lang.toLowerCase() === tag.toLowerCase() || new RegExp( '^' + lang ).test( tag );
         } ) ) {
         return 'rtl';
     }

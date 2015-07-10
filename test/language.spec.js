@@ -52,6 +52,12 @@ describe( 'language', function() {
                 dir: 'rtl',
                 src: 'ar'
             } ],
+            [ 'ar-IR', {
+                tag: 'ar-IR',
+                desc: 'ar-IR',
+                dir: 'rtl',
+                src: 'ar-IR'
+            } ],
             [ 'nl', {
                 tag: 'nl',
                 desc: 'Dutch',
