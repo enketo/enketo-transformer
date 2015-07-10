@@ -2,6 +2,7 @@
 
 var Promise = require( 'q' ).Promise;
 var fs = require( 'fs' );
+var pkg = require( '../package' );
 var crypto = require( 'crypto' );
 var libxslt = require( 'libxslt' );
 var libxmljs = libxslt.libxmljs;
@@ -219,10 +220,10 @@ function _toLocalMediaUrl( url ) {
 
 /**
  * gets a hash of the 2 XSL stylesheets
- * @return {string} hash representing version of XSL stylesheets - NOT A PROMISE
+ * @return {string} hash representing version of XSL stylesheets
  */
 function _getVersion() {
-    return _md5( sheets.xslForm + sheets.xslModel );
+    return _md5( sheets.xslForm + sheets.xslModel + pkg.version );
 }
 
 /**
