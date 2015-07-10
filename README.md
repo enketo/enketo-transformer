@@ -52,3 +52,8 @@ var result = transformer.transform( {
 ## Develop
  
 A vagrant configuration file and provisioning script is included.
+
+
+## Change Log
+
+See [change log](./CHANGELOG.md)
