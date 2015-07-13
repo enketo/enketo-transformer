@@ -19,10 +19,11 @@ fi
 npm install
 npm install -g mocha
 
-echo "**************************************************************************************"
-echo "***                           Development VM created!                             ****"
-echo "***                                                                               ****"
-echo "***                         vagrant ssh && cd /vagrant                            ****"
-echo "***                              start: npm start                                 ****"
-echo "***                              test: npm test                                   ****"
-echo "**************************************************************************************"
+echo "*************************************************************************************"
+echo "***                           Development VM created!                             ***"
+echo "***                                                                               ***"
+echo "***                                vagrant ssh                                    ***"
+echo "***                                cd /vagrant                                    ***"
+echo "***                              start: npm start                                 ***"
+echo "***                              test: npm test                                   ***"
+echo "*************************************************************************************"
