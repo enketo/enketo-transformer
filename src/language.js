@@ -71,8 +71,11 @@ function _languagesOnly( obj ) {
  * @return {string}     either 'rtl' or the default 'ltr'
  */
 function _getDirectionality( tag ) {
+    // strip region
+    tag = tag.split( '-' )[ 0 ];
+
     if ( rtlLangs.some( function( lang ) {
-            return lang.toLowerCase() === tag.toLowerCase() || new RegExp( '^' + lang ).test( tag );
+            return lang.toLowerCase() === tag.toLowerCase() || ( tag.length <= 3 && new RegExp( '^' + lang ).test( tag ) );
         } ) ) {
         return 'rtl';
     }

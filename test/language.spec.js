@@ -44,6 +44,12 @@ describe( 'language', function() {
                 dir: 'ltr',
                 src: 'English'
             } ],
+            [ 'fantasy_lang', {
+                tag: 'fantasy_lang',
+                desc: 'fantasy lang',
+                dir: 'ltr',
+                src: 'fantasy_lang'
+            } ],
             // better way, which works well in Enketo (not in ODK Collect), 
             // description is automatically set to English description if tag is found
             [ 'ar', {
