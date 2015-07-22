@@ -44,6 +44,12 @@ describe( 'language', function() {
                 dir: 'ltr',
                 src: 'English'
             } ],
+            [ 'Dari', {
+                tag: 'prs',
+                desc: 'Dari',
+                dir: 'rtl',
+                src: 'Dari'
+            } ],
             [ 'fantasy_lang', {
                 tag: 'fantasy_lang',
                 desc: 'fantasy lang',

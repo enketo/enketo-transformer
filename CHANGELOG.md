@@ -2,10 +2,21 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased]
+[1.2.3] - 2015-07-22
 ------------------------
 ##### Fixed
-- directionality of language tag with region (e.g. ar-IR) not determined correctly.
+- Default language attribute value processed to match form language tags.
+- Exact language description now ranked first (Dari fix).
+
+[1.2.2] - 2015-07-14
+-----------------------
+##### Fixed
+- Language names starting with 'fa' get incorrect directionality
+
+[1.2.1] - 2015-07-13
+-----------------------
+##### Fixed
+- Directionality of language tag with region (e.g. ar-IR) not determined correctly.
 
 [1.2.0] - 2015-07-10 
 ------------------------

@@ -6,7 +6,8 @@ var debug = require( 'debug' )( 'transformer-languages' );
 
 /**
  * Parses a language string into a language object. Guesses missing properties.
- * 
+ *
+ * @see    http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
  * @param  {string} lang language strings as included in the XForm
  * @return {{desc: string, tag: string, dir: string, src: string}}      language object
  */
@@ -41,7 +42,14 @@ function parse( lang ) {
  * @return {<*>}         the first language object result that was found
  */
 function _getLangWithDesc( desc ) {
-    return tags.search( desc ).filter( _languagesOnly )[ 0 ];
+    var results = tags.search( desc ).filter( _languagesOnly );
+    var exactMatch = results.filter( function( obj ) {
+        return obj.data.record.Description.some( function( description ) {
+            return description.toLowerCase() === desc.toLowerCase();
+        } );
+    } )[ 0 ];
+
+    return exactMatch || results[ 0 ];
 }
 
 /**
@@ -62,6 +70,10 @@ function _getLangWithTag( tag ) {
  */
 function _languagesOnly( obj ) {
     return obj.data && obj.data.type === 'language';
+}
+
+function _rank( obj, description ) {
+
 }
 
 /**
