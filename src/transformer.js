@@ -174,6 +174,8 @@ function _replaceMediaSources( xmlDoc, manifest ) {
 function _replaceLanguageTags( doc ) {
     var languageElements;
     var languages;
+    var langSelectorElement;
+    var defaultLang;
 
     languageElements = doc.find( '/root/form/select[@id="form-languages"]/option' );
 
@@ -201,6 +203,21 @@ function _replaceLanguageTags( doc ) {
             } );
         } );
     } );
+
+    // correct default lang attribute
+    langSelectorElement = doc.get( '/root/form/*[@data-default-lang]' );
+    if ( langSelectorElement ) {
+        defaultLang = langSelectorElement.attr( 'data-default-lang' ).value();
+        languages.some( function( lang ) {
+            if ( lang.src === defaultLang ) {
+                langSelectorElement.attr( {
+                    'data-default-lang': lang.tag
+                } );
+                return true;
+            }
+            return false;
+        } );
+    }
 
     return doc;
 }
