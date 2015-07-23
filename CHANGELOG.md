@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.2.4] - 2015-07-23
+------------------------
+##### Fixed
+- Right-to-left detection of languages that cannot be found in IANA registry.
+
 [1.2.3] - 2015-07-22
 ------------------------
 ##### Fixed

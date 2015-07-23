@@ -181,7 +181,10 @@ function _replaceLanguageTags( doc ) {
 
     // list of parsed language objects
     languages = languageElements.map( function( el ) {
-        return language.parse( el.text() );
+        var lang = el.text();
+        // first non-empty text content of a span child element with that lang attribute
+        var firstLabelText = doc.get( '/root/form//label/span[@lang="' + lang + '" and text()]' ).text() || '';
+        return language.parse( lang, firstLabelText );
     } );
 
     // add or correct dir and value attributes, and amend textcontent of options in language selector

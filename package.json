@@ -1,6 +1,6 @@
 {
     "name": "enketo-transformer",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "description": "Library that transforms ODK-compliant XForms in a format that enketo-core consumes",
     "main": "src/transformer.js",
     "bugs": {
@@ -32,10 +32,11 @@
         "language-tags": "^1.0.3",
         "libxslt": "0.4.1",
         "q": "2.0.x",
-        "request": "2.58.x"
+        "request": "2.60.x",
+        "string-direction": "0.1.x"
     },
     "devDependencies": {
-        "chai": "3.0.x",
+        "chai": "3.2.x",
         "chai-as-promised": "5.1.x",
         "language-tags": "1.0.x"
     }

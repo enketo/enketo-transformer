@@ -1,7 +1,7 @@
 "use strict";
 
 var tags = require( 'language-tags' );
-var rtlLangs = require( './right-to-left' );
+var stringDirection = require( 'string-direction' );
 var debug = require( 'debug' )( 'transformer-languages' );
 
 /**
@@ -11,7 +11,7 @@ var debug = require( 'debug' )( 'transformer-languages' );
  * @param  {string} lang language strings as included in the XForm
  * @return {{desc: string, tag: string, dir: string, src: string}}      language object
  */
-function parse( lang ) {
+function parse( lang, sample ) {
     var ianaLang;
     var language = {};
     var parts = lang.split( '__' );
@@ -29,7 +29,7 @@ function parse( lang ) {
         language.desc = ianaLang ? ianaLang.descriptions()[ 0 ] : lang.replace( '_', ' ' );
     }
 
-    language.dir = _getDirectionality( language.tag );
+    language.dir = _getDirectionality( sample );
     language.src = lang;
 
     return language;
@@ -72,23 +72,14 @@ function _languagesOnly( obj ) {
     return obj.data && obj.data.type === 'language';
 }
 
-function _rank( obj, description ) {
-
-}
-
 /**
  * Obtains the directionality of a tag or language description
  * 
  * @param  {string} tag language tag or language description
  * @return {string}     either 'rtl' or the default 'ltr'
  */
-function _getDirectionality( tag ) {
-    // strip region
-    tag = tag.split( '-' )[ 0 ];
-
-    if ( rtlLangs.some( function( lang ) {
-            return lang.toLowerCase() === tag.toLowerCase() || ( tag.length <= 3 && new RegExp( '^' + lang ).test( tag ) );
-        } ) ) {
+function _getDirectionality( sample ) {
+    if ( stringDirection.getDirection( sample ) !== 'ltr' ) {
         return 'rtl';
     }
     return 'ltr';
