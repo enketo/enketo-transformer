@@ -179,12 +179,15 @@ function _replaceLanguageTags( doc ) {
 
     languageElements = doc.find( '/root/form/select[@id="form-languages"]/option' );
 
-    // list of parsed language objects
+    // List of parsed language objects
     languages = languageElements.map( function( el ) {
         var lang = el.text();
-        // first non-empty text content of a span child element with that lang attribute
-        var firstLabelText = doc.get( '/root/form//label/span[@lang="' + lang + '" and text()]' ).text() || '';
-        return language.parse( lang, firstLabelText );
+        // First find non-empty text content of a hint with that lang attribute.
+        // If not found, find any span with that lang attribute.
+        var langSampleEl = doc.get( '/root/form//span[contains(@class, "or-hint") and @lang="' + lang + '" and text()]' ) ||
+            doc.get( '/root/form//span[@lang="' + lang + '" and text()]' );
+        var langSampleText = ( langSampleEl ) ? langSampleEl.text() : 'nothing';
+        return language.parse( lang, langSampleText );
     } );
 
     // add or correct dir and value attributes, and amend textcontent of options in language selector

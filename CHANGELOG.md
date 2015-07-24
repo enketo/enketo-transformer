@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased] 
+------------------------
+##### Changed
+- Prefer first hint when determining directionality of language.
+
 [1.2.4] - 2015-07-23
 ------------------------
 ##### Fixed
