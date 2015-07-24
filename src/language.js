@@ -13,24 +13,30 @@ var debug = require( 'debug' )( 'transformer-languages' );
  */
 function parse( lang, sample ) {
     var ianaLang;
-    var language = {};
-    var parts = lang.split( '__' );
+    var language = {
+        desc: lang.trim(),
+        tag: lang.trim(),
+        dir: _getDirectionality( sample ),
+        src: lang
+    };
+    var parts = lang.match( /^([^(]+)\((.*)\)\s*$/ );
 
-    if ( parts.length > 1 ) {
-        language.desc = parts[ 1 ].replace( '_', ' ' );
-        language.tag = parts[ 0 ];
-    } else if ( lang.length > 3 ) {
-        language.desc = lang.replace( '_', ' ' );
-        ianaLang = _getLangWithDesc( language.desc );
-        language.tag = ianaLang ? ianaLang.data.subtag : lang;
+    if ( parts && parts.length > 2 ) {
+        language.desc = parts[ 1 ].trim();
+        language.tag = parts[ 2 ].trim();
     } else {
-        language.tag = lang;
-        ianaLang = _getLangWithTag( language.tag );
-        language.desc = ianaLang ? ianaLang.descriptions()[ 0 ] : lang.replace( '_', ' ' );
+        // First check whether lang is a known IANA subtag like 'en' or 'en-GB'
+        ianaLang = _getLangWithTag( lang.split( '-' )[ 0 ] );
+        if ( ianaLang ) {
+            language.desc = ianaLang.descriptions()[ 0 ];
+        } else {
+            // Check whether IANA language can be found with description
+            ianaLang = _getLangWithDesc( language.desc );
+            if ( ianaLang ) {
+                language.tag = ianaLang.data.subtag;
+            }
+        }
     }
-
-    language.dir = _getDirectionality( sample );
-    language.src = lang;
 
     return language;
 }

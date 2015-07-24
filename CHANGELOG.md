@@ -2,10 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased] 
+[1.3.0] - 2015-07-24 
 ------------------------
 ##### Changed
 - Prefer first hint when determining directionality of language.
+- Preferred language name syntax in XForms is now "Name Of Language (tag)". 
 
 [1.2.4] - 2015-07-23
 ------------------------

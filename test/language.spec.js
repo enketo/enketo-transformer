@@ -51,17 +51,18 @@ describe( 'language', function() {
                 dir: 'rtl',
                 src: 'Dari'
             } ],
-            [ 'fantasy_lang', 'bl', {
-                tag: 'fantasy_lang',
+            // spaces
+            [ '  fantasy lang  ', 'bl', {
+                tag: 'fantasy lang',
                 desc: 'fantasy lang',
                 dir: 'ltr',
-                src: 'fantasy_lang'
+                src: '  fantasy lang  '
             } ],
-            [ 'fantasy_lang', 'ک', {
-                tag: 'fantasy_lang',
+            [ 'fantasy lang', 'ک', {
+                tag: 'fantasy lang',
                 desc: 'fantasy lang',
                 dir: 'rtl',
-                src: 'fantasy_lang'
+                src: 'fantasy lang'
             } ],
             // better way, which works well in Enketo (not in ODK Collect), 
             // description is automatically set to English description if tag is found
@@ -73,7 +74,7 @@ describe( 'language', function() {
             } ],
             [ 'ar-IR', 'رب', {
                 tag: 'ar-IR',
-                desc: 'ar-IR',
+                desc: 'Arabic',
                 dir: 'rtl',
                 src: 'ar-IR'
             } ],
@@ -84,24 +85,31 @@ describe( 'language', function() {
                 src: 'nl'
             } ],
             // the recommended future-proof way
-            [ 'ar__ArabicDialect', 'رب', {
+            [ 'ArabicDialect (ar)', 'رب', {
                 tag: 'ar',
                 desc: 'ArabicDialect',
                 dir: 'rtl',
-                src: 'ar__ArabicDialect'
+                src: 'ArabicDialect (ar)'
             } ],
-            [ 'nl__Nederlands', 'heej', {
+            // no space before paren open
+            [ 'ArabicDialect(ar)', 'رب', {
+                tag: 'ar',
+                desc: 'ArabicDialect',
+                dir: 'rtl',
+                src: 'ArabicDialect(ar)'
+            } ],
+            [ 'Nederlands (nl)', 'heej', {
                 tag: 'nl',
                 desc: 'Nederlands',
                 dir: 'ltr',
-                src: 'nl__Nederlands'
+                src: 'Nederlands (nl)'
             } ],
-            // recommended way, also converts underscores to spaces
-            [ 'ar__Arabic_Dialect', 'رب', {
+            // recommended way, spaces in name
+            [ 'Arabic Dialect (ar)', 'رب', {
                 tag: 'ar',
                 desc: 'Arabic Dialect',
                 dir: 'rtl',
-                src: 'ar__Arabic_Dialect'
+                src: 'Arabic Dialect (ar)'
             } ],
             // unmatchable tag
             [ '0a', 'd', {
@@ -118,11 +126,11 @@ describe( 'language', function() {
                 src: 'nonexisting'
             } ],
             // unmatchable tag and unmatchable description
-            [ '0a__nonexisting', 'd', {
+            [ 'nonexisting (0a)', 'd', {
                 tag: '0a',
                 desc: 'nonexisting',
                 dir: 'ltr',
-                src: '0a__nonexisting'
+                src: 'nonexisting (0a)'
             } ],
         ].forEach( test );
 
