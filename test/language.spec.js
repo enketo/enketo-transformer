@@ -20,6 +20,19 @@ describe( 'language', function() {
         };
 
         [
+            // no lanuage (only inline XForm text)
+            [ '', 'a', {
+                tag: '',
+                desc: '',
+                dir: 'ltr',
+                src: ''
+            } ],
+            [ '', 'رب', {
+                tag: '',
+                desc: '',
+                dir: 'rtl',
+                src: ''
+            } ],
             // non-recommended ways, some half-hearted attempt to determine at least dir correctly
             [ 'Arabic', 'رب', {
                 tag: 'ar',

@@ -48,14 +48,14 @@ function parse( lang, sample ) {
  * @return {<*>}         the first language object result that was found
  */
 function _getLangWithDesc( desc ) {
-    var results = tags.search( desc ).filter( _languagesOnly );
+    var results = ( desc ) ? tags.search( desc ).filter( _languagesOnly ) : [];
     var exactMatch = results.filter( function( obj ) {
         return obj.data.record.Description.some( function( description ) {
             return description.toLowerCase() === desc.toLowerCase();
         } );
     } )[ 0 ];
 
-    return exactMatch || results[ 0 ];
+    return exactMatch || results[ 0 ] || '';
 }
 
 /**
@@ -65,7 +65,7 @@ function _getLangWithDesc( desc ) {
  * @return {<*>}         the first language object result that was found
  */
 function _getLangWithTag( tag ) {
-    return tags.subtags( tag ).filter( _languagesOnly )[ 0 ];
+    return ( tag ) ? tags.subtags( tag ).filter( _languagesOnly )[ 0 ] : '';
 }
 
 /**

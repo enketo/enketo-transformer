@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.4.0] - 2015-07-28
+------------------------
+##### Added
+- Simple select questions get the simple-select class. **Update enketo-core!**
+
+##### Fixed
+- Directionality not detected when forms contain no itext.
+
 [1.3.0] - 2015-07-24 
 ------------------------
 ##### Changed

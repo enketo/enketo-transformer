@@ -182,13 +182,13 @@ function _replaceLanguageTags( doc ) {
     // List of parsed language objects
     languages = languageElements.map( function( el ) {
         var lang = el.text();
-        // First find non-empty text content of a hint with that lang attribute.
-        // If not found, find any span with that lang attribute.
-        var langSampleEl = doc.get( '/root/form//span[contains(@class, "or-hint") and @lang="' + lang + '" and text()]' ) ||
-            doc.get( '/root/form//span[@lang="' + lang + '" and text()]' );
-        var langSampleText = ( langSampleEl ) ? langSampleEl.text() : 'nothing';
-        return language.parse( lang, langSampleText );
+        return language.parse( lang, _getLanguageSampleText( doc, lang ) );
     } );
+
+    // forms without itext and only one language, still need directionality info
+    if ( languages.length === 0 ) {
+        languages.push( language.parse( '', _getLanguageSampleText( doc, '' ) ) );
+    }
 
     // add or correct dir and value attributes, and amend textcontent of options in language selector
     languageElements.forEach( function( el, index ) {
@@ -226,6 +226,16 @@ function _replaceLanguageTags( doc ) {
     }
 
     return doc;
+}
+
+
+function _getLanguageSampleText( doc, lang ) {
+    // First find non-empty text content of a hint with that lang attribute.
+    // If not found, find any span with that lang attribute.
+    var langSampleEl = doc.get( '/root/form//span[contains(@class, "or-hint") and @lang="' + lang + '" and text()]' ) ||
+        doc.get( '/root/form//span[@lang="' + lang + '" and text()' );
+
+    return ( langSampleEl ) ? langSampleEl.text() : 'nothing';
 }
 
 /**
