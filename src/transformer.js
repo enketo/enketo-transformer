@@ -193,8 +193,8 @@ function _replaceLanguageTags( doc ) {
     // add or correct dir and value attributes, and amend textcontent of options in language selector
     languageElements.forEach( function( el, index ) {
         el.attr( {
-            dir: languages[ index ].dir,
-            value: languages[ index ].tag
+            'data-dir': languages[ index ].dir,
+            'value': languages[ index ].tag
         } ).text( languages[ index ].desc );
     } );
 
