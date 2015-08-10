@@ -2,10 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.4.2] - 2015-08-10
+------------------------
+##### Fixed
+- Rtl detection not working if no itext hints present.
+
 [1.4.1] - 2015-07-29
 ------------------------
 ##### Fixed
-- languages in form selector oddly aligned if mix of ltr and rtl languages is used (FF)
+- Languages in form selector oddly aligned if mix of ltr and rtl languages is used (FF).
 
 [1.4.0] - 2015-07-28
 ------------------------

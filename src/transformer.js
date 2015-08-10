@@ -233,7 +233,7 @@ function _getLanguageSampleText( doc, lang ) {
     // First find non-empty text content of a hint with that lang attribute.
     // If not found, find any span with that lang attribute.
     var langSampleEl = doc.get( '/root/form//span[contains(@class, "or-hint") and @lang="' + lang + '" and text()]' ) ||
-        doc.get( '/root/form//span[@lang="' + lang + '" and text()' );
+        doc.get( '/root/form//span[@lang="' + lang + '" and text()]' );
 
     return ( langSampleEl ) ? langSampleEl.text() : 'nothing';
 }
