@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.4.3] - 2015-08-26
+##### Fixed
+- Default directionality ltr if first text element contains only whitespaces.
+
 [1.4.2] - 2015-08-10
 ------------------------
 ##### Fixed
