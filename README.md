@@ -31,7 +31,7 @@ var result = transformer.transform( {
 ## Use as app
 
 1. start with `npm start`
-2. use with queryparameter e.g. with http://localhost:8085/transformer?xform=http://myxforms.com/myxform.xml
+2. use with queryparameter e.g. with http://localhost:8085/transform?xform=http://myxforms.com/myxform.xml
 
 
 ## Response format
