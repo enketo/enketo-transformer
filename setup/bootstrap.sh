@@ -7,12 +7,13 @@ set -e
 echo 'installing prerequisites...'
 apt-get update
 apt-get upgrade -y
-curl -sL https://deb.nodesource.com/setup_0.10 | sudo bash -
-apt-get install -y git build-essential nodejs
+apt-get install -y curl
+curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
+apt-get install -y build-essential nodejs
 
 # installing npm packages
 cd /vagrant
-npm explore npm -g -- npm install node-gyp@latest
+# npm explore npm -g -- npm install node-gyp@latest
 if [ -d "/vagrant/node_modules" ]; then
 	rm -R /vagrant/node_modules
 fi

@@ -30,7 +30,7 @@
         "enketo-xslt": "1.2.x",
         "express": "4.12.x",
         "language-tags": "^1.0.3",
-        "libxslt": "0.4.1",
+        "libxslt": "0.5.4",
         "q": "2.0.x",
         "request": "2.60.x",
         "string-direction": "0.1.x"
