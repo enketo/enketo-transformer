@@ -7,6 +7,7 @@ var crypto = require( 'crypto' );
 var libxslt = require( 'libxslt' );
 var libxmljs = libxslt.libxmljs;
 var language = require( './language' );
+var markdown = require( './markdown' );
 var sheets = require( 'enketo-xslt' );
 var debug = require( 'debug' )( 'transformer' );
 var xslFormDoc = libxmljs.parseXml( sheets.xslForm, {
@@ -37,8 +38,7 @@ function transform( survey ) {
             htmlDoc = _replaceTheme( htmlDoc, survey.theme );
             htmlDoc = _replaceMediaSources( htmlDoc, survey.manifest );
             htmlDoc = _replaceLanguageTags( htmlDoc );
-            // TODO: does this result in self-closing tags?
-            survey.form = htmlDoc.root().get( '*' ).toString( false );
+            survey.form = _renderMarkdown( htmlDoc );
 
             return _transform( xslModelDoc, xformDoc );
         } )
@@ -228,7 +228,13 @@ function _replaceLanguageTags( doc ) {
     return doc;
 }
 
-
+/**
+ * Obtains a non-empty hint text or other text sample of a particular form language.
+ * 
+ * @param  {[type]} doc  libxmljs object
+ * @param  {string} lang language
+ * @return {string}      the text sample
+ */
 function _getLanguageSampleText( doc, lang ) {
     // First find non-empty text content of a hint with that lang attribute.
     // If not found, find any span with that lang attribute.
@@ -237,6 +243,37 @@ function _getLanguageSampleText( doc, lang ) {
         doc.get( '/root/form//span[@lang="' + lang + '" and text()]' );
 
     return ( langSampleEl && langSampleEl.text().trim().length ) ? langSampleEl.text() : 'nothing';
+}
+
+/**
+ * Converts a subset of Markdown in all labels and hints into HTML
+ * 
+ * @param  {[type]} htmlDoc libxmljs object
+ * @return {[type]}     libxmljs object
+ */
+function _renderMarkdown( htmlDoc ) {
+    var htmlStr;
+    var replacements = [];
+
+    htmlDoc.find( '/root/form//span[contains(@class, "question-label") or contains(@class, "or-hint")]' ).forEach( function( el, index ) {
+        var original = el.text();
+        var rendered = markdown.toHtml( original );
+        if ( original !== rendered ) {
+            replacements[ index ] = rendered;
+            el.text( '$$$___' + index );
+        }
+    } );
+
+    // TODO: does this result in self-closing tags?
+    htmlStr = htmlDoc.root().get( '*' ).toString( false );
+
+    replacements.forEach( function( replacement, index ) {
+        if ( replacement ) {
+            htmlStr = htmlStr.replace( new RegExp( '\\$\\$\\$___' + index ), replacement );
+        }
+    } );
+
+    return htmlStr;
 }
 
 /**

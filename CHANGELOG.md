@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased] 
+-----------------------
+##### Added
+- Moved markdown support from enketo-core, added additional support, and expanded to all labels and hints (**Warning:** use only with enketo-core 4.2.0+ ).
+
 [1.4.3] - 2015-08-26
 ##### Fixed
 - Default directionality ltr if first text element contains only whitespaces.
