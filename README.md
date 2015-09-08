@@ -24,11 +24,11 @@ var result = transformer.transform( {
 } );
 ```
 
-## Install as app
+## Install as app (web API)
 1. clone repo
 2. install dependencies with `npm install`
 
-## Use as app
+## Use as app (web API)
 
 1. start with `npm start`
 2. use with queryparameter e.g. with http://localhost:8085/transform?xform=http://myxforms.com/myxform.xml

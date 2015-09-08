@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased] 
+[1.5.0] - 2015-09-08 
 -----------------------
 ##### Added
 - Moved markdown support from enketo-core, added additional support, and expanded to all labels and hints (**Warning:** use only with enketo-core 4.2.0+ ).
