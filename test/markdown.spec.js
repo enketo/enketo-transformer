@@ -48,6 +48,8 @@ describe( 'markdown', function() {
             [ '<span>a</span>', '<span>a</span>' ],
             [ '&lt;span&gt;a&lt;/span&gt;', '<span>a</span>' ],
             [ '<span style="color:red;">red</span>', '<span style="color:red;">red</span>' ],
+            [ '<span>bad\nunaffected <span style="color: purple">el</span>.', '<p>&lt;span&gt;bad</p>unaffected <span style="color: purple">el</span>.' ],
+            [ '<span style=\'color:red;\'>red</span>', '<span style=\'color:red;\'>red</span>' ],
             [ '><', '&gt;&lt;' ],
             // sanitized html
             [ '<span style="color:red;" onclick="alert(\"gotcha!\")">click me</span>', '<span style="color:red;">click me</span>' ],
