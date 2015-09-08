@@ -1,12 +1,12 @@
 /* global describe, require, it*/
-"use strict";
+'use strict';
 
 var Promise = require( 'q' ).Promise;
-var chai = require( "chai" );
-var chaiAsPromised = require( "chai-as-promised" );
+var chai = require( 'chai' );
+var chaiAsPromised = require( 'chai-as-promised' );
 var expect = chai.expect;
-var fs = require( "fs" );
-var transformer = require( "../src/transformer" );
+var fs = require( 'fs' );
+var transformer = require( '../src/transformer' );
 
 chai.use( chaiAsPromised );
 

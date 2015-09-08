@@ -1,9 +1,9 @@
 /* global describe, it*/
-"use strict";
+'use strict';
 
-var chai = require( "chai" );
+var chai = require( 'chai' );
 var expect = chai.expect;
-var language = require( "../src/language" );
+var language = require( '../src/language' );
 
 describe( 'language', function() {
 
