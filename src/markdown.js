@@ -1,25 +1,24 @@
 'use strict';
 
 /**
- * Transforms XForm label and hint with a subset of Markdown into HTML
+ * Transforms XForm label and hint textnode content with a subset of Markdown into HTML
+ * 
  * Supported:
  * - _, __, *, **, [](), #, ##, ###, ####, #####, 
  * - span tags and html-encoded span tags,
- * - unordered markdown lists and order markdown lists (one level)
+ * - single-level unordered markdown lists and single-level ordered markdown lists
  * - newline characters
  * 
  * Also HTML encodes any unsupported HTML tags for safe use inside web-based clients
  * 
- * @param  {string} text label or hint text content
- * @return {string}      transformed text content
+ * @param  {string} text text content of a textnode
+ * @return {string}      transformed text content of a textnode
  */
-
-
 function markdownToHtml( text ) {
     var html = text
-        // html encoding of < for safety
+        // html encoding of < for safety (not necessary in Enketo because only textContent is rendered)
         .replace( /</gm, '&lt;' )
-        // html encoding of > for safety
+        // html encoding of > for safety (not necessary in Enketo because only textContent is rendered)
         .replace( />/gm, '&gt;' )
         // strong
         .replace( /__(.*)__/gm, '<strong>$1</strong>' )

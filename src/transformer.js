@@ -246,34 +246,45 @@ function _getLanguageSampleText( doc, lang ) {
 }
 
 /**
- * Converts a subset of Markdown in all labels and hints into HTML
+ * Converts a subset of Markdown in all textnode children of labels and hints into HTML
  * 
  * @param  {[type]} htmlDoc libxmljs object
  * @return {[type]}     libxmljs object
  */
 function _renderMarkdown( htmlDoc ) {
     var htmlStr;
-    var replacements = [];
+    var replacements = {};
 
     htmlDoc.find( '/root/form//span[contains(@class, "question-label") or contains(@class, "or-hint")]' ).forEach( function( el, index ) {
-        var original = el.text();
-        var rendered = markdown.toHtml( original );
-        if ( original !== rendered ) {
-            replacements[ index ] = rendered;
-            el.text( '$$$___' + index );
-        }
+        el.childNodes()
+            .filter( _textNodesOnly )
+            .forEach( function( textNode, i ) {
+                var key;
+                var original = textNode.text();
+                var rendered = markdown.toHtml( original );
+                if ( original !== rendered ) {
+                    key = '$$$' + index + '_' + i;
+                    replacements[ key ] = rendered;
+                    textNode.text( key );
+                }
+            } );
     } );
 
     // TODO: does this result in self-closing tags?
     htmlStr = htmlDoc.root().get( '*' ).toString( false );
 
-    replacements.forEach( function( replacement, index ) {
+    Object.keys( replacements ).forEach( function( key ) {
+        var replacement = replacements[ key ];
         if ( replacement ) {
-            htmlStr = htmlStr.replace( new RegExp( '\\$\\$\\$___' + index ), replacement );
+            htmlStr = htmlStr.replace( key, replacement );
         }
     } );
 
     return htmlStr;
+}
+
+function _textNodesOnly( node ) {
+    return node.type() === 'text';
 }
 
 /**

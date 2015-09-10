@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.5.2] - 2015-09-10
+-----------------------
+##### Changed
+- Reverted node 0.12 fix. It is now incompatible again.
+
+##### Fixed
+- Missing outputs from transformation result.
+
 [1.5.1] - 2015-09-09
 -----------------------
 ##### Removed
