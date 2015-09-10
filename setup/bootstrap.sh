@@ -8,7 +8,7 @@ echo 'installing prerequisites...'
 apt-get update
 apt-get upgrade -y
 apt-get install -y curl
-curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
+curl -sL https://deb.nodesource.com/setup_0.10 | sudo bash -
 apt-get install -y build-essential nodejs
 
 # installing npm packages
