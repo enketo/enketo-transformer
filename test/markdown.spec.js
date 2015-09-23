@@ -73,11 +73,14 @@ describe( 'markdown', function() {
             [ '<script src="hack.js"></script>', '&lt;script src="hack.js"&gt;&lt;/script&gt;' ],
             [ '&lt;script src="hack.js"&gt;&lt;/script&gt;', '&lt;script src="hack.js"&gt;&lt;/script&gt;' ],
             // correct unordered lists
-            [ 'list:\n* a\n* b \n+ c   \n+ d', 'list:<ul><li>a</li><li>b</li><li>c</li><li>d</li></ul>' ],
+            [ '* a\n* b\n', '<ul><li>a</li><li>b</li></ul>' ], // pyxform trims label starting with \n
+            [ '\n* a\n* 2.\n', '<ul><li>a</li><li>2.</li></ul>' ],
+            [ 'list:\n* a\n* b \n+ c   \n+ d', '<p>list:</p><ul><li>a</li><li>b</li><li>c</li><li>d</li></ul>' ],
             [ 'list:\n\n* a\n* b \n+ c   \n+ d', '<p>list:</p><ul><li>a</li><li>b</li><li>c</li><li>d</li></ul>' ],
-            [ '* a\n* b\n', '<ul><li>a</li><li>b</li></ul>' ],
             // correct ordered lists
-            [ 'list:\n1. a\n2. b \n501. c   \n6. d', 'list:<ol><li>a</li><li>b</li><li>c</li><li>d</li></ol>' ],
+            [ '1. a\n2. b', '<ol><li>a</li><li>b</li></ol>' ], // pyxform trims label starting with \n
+            [ '\n1. 2.\n2. b', '<ol><li>2.</li><li>b</li></ol>' ],
+            [ 'list:\n1. a\n2. b \n501. c   \n6. d', '<p>list:</p><ol><li>a</li><li>b</li><li>c</li><li>d</li></ol>' ],
             [ 'list:\n\n1. a\n2. b \n501. c   \n6. d', '<p>list:</p><ol><li>a</li><li>b</li><li>c</li><li>d</li></ol>' ],
             // correct combos
             [ 'format __s__ and _e_\nformat **s** and *e*',
@@ -88,7 +91,7 @@ describe( 'markdown', function() {
             ],
             [ '_<span style="color:red;">dbl</span>_', '<em><span style="color:red;">dbl</span></em>' ],
             [ '<span style="color:red;">_dbl_</span>', '<span style="color:red;"><em>dbl</em></span>' ],
-            [ 'list:\n* __a__\n* _b_ \n+ [c](c)', 'list:<ul><li><strong>a</strong></li><li><em>b</em></li><li><a href="c" target="_blank">c</a></li></ul>' ],
+            [ 'list:\n* __a__\n* _b_ \n+ [c](c)', '<p>list:</p><ul><li><strong>a</strong></li><li><em>b</em></li><li><a href="c" target="_blank">c</a></li></ul>' ],
         ].forEach( function( test ) {
             var source = test[ 0 ];
             var expected = test[ 1 ];
