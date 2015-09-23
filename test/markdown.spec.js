@@ -67,6 +67,7 @@ describe( 'markdown', function() {
             // correct unordered lists
             [ 'list:\n* a\n* b \n+ c   \n+ d', 'list:<ul><li>a</li><li>b</li><li>c</li><li>d</li></ul>' ],
             [ 'list:\n\n* a\n* b \n+ c   \n+ d', '<p>list:</p><ul><li>a</li><li>b</li><li>c</li><li>d</li></ul>' ],
+            [ '* a\n* b\n', '<ul><li>a</li><li>b</li></ul>' ],
             // correct ordered lists
             [ 'list:\n1. a\n2. b \n501. c   \n6. d', 'list:<ol><li>a</li><li>b</li><li>c</li><li>d</li></ol>' ],
             [ 'list:\n\n1. a\n2. b \n501. c   \n6. d', '<p>list:</p><ol><li>a</li><li>b</li><li>c</li><li>d</li></ol>' ],

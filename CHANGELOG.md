@@ -2,10 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased] 
+-----------------------
+##### Fixed
+- List require newline character to start (too strict).
+
 [1.5.2] - 2015-09-10
 -----------------------
 ##### Changed
-- Reverted node 0.12 fix. It is now incompatible again.
+- Reverted node 0.12 fix. It is now again incompatible with 0.12.
 
 ##### Fixed
 - Missing outputs from transformation result.
