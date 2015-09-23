@@ -21,11 +21,11 @@ function markdownToHtml( text ) {
         // html encoding of > for safety (not necessary in Enketo because only textContent is rendered)
         .replace( />/gm, '&gt;' )
         // strong
-        .replace( /__(.*)__/gm, '<strong>$1</strong>' )
-        .replace( /\*\*(.*)\*\*/gm, '<strong>$1</strong>' )
+        .replace( /__(.*?)__/gm, '<strong>$1</strong>' )
+        .replace( /\*\*(.*?)\*\*/gm, '<strong>$1</strong>' )
         // emphasis
-        .replace( /_([^\s].*)_/gm, '<em>$1</em>' )
-        .replace( /\*([^\s].*)\*/gm, '<em>$1</em>' )
+        .replace( /_([^\s][^_\n]*)_/gm, '<em>$1</em>' )
+        .replace( /\*([^\s][^\*\n]*)\*/gm, '<em>$1</em>' )
         // links
         .replace( /\[([^\]]*)\]\(([^\)]+)\)/gm, '<a href="$2" target="_blank">$1</a>' )
         // headers

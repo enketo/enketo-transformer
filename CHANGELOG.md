@@ -2,10 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased] 
+[1.5.3] - 2015-09-23 
 -----------------------
 ##### Fixed
-- List require newline character to start (too strict).
+- Lists require newline character to start (too strict).
+- Multiple emphasis (or strong) markup in same line converts as one.
 
 [1.5.2] - 2015-09-10
 -----------------------

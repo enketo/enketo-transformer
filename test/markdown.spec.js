@@ -13,14 +13,22 @@ describe( 'markdown', function() {
             // correct emphasis
             [ '_emphasis_', '<em>emphasis</em>' ],
             [ '*emphasis*', '<em>emphasis</em>' ],
+            [ '_emphasis_ and _emphasis_', '<em>emphasis</em> and <em>emphasis</em>' ],
+            [ '*emphasis* and *emphasis*', '<em>emphasis</em> and <em>emphasis</em>' ],
+            [ '_emphasis_ and *emphasis*', '<em>emphasis</em> and <em>emphasis</em>' ],
+            //[ '_empha__sis_', '<em>empha__sis</em>' ],
             // incorrect emphasis
             [ '_ emphasis_', '_ emphasis_' ],
-            [ '* emphasis*', '* emphasis*' ],
+            [ '* emphasis*', '<ul><li>emphasis*</li></ul>' ],
             // correct strong
             [ '__strong__', '<strong>strong</strong>' ],
             [ '**strong**', '<strong>strong</strong>' ],
             [ '__ strong __', '<strong> strong </strong>' ],
             [ '** strong **', '<strong> strong </strong>' ],
+            [ '**strong** and **strong**', '<strong>strong</strong> and <strong>strong</strong>' ],
+            [ '__strong__ and __strong__', '<strong>strong</strong> and <strong>strong</strong>' ],
+            [ '**strong** and __strong__', '<strong>strong</strong> and <strong>strong</strong>' ],
+            [ '__stro_ng__', '<strong>stro_ng</strong>' ],
             // correct headings
             [ '#h1\n', '<h1>h1</h1>' ],
             [ '# h1\n', '<h1>h1</h1>' ],
