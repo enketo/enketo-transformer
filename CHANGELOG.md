@@ -2,16 +2,21 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.5.5] - 2015-0-25
+------------------------
+##### Fixed
+- Markdown lists created items if space behind bullet was missing.
+
 [1.5.4] - 2015-09-24
 -----------------------
 ##### Fixed
-- Lists not formed correctly.
+- Markdown lists not formed correctly.
 
 [1.5.3] - 2015-09-23 
 -----------------------
 ##### Fixed
-- Lists require newline character to start (too strict).
-- Multiple emphasis (or strong) markup in same line converts as one.
+- Markdown lists require newline character to start (too strict).
+- Markdown multiple emphasis (or strong) markup in same line converts as one.
 
 [1.5.2] - 2015-09-10
 -----------------------
@@ -24,7 +29,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [1.5.1] - 2015-09-09
 -----------------------
 ##### Removed
-- XSLT warning messages for output and itemset
+- XSLT warning messages for output and itemset.
 
 ##### Fixed
 - node 0.12 compatibility

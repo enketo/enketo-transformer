@@ -74,14 +74,22 @@ describe( 'markdown', function() {
             [ '&lt;script src="hack.js"&gt;&lt;/script&gt;', '&lt;script src="hack.js"&gt;&lt;/script&gt;' ],
             // correct unordered lists
             [ '* a\n* b\n', '<ul><li>a</li><li>b</li></ul>' ], // pyxform trims label starting with \n
+            [ '* ', '<ul><li></li></ul>' ],
             [ '\n* a\n* 2.\n', '<ul><li>a</li><li>2.</li></ul>' ],
             [ 'list:\n* a\n* b \n+ c   \n+ d', '<p>list:</p><ul><li>a</li><li>b</li><li>c</li><li>d</li></ul>' ],
             [ 'list:\n\n* a\n* b \n+ c   \n+ d', '<p>list:</p><ul><li>a</li><li>b</li><li>c</li><li>d</li></ul>' ],
+            // incorrect unordered lists            
+            [ '-', '-' ],
+            [ '*', '*' ],
+            [ '+', '+' ],
             // correct ordered lists
             [ '1. a\n2. b', '<ol><li>a</li><li>b</li></ol>' ], // pyxform trims label starting with \n
+            [ '3. ', '<ol><li></li></ol>' ],
             [ '\n1. 2.\n2. b', '<ol><li>2.</li><li>b</li></ol>' ],
             [ 'list:\n1. a\n2. b \n501. c   \n6. d', '<p>list:</p><ol><li>a</li><li>b</li><li>c</li><li>d</li></ol>' ],
             [ 'list:\n\n1. a\n2. b \n501. c   \n6. d', '<p>list:</p><ol><li>a</li><li>b</li><li>c</li><li>d</li></ol>' ],
+            // incorrect ordered lists            
+            [ '3.', '3.' ],
             // correct combos
             [ 'format __s__ and _e_\nformat **s** and *e*',
                 '<p>format <strong>s</strong> and <em>e</em></p>format <strong>s</strong> and <em>e</em>'
