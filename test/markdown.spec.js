@@ -19,7 +19,7 @@ describe( 'markdown', function() {
             //[ '_empha__sis_', '<em>empha__sis</em>' ],
             // incorrect emphasis
             [ '_ emphasis_', '_ emphasis_' ],
-            [ '* emphasis*', '<ul><li>emphasis*</li></ul>' ],
+            [ 'list:\n* emphasis*', 'list:<ul><li>emphasis*</li></ul>' ],
             // correct strong
             [ '__strong__', '<strong>strong</strong>' ],
             [ '**strong**', '<strong>strong</strong>' ],
@@ -73,23 +73,27 @@ describe( 'markdown', function() {
             [ '<script src="hack.js"></script>', '&lt;script src="hack.js"&gt;&lt;/script&gt;' ],
             [ '&lt;script src="hack.js"&gt;&lt;/script&gt;', '&lt;script src="hack.js"&gt;&lt;/script&gt;' ],
             // correct unordered lists
-            [ '* a\n* b\n', '<ul><li>a</li><li>b</li></ul>' ], // pyxform trims label starting with \n
-            [ '* ', '<ul><li></li></ul>' ],
+            [ '\n* a\n* b\n', '<ul><li>a</li><li>b</li></ul>' ], // note: pyxform trims labels starting with \n
+            [ '\n* ', '<ul><li></li></ul>' ],
             [ '\n* a\n* 2.\n', '<ul><li>a</li><li>2.</li></ul>' ],
-            [ 'list:\n* a\n* b \n+ c   \n+ d', '<p>list:</p><ul><li>a</li><li>b</li><li>c</li><li>d</li></ul>' ],
+            [ 'list:\n* a\n* b \n+ c   \n+ d', 'list:<ul><li>a</li><li>b</li><li>c</li><li>d</li></ul>' ],
             [ 'list:\n\n* a\n* b \n+ c   \n+ d', '<p>list:</p><ul><li>a</li><li>b</li><li>c</li><li>d</li></ul>' ],
             // incorrect unordered lists            
             [ '-', '-' ],
             [ '*', '*' ],
             [ '+', '+' ],
+            [ '* ', '* ' ],
+            [ '* a', '* a' ],
             // correct ordered lists
-            [ '1. a\n2. b', '<ol><li>a</li><li>b</li></ol>' ], // pyxform trims label starting with \n
-            [ '3. ', '<ol><li></li></ol>' ],
+            [ '\n1. a\n2. b', '<ol><li>a</li><li>b</li></ol>' ], // note: pyxform trims labels starting with \n
+            [ '\n3. ', '<ol><li></li></ol>' ],
             [ '\n1. 2.\n2. b', '<ol><li>2.</li><li>b</li></ol>' ],
-            [ 'list:\n1. a\n2. b \n501. c   \n6. d', '<p>list:</p><ol><li>a</li><li>b</li><li>c</li><li>d</li></ol>' ],
+            [ 'list:\n1. a\n2. b \n501. c   \n6. d', 'list:<ol><li>a</li><li>b</li><li>c</li><li>d</li></ol>' ],
             [ 'list:\n\n1. a\n2. b \n501. c   \n6. d', '<p>list:</p><ol><li>a</li><li>b</li><li>c</li><li>d</li></ol>' ],
             // incorrect ordered lists            
             [ '3.', '3.' ],
+            [ '3. ', '3. ' ],
+            [ '3. a', '3. a' ],
             // correct combos
             [ 'format __s__ and _e_\nformat **s** and *e*',
                 '<p>format <strong>s</strong> and <em>e</em></p>format <strong>s</strong> and <em>e</em>'
@@ -99,7 +103,7 @@ describe( 'markdown', function() {
             ],
             [ '_<span style="color:red;">dbl</span>_', '<em><span style="color:red;">dbl</span></em>' ],
             [ '<span style="color:red;">_dbl_</span>', '<span style="color:red;"><em>dbl</em></span>' ],
-            [ 'list:\n* __a__\n* _b_ \n+ [c](c)', '<p>list:</p><ul><li><strong>a</strong></li><li><em>b</em></li><li><a href="c" target="_blank">c</a></li></ul>' ],
+            [ 'list:\n* __a__\n* _b_ \n+ [c](c)', 'list:<ul><li><strong>a</strong></li><li><em>b</em></li><li><a href="c" target="_blank">c</a></li></ul>' ],
         ].forEach( function( test ) {
             var source = test[ 0 ];
             var expected = test[ 1 ];

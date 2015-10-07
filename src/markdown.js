@@ -31,9 +31,9 @@ function markdownToHtml( text ) {
         // headers
         .replace( /(#+)([^\n]*)\n/gm, _createHeader )
         // unordered lists (in JS $ matches end of line as well as end of string)
-        .replace( /^(\n?(\*|\+|-) (.*))+$/gm, _createUnorderedList )
+        .replace( /(\n(\*|\+|-) (.*))+$/gm, _createUnorderedList )
         // ordered lists (in JS $ matches end of line as well as end of string)
-        .replace( /^(\n?([0-9]+\.) (.*))+$/gm, _createOrderedList )
+        .replace( /(\n([0-9]+\.) (.*))+$/gm, _createOrderedList )
         // span
         .replace( /&lt;\s?span(.*)&gt;(.+)&lt;\/\s?span\s?&gt;/gm, _createSpan )
         // paragraphs

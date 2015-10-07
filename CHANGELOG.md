@@ -2,10 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[1.5.5] - 2015-0-25
+[1.5.5] - 2015-10-07
 ------------------------
 ##### Fixed
 - Markdown lists created items if space behind bullet was missing.
+- Markdown lists were created if first item not preceded by new line. See [issue](https://groups.google.com/forum/#!topic/opendatakit/uGMgOHtsKbU)
 
 [1.5.4] - 2015-09-24
 -----------------------
