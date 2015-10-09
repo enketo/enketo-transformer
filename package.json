@@ -34,11 +34,11 @@
         "body-parser": "^1.14.1",
         "debug": "2.2.x",
         "enketo-xslt": "1.2.2",
-        "express": "4.12.x",
+        "express": "5.0.0-alpha.2",
         "language-tags": "^1.0.3",
         "libxslt": "0.4.1",
         "q": "2.0.x",
-        "request": "2.61.x",
+        "request": "2.64.x",
         "string-direction": "0.1.x"
     },
     "devDependencies": {
