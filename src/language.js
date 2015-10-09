@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var tags = require( 'language-tags' );
 var stringDirection = require( 'string-direction' );

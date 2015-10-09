@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+##### Changed
+------------------------
+- Instead of manifest parameter a media map is now required (**Warning!**)
+
 [1.5.5] - 2015-10-07
 ------------------------
 ##### Fixed

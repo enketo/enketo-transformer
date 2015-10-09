@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = require( 'q' ).Promise;
 var fs = require( 'fs' );
@@ -36,7 +36,7 @@ function transform( survey ) {
         } )
         .then( function( htmlDoc ) {
             htmlDoc = _replaceTheme( htmlDoc, survey.theme );
-            htmlDoc = _replaceMediaSources( htmlDoc, survey.manifest );
+            htmlDoc = _replaceMediaSources( htmlDoc, survey.media );
             htmlDoc = _replaceLanguageTags( htmlDoc );
             survey.form = _renderMarkdown( htmlDoc );
 
@@ -130,34 +130,34 @@ function _replaceTheme( doc, theme ) {
  * @param  {*} manifest      json representation of XForm manifest
  * @return {Promise}         libxmljs object
  */
-function _replaceMediaSources( xmlDoc, manifest ) {
+function _replaceMediaSources( xmlDoc, mediaMap ) {
+    var formLogo;
+    var formLogoEl;
 
-    if ( !manifest ) {
+    if ( !mediaMap ) {
         return xmlDoc;
     }
 
     // iterate through each element with a src attribute
     xmlDoc.find( '//*[@src]' ).forEach( function( mediaEl ) {
-        manifest.some( function( file ) {
-            if ( new RegExp( 'jr://(images|video|audio|file|file-csv)/' + file.filename ).test( mediaEl.attr( 'src' ).value() ) ) {
-                mediaEl.attr( 'src', _toLocalMediaUrl( file.downloadUrl ) );
-                return true;
-            }
-            return false;
-        } );
-    } );
-
-    // add form logo if existing in manifest
-    manifest.some( function( file ) {
-        var formLogoEl = xmlDoc.get( '//*[@class="form-logo"]' );
-        if ( file.filename === 'form_logo.png' && formLogoEl ) {
-            formLogoEl
-                .node( 'img' )
-                .attr( 'src', _toLocalMediaUrl( file.downloadUrl ) )
-                .attr( 'alt', 'form logo' );
-            return true;
+        var src = mediaEl.attr( 'src' ).value();
+        var matches = src ? src.match( /jr:\/\/[\w-]+\/(.+)/ ) : null;
+        var filename = matches && matches.length ? matches[ 1 ] : null;
+        var replacement = filename ? mediaMap[ filename ] : null;
+        if ( replacement ) {
+            mediaEl.attr( 'src', replacement );
         }
     } );
+
+    // add form logo <img> element if applicable
+    formLogo = mediaMap[ 'form_logo.png' ];
+    formLogoEl = xmlDoc.get( '//*[@class="form-logo"]' );
+    if ( formLogo && formLogoEl ) {
+        formLogoEl
+            .node( 'img' )
+            .attr( 'src', formLogo )
+            .attr( 'alt', 'form logo' );
+    }
 
     return xmlDoc;
 }
@@ -285,19 +285,6 @@ function _renderMarkdown( htmlDoc ) {
 
 function _textNodesOnly( node ) {
     return node.type() === 'text';
-}
-
-/**
- * Converts a url to a local (Enketo Express) url.
- * If required we could make the url prefix dynamic by exporting a function that takes a prefix parameter.
- *
- * @param  {string} url The url to convert.
- * @return {string}     The converted url.
- */
-function _toLocalMediaUrl( url ) {
-    var localUrl = '/media/get/' + url.replace( /(https?):\/\//, '$1/' );
-
-    return localUrl;
 }
 
 /**

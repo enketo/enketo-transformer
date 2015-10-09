@@ -97,4 +97,54 @@ describe( 'transformer', function() {
 
     } );
 
+    describe( 'manipulates media sources', function() {
+
+        it( 'by replacing them according to a provided map', function() {
+            var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );
+            var media = {
+                'happy.jpg': '/i/am/happy.jpg',
+                'pigeon.png': '/a/b/pigeon.png'
+            };
+            var result1 = transformer.transform( {
+                xform: xform
+            } );
+            var result2 = transformer.transform( {
+                xform: xform,
+                media: media
+            } );
+
+            return Promise.all( [
+                expect( result1 ).to.eventually.have.property( 'form' ).and.to.contain( 'jr://images/happy.jpg' ),
+                expect( result1 ).to.eventually.have.property( 'form' ).and.to.contain( 'jr://images/pigeon.png' ),
+                expect( result1 ).to.eventually.have.property( 'form' ).and.to.not.contain( '/i/am/happy.jpg' ),
+                expect( result1 ).to.eventually.have.property( 'form' ).and.to.not.contain( '/a/b/pigeon.png' ),
+
+                expect( result2 ).to.eventually.have.property( 'form' ).and.to.not.contain( 'jr://images/happy.jpg' ),
+                expect( result2 ).to.eventually.have.property( 'form' ).and.to.not.contain( 'jr://images/pigeon.png' ),
+                expect( result2 ).to.eventually.have.property( 'form' ).and.to.contain( '/i/am/happy.jpg' ),
+                expect( result2 ).to.eventually.have.property( 'form' ).and.to.contain( '/a/b/pigeon.png' )
+            ] );
+        } );
+
+        it( 'by adding a form logo <img> if needed', function() {
+            var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );
+            var media = {
+                'form_logo.png': '/i/am/logo.png'
+            };
+            var result1 = transformer.transform( {
+                xform: xform
+            } );
+            var result2 = transformer.transform( {
+                xform: xform,
+                media: media
+            } );
+
+            return Promise.all( [
+                expect( result1 ).to.eventually.have.property( 'form' ).and.to.not.contain( '<img src="/i/am/logo.png"' ),
+                expect( result2 ).to.eventually.have.property( 'form' ).and.to.contain( '<img src="/i/am/logo.png"' )
+            ] );
+        } );
+
+    } );
+
 } );
