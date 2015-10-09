@@ -2,7 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased]
+[1.6.0] - 2015-10-09
+------------------------
+##### Added
+- Full-featured POST /transform API endpoint 
+
 ##### Changed
 ------------------------
 - Instead of manifest parameter a media map is now required (**Warning!**)

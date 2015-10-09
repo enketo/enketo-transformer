@@ -48,6 +48,7 @@ function transform( survey ) {
             survey.model = xmlDoc.root().get( '*' ).toString( false );
 
             delete survey.xform;
+            delete survey.media;
             return survey;
         } );
 }

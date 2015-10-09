@@ -22,7 +22,15 @@ var transformer = require('enketo-transformer');
 var xform = fs.readFileSync( 'path/to/xform.xml' );
   
 var result = transformer.transform( {
-    xform: xform
+	// required string of XForm
+    xform: xform,
+    // optional string, to add theme if no theme is defined in the XForm
+    theme: 'sometheme', 
+    // optional map, to replace jr://..../myfile.png URLs
+    media: {
+    	'myfile.png' : '/path/to/somefile.png',
+    	'myfile.mp3' : '/another/path/to/2.mp3'
+	}
 } );
 ```
 
@@ -33,8 +41,18 @@ var result = transformer.transform( {
 ## Use as app (web API)
 
 1. start with `npm start`
-2. use with queryparameter e.g. with http://localhost:8085/transform?xform=http://myxforms.com/myxform.xml
+2. limited use with `GET /transform` with xform parameter (required, **xform URL**), or
+3. full-featured use with: `POST /transform` with URL-encoded body including `xform` (required, **full XForm as a string**), `theme` (optional, string), and `media` (optional, map) parameters
 
+sample GET request:
+```
+curl http://localhost:8085/transform?xform=https://example.com/forms/78372/form.xml
+```
+
+sample POST request: 
+```bash
+curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.png&media[this]=that" http://localhost:8085/transform
+```
 
 ## Response format
 
@@ -53,8 +71,11 @@ var result = transformer.transform( {
 
 ## Develop
  
-A vagrant configuration file and provisioning script is included.
+A vagrant configuration file and provisioning script is included. Use DEBUG environment variable to see debug terminal output, e.g.:
 
+```bash
+DEBUG=api,transformer,markdown node app.js
+```
 
 ## Change Log
 
