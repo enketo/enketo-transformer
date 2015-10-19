@@ -1,7 +1,7 @@
 /* global describe, require, it*/
 'use strict';
 
-var Promise = require( 'q' ).Promise;
+var Promise = require( 'lie' );
 var chai = require( 'chai' );
 var chaiAsPromised = require( 'chai-as-promised' );
 var expect = chai.expect;

@@ -49,7 +49,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ##### Added
 - Moved markdown support from enketo-core, added additional support, and expanded to all labels and hints (**Warning:** use only with enketo-core 4.2.0+ ).
 
-[Unreleased]
+[1.6.1] - 2015-10-19
 -----------------------
 ##### Fixed
 - First labels/hints consisting only of whitespace are selected to determine directionality.
