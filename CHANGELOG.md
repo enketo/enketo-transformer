@@ -52,6 +52,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [Unreleased]
 -----------------------
 ##### Fixed
+- First labels/hints consisting only of whitespace are selected to determine directionality.
 - Directionality for '-' returns rtl directionality (default).
 
 [1.4.3] - 2015-08-26

@@ -239,9 +239,8 @@ function _replaceLanguageTags( doc ) {
 function _getLanguageSampleText( doc, lang ) {
     // First find non-empty text content of a hint with that lang attribute.
     // If not found, find any span with that lang attribute.
-    // TODO: the element returned should not only contain whitespace (newline chars, spaces)
-    var langSampleEl = doc.get( '/root/form//span[contains(@class, "or-hint") and @lang="' + lang + '" and text()]' ) ||
-        doc.get( '/root/form//span[@lang="' + lang + '" and text()]' );
+    var langSampleEl = doc.get( '/root/form//span[contains(@class, "or-hint") and @lang="' + lang + '" and normalize-space()]' ) ||
+        doc.get( '/root/form//span[@lang="' + lang + '" and normalize-space()]' );
 
     return ( langSampleEl && langSampleEl.text().trim().length ) ? langSampleEl.text() : 'nothing';
 }
