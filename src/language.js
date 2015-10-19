@@ -85,10 +85,11 @@ function _languagesOnly( obj ) {
  * @return {string}     either 'rtl' or the default 'ltr'
  */
 function _getDirectionality( sample ) {
-    if ( stringDirection.getDirection( sample ) !== 'ltr' ) {
-        return 'rtl';
+    var direction = stringDirection.getDirection( sample );
+    if ( direction !== 'rtl' ) {
+        return 'ltr';
     }
-    return 'ltr';
+    return direction;
 }
 
 module.exports = {

@@ -49,7 +49,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ##### Added
 - Moved markdown support from enketo-core, added additional support, and expanded to all labels and hints (**Warning:** use only with enketo-core 4.2.0+ ).
 
+[Unreleased]
+-----------------------
+##### Fixed
+- Directionality for '-' returns rtl directionality (default).
+
 [1.4.3] - 2015-08-26
+------------------------
 ##### Fixed
 - Default directionality ltr if first text element contains only whitespaces.
 
