@@ -1,6 +1,6 @@
 'use strict';
 
-var Promise = require( 'q' ).Promise;
+var Promise = require( 'lie' );
 var fs = require( 'fs' );
 var pkg = require( '../package' );
 var crypto = require( 'crypto' );

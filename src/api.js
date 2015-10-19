@@ -9,7 +9,7 @@
  * PRs are very welcome!
  */
 
-var Promise = require( 'q' ).Promise;
+var Promise = require( 'lie' );
 var request = require( 'request' );
 var express = require( 'express' );
 var router = express.Router();
