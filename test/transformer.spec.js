@@ -99,7 +99,7 @@ describe( 'transformer', function() {
 
     describe( 'manipulates media sources', function() {
 
-        it( 'by replacing them according to a provided map', function() {
+        it( 'in the View by replacing them according to a provided map', function() {
             var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );
             var media = {
                 'happy.jpg': '/i/am/happy.jpg',
@@ -125,6 +125,34 @@ describe( 'transformer', function() {
                 expect( result2 ).to.eventually.have.property( 'form' ).and.to.contain( '/a/b/pigeon.png' )
             ] );
         } );
+
+        it( 'in the Model by replacing them according to a provided map', function() {
+            var xform = fs.readFileSync( './test/forms/external.xml', 'utf8' );
+            var media = {
+                'neighborhoods.csv': '/path/to/neighborhoods.csv',
+                'cities.xml': '/path/to/cities.xml'
+            };
+            var result1 = transformer.transform( {
+                xform: xform
+            } );
+            var result2 = transformer.transform( {
+                xform: xform,
+                media: media
+            } );
+
+            return Promise.all( [
+                expect( result1 ).to.eventually.have.property( 'model' ).and.to.contain( 'jr://file-csv/neighborhoods.csv' ),
+                expect( result1 ).to.eventually.have.property( 'model' ).and.to.contain( 'jr://file/cities.xml' ),
+                expect( result1 ).to.eventually.have.property( 'model' ).and.to.not.contain( '/path/to/neighborhoods.csv' ),
+                expect( result1 ).to.eventually.have.property( 'model' ).and.to.not.contain( '/path/to/cities.xml' ),
+
+                expect( result2 ).to.eventually.have.property( 'model' ).and.to.not.contain( 'jr://file-csv/neighborhoods.csv' ),
+                expect( result2 ).to.eventually.have.property( 'model' ).and.to.not.contain( 'jr://file/cities.xml' ),
+                expect( result2 ).to.eventually.have.property( 'model' ).and.to.contain( '/path/to/neighborhoods.csv' ),
+                expect( result2 ).to.eventually.have.property( 'model' ).and.to.contain( '/path/to/cities.xml' )
+            ] );
+        } );
+
 
         it( 'by adding a form logo <img> if needed', function() {
             var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );

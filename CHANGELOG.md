@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.6.2] - 2015-10-23
+-----------------------
+##### Fixed
+- Media sources in model not being replaced.
+
+[1.6.1] - 2015-10-19
+-----------------------
+##### Fixed
+- First labels/hints consisting only of whitespace are selected to determine directionality.
+- Directionality for '-' returns rtl directionality (default).
+
 [1.6.0] - 2015-10-09
 ------------------------
 ##### Added
@@ -48,12 +59,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 -----------------------
 ##### Added
 - Moved markdown support from enketo-core, added additional support, and expanded to all labels and hints (**Warning:** use only with enketo-core 4.2.0+ ).
-
-[1.6.1] - 2015-10-19
------------------------
-##### Fixed
-- First labels/hints consisting only of whitespace are selected to determine directionality.
-- Directionality for '-' returns rtl directionality (default).
 
 [1.4.3] - 2015-08-26
 ------------------------

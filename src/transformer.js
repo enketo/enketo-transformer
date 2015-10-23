@@ -43,7 +43,7 @@ function transform( survey ) {
             return _transform( xslModelDoc, xformDoc );
         } )
         .then( function( xmlDoc ) {
-            xmlDoc = _replaceMediaSources( xmlDoc, survey.manifest );
+            xmlDoc = _replaceMediaSources( xmlDoc, survey.media );
 
             survey.model = xmlDoc.root().get( '*' ).toString( false );
 
