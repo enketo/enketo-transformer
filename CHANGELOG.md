@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.6.3] - 2015-10-24
+-----------------------
+##### Fixed
+- String containing just a \<span\> without other markdown, is not converted.
+
 [1.6.2] - 2015-10-23
 -----------------------
 ##### Fixed

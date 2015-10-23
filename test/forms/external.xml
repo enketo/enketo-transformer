@@ -15,7 +15,7 @@
   </h:head>
   <h:body>
     <input ref="/widgets/intro">
-      <label>Intro</label>
+      <label>&lt;span style="color:pink;"&gt;Intro&lt;/span&gt;</label>
     </input>
   </h:body>
 </h:html>

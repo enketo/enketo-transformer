@@ -260,7 +260,8 @@ function _renderMarkdown( htmlDoc ) {
             .filter( _textNodesOnly )
             .forEach( function( textNode, i ) {
                 var key;
-                var original = textNode.text();
+                // text() will convert &gt; to >
+                var original = textNode.text().replace( '<', '&lt;' ).replace( '>', '&gt;' );
                 var rendered = markdown.toHtml( original );
                 if ( original !== rendered ) {
                     key = '$$$' + index + '_' + i;

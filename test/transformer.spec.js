@@ -97,6 +97,22 @@ describe( 'transformer', function() {
 
     } );
 
+    describe( 'renders markdown', function() {
+        it( 'takes into account that libxmljs Element.text() converts htmlentities', function() {
+            var xform = fs.readFileSync( './test/forms/external.xml', 'utf8' );
+            var result = transformer.transform( {
+                xform: xform
+            } );
+
+            return Promise.all( [
+                expect( result ).to.eventually.have.property( 'form' )
+                .and.to.not.contain( '&lt;span style="color:pink;"&gt;Intro&lt;/span&gt;' ),
+                expect( result ).to.eventually.have.property( 'form' )
+                .and.to.contain( '<span style="color:pink;">Intro</span>' )
+            ] );
+        } );
+    } );
+
     describe( 'manipulates media sources', function() {
 
         it( 'in the View by replacing them according to a provided map', function() {
