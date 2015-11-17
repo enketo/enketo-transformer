@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.6.4] - 2015-11-17
+-----------------------
+##### Fixed
+- Node 0.12 compatibility (second try)
+
 [1.6.3] - 2015-10-24
 -----------------------
 ##### Fixed
