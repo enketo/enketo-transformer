@@ -10,12 +10,6 @@ var language = require( './language' );
 var markdown = require( './markdown' );
 var sheets = require( 'enketo-xslt' );
 var debug = require( 'debug' )( 'transformer' );
-var xslFormDoc = libxmljs.parseXml( sheets.xslForm, {
-    nocdata: true
-} );
-var xslModelDoc = libxmljs.parseXml( sheets.xslModel, {
-    nocdata: true
-} );
 var version = _getVersion();
 
 /**
@@ -32,7 +26,8 @@ function transform( survey ) {
     return _parseXml( survey.xform )
         .then( function( doc ) {
             xformDoc = doc;
-            return _transform( xslFormDoc, xformDoc );
+
+            return _transform( sheets.xslForm, xformDoc );
         } )
         .then( function( htmlDoc ) {
             htmlDoc = _replaceTheme( htmlDoc, survey.theme );
@@ -40,7 +35,7 @@ function transform( survey ) {
             htmlDoc = _replaceLanguageTags( htmlDoc );
             survey.form = _renderMarkdown( htmlDoc );
 
-            return _transform( xslModelDoc, xformDoc );
+            return _transform( sheets.xslModel, xformDoc );
         } )
         .then( function( xmlDoc ) {
             xmlDoc = _replaceMediaSources( xmlDoc, survey.media );
@@ -60,9 +55,9 @@ function transform( survey ) {
  * @param  {[type]} xmlDoc libxmljs object of XML document
  * @return {Promise}       libxmljs result document object 
  */
-function _transform( xslDoc, xmlDoc ) {
+function _transform( xslStr, xmlDoc ) {
     return new Promise( function( resolve, reject ) {
-        libxslt.parse( xslDoc, function( error, stylesheet ) {
+        libxslt.parse( xslStr, function( error, stylesheet ) {
             if ( error ) {
                 reject( error );
             } else {

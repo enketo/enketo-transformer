@@ -45,7 +45,7 @@ describe( 'transformer', function() {
         } );
     } );
 
-    describe( 'manipulates themes', function() {
+    describe( 'manipulates themes and', function() {
         var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );
 
         it( 'adds a provided theme if none is defined in the XForm', function() {
