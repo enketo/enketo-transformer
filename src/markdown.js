@@ -20,6 +20,8 @@ function markdownToHtml( text ) {
         .replace( /</gm, '&lt;' )
         // html encoding of > for safety (not necessary in Enketo because only textContent is rendered)
         .replace( />/gm, '&gt;' )
+        // span
+        .replace( /&lt;\s?span([^\/\n]*)&gt;([^\/\n]+)&lt;\/\s?span\s?&gt;/gm, _createSpan )
         // strong
         .replace( /__(.*?)__/gm, '<strong>$1</strong>' )
         .replace( /\*\*(.*?)\*\*/gm, '<strong>$1</strong>' )
@@ -34,10 +36,9 @@ function markdownToHtml( text ) {
         .replace( /(\n(\*|\+|-) (.*))+$/gm, _createUnorderedList )
         // ordered lists (in JS $ matches end of line as well as end of string)
         .replace( /(\n([0-9]+\.) (.*))+$/gm, _createOrderedList )
-        // span
-        .replace( /&lt;\s?span(.*)&gt;(.+)&lt;\/\s?span\s?&gt;/gm, _createSpan )
         // paragraphs
         .replace( /([^\n]+)\n/gm, _createParagraph );
+
     return html;
 }
 

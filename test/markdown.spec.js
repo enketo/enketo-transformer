@@ -55,9 +55,10 @@ describe( 'markdown', function() {
             // correct html
             [ '<span>a</span>', '<span>a</span>' ],
             [ '&lt;span&gt;a&lt;/span&gt;', '<span>a</span>' ],
-            [ '<span style="color:red;">red</span>', '<span style="color:red;">red</span>' ],
+            [ '<span style="color:red;">red</span>' ],
             [ '<span>bad\nunaffected <span style="color: purple">el</span>.', '<p>&lt;span&gt;bad</p>unaffected <span style="color: purple">el</span>.' ],
-            [ '<span style=\'color:red;\'>red</span>', '<span style=\'color:red;\'>red</span>' ],
+            [ '<span style=\'color:red;\'>red</span>' ],
+            [ '<span style="color:red;">c</span><span style="color:blue;">r</span>' ],
             [ '><', '&gt;&lt;' ],
             // sanitized html
             [ '<span style="color:red;" onclick="alert(\"gotcha!\")">click me</span>', '<span style="color:red;">click me</span>' ],
@@ -106,7 +107,7 @@ describe( 'markdown', function() {
             [ 'list:\n* __a__\n* _b_ \n+ [c](c)', 'list:<ul><li><strong>a</strong></li><li><em>b</em></li><li><a href="c" target="_blank">c</a></li></ul>' ],
         ].forEach( function( test ) {
             var source = test[ 0 ];
-            var expected = test[ 1 ];
+            var expected = ( typeof test[ 1 ] !== 'undefined' ) ? test[ 1 ] : test[ 0 ];
             it( 'renders "' + source + '" correctly', function() {
                 expect( markdown.toHtml( source ) ).to.equal( expected );
             } );
