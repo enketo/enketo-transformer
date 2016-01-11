@@ -191,6 +191,29 @@ describe( 'transformer', function() {
 
     } );
 
+    describe( 'processes questions with constraints', function() {
+        it( 'and adds the correct number of constraint-msg elements', function() {
+            var count = function( result ) {
+                var matches = result.form.match( /class="or-constraint-msg/g );
+                return matches ? matches.length : 0;
+            };
+            var xform1 = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );
+            var count1 = transformer.transform( {
+                xform: xform1
+            } ).then( count );
+            var xform2 = fs.readFileSync( './test/forms/advanced-required.xml', 'utf8' );
+            var count2 = transformer.transform( {
+                xform: xform2
+            } ).then( count );
+
+            return Promise.all( [
+                expect( count1 ).to.eventually.equal( 4 ),
+                expect( count2 ).to.eventually.equal( 0 )
+            ] );
+        } );
+
+    } );
+
     describe( 'processes required questions', function() {
 
         it( 'and adds the data-required HTML attribute for required XForm attributes keeping the value unchanged', function() {
@@ -214,6 +237,24 @@ describe( 'transformer', function() {
             return expect( result ).to.eventually.have.property( 'form' ).and.to.not.contain( 'data-required' );
         } );
 
+        it( 'and adds the correct number of required-msg elements', function() {
+            var count = function( result ) {
+                return result.form.match( /class="or-required-msg/g ).length;
+            };
+            var xform1 = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );
+            var count1 = transformer.transform( {
+                xform: xform1
+            } ).then( count );
+            var xform2 = fs.readFileSync( './test/forms/advanced-required.xml', 'utf8' );
+            var count2 = transformer.transform( {
+                xform: xform2
+            } ).then( count );
+
+            return Promise.all( [
+                expect( count1 ).to.eventually.equal( 1 ),
+                expect( count2 ).to.eventually.equal( 2 )
+            ] );
+        } );
 
         it( 'and adds a default requiredMsg if no custom is provided', function() {
             var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );
