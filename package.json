@@ -31,13 +31,13 @@
         "Transformer"
     ],
     "dependencies": {
-        "body-parser": "^1.14.1",
+        "body-parser": "1.14.x",
         "debug": "2.2.x",
         "enketo-xslt": "1.2.4",
         "express": "5.0.0-alpha.2",
-        "language-tags": "^1.0.3",
+        "language-tags": "1.0.4",
         "libxslt": "0.6.1",
-        "lie": "^3.0.1",
+        "lie": "3.0.x",
         "request": "2.67.x",
         "string-direction": "0.1.x"
     },
