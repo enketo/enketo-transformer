@@ -36,13 +36,13 @@
         "enketo-xslt": "1.2.2",
         "express": "5.0.0-alpha.2",
         "language-tags": "^1.0.3",
-        "libxslt": "0.6.0",
+        "libxslt": "0.6.1",
         "lie": "^3.0.1",
         "request": "2.67.x",
         "string-direction": "0.1.x"
     },
     "devDependencies": {
         "chai": "3.4.x",
-        "chai-as-promised": "5.1.x"
+        "chai-as-promised": "5.2.x"
     }
 }
