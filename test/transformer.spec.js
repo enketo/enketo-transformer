@@ -191,4 +191,106 @@ describe( 'transformer', function() {
 
     } );
 
+    describe( 'processes required questions', function() {
+
+        it( 'and adds the data-required HTML attribute for required XForm attributes keeping the value unchanged', function() {
+            var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );
+            var result = transformer.transform( {
+                xform: xform
+            } );
+
+            return Promise.all( [
+                expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-required="true()"' ),
+                expect( result ).to.eventually.have.property( 'form' ).and.to.not.contain( ' required="required"' )
+            ] );
+        } );
+
+        it( 'and does not add the data-required attribute if the value is false()', function() {
+            var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' ).replace( 'required="true()"', 'required="false()"' );
+            var result = transformer.transform( {
+                xform: xform
+            } );
+
+            return expect( result ).to.eventually.have.property( 'form' ).and.to.not.contain( 'data-required' );
+        } );
+
+
+        it( 'and adds a default requiredMsg if no custom is provided', function() {
+            var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );
+            var result = transformer.transform( {
+                xform: xform
+            } );
+
+            return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-i18n="constraint.required"' );
+        } );
+
+        it( 'and adds a custom requiredMsg if provided', function() {
+            var xform = fs.readFileSync( './test/forms/advanced-required.xml', 'utf8' ).replace( 'required="true()"', 'required="false()"' );
+            var result = transformer.transform( {
+                xform: xform
+            } );
+
+            return Promise.all( [
+                expect( result ).to.eventually.have.property( 'form' ).and.to.not.contain( 'data-i18n' ),
+                expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'custom verplicht bericht' ),
+                expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'custom required message' )
+            ] );
+        } );
+
+    } );
+
+
+    describe( 'processes multiline questions', function() {
+
+        it( 'and outputs a textarea for appearance="multiline" on text input', function() {
+            var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );
+            var result = transformer.transform( {
+                xform: xform
+            } );
+
+            return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( '<textarea' );
+        } );
+
+        it( 'and outputs a textarea for appearance="multi-line" on text input', function() {
+            var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' ).replace( 'appearance="multiline"', 'appearance="multi-line"' );
+            var result = transformer.transform( {
+                xform: xform
+            } );
+
+            return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( '<textarea' );
+        } );
+
+        it( 'and outputs a textarea for appearance="textarea" on text input', function() {
+            var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' ).replace( 'appearance="multiline"', 'appearance="textarea"' );
+            var result = transformer.transform( {
+                xform: xform
+            } );
+
+            return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( '<textarea' );
+        } );
+
+        it( 'and outputs a textarea for appearance="text-area" on text input', function() {
+            var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' ).replace( 'appearance="multiline"', 'appearance="text-area"' );
+            var result = transformer.transform( {
+                xform: xform
+            } );
+
+            return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( '<textarea' );
+        } );
+
+        it( 'and outputs a textarea for rows="x" attribute on text input, with a rows appearance', function() {
+            var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' ).replace( 'appearance="multiline"', 'rows="5"' );
+            var result = transformer.transform( {
+                xform: xform
+            } );
+
+            return Promise.all( [
+                expect( result ).to.eventually.have.property( 'form' ).and.to.contain( '<textarea' ),
+                expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'or-appearance-rows-5' )
+            ] );
+        } );
+
+    } );
+
+
 } );

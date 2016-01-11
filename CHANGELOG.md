@@ -2,8 +2,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.7.0] - 2016-01-11
+----------------------
+##### Added 
+- Support for big-image.
+- Support for jr:requiredMsg.
+- Support for rows input attribute (alias of multiline appearance).
+- Support for dynamic required binding attributes.
+
 [1.6.6] - 2015-12-21
------------------------
+----------------------
 ##### Fixed
 - Markdown renders multiple span elements on same line as one span.
 
