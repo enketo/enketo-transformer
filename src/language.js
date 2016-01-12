@@ -49,13 +49,7 @@ function parse( lang, sample ) {
  */
 function _getLangWithDesc( desc ) {
     var results = ( desc ) ? tags.search( desc ).filter( _languagesOnly ) : [];
-    var exactMatch = results.filter( function( obj ) {
-        return obj.data.record.Description.some( function( description ) {
-            return description.toLowerCase() === desc.toLowerCase();
-        } );
-    } )[ 0 ];
-
-    return exactMatch || results[ 0 ] || '';
+    return results[ 0 ] || '';
 }
 
 /**

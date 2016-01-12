@@ -35,7 +35,7 @@
         "debug": "2.2.x",
         "enketo-xslt": "1.2.4",
         "express": "5.0.0-alpha.2",
-        "language-tags": "1.0.4",
+        "language-tags": "1.0.5",
         "libxslt": "0.6.1",
         "lie": "3.0.x",
         "request": "2.67.x",
