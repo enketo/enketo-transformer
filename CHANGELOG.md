@@ -2,15 +2,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.7.3] - 2016-01-14
+----------------------
+##### Fixed
+- Href source is not replaced.
+
 [1.7.2] - 2016-01-13
 ----------------------
 ##### Changed
-- added or-big-image class to image links
+- Added or-big-image class to image links
 
 [1.7.1] - 2016-01-12
 ----------------------
 ##### Changed
-- minor under-the-hood changes
+- Minor under-the-hood changes
 
 [1.7.0] - 2016-01-11
 ----------------------

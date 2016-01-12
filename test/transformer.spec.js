@@ -115,7 +115,7 @@ describe( 'transformer', function() {
 
     describe( 'manipulates media sources', function() {
 
-        it( 'in the View by replacing them according to a provided map', function() {
+        it( 'in the View by replacing media elements according to a provided map', function() {
             var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );
             var media = {
                 'happy.jpg': '/i/am/happy.jpg',
@@ -139,6 +139,27 @@ describe( 'transformer', function() {
                 expect( result2 ).to.eventually.have.property( 'form' ).and.to.not.contain( 'jr://images/pigeon.png' ),
                 expect( result2 ).to.eventually.have.property( 'form' ).and.to.contain( '/i/am/happy.jpg' ),
                 expect( result2 ).to.eventually.have.property( 'form' ).and.to.contain( '/a/b/pigeon.png' )
+            ] );
+        } );
+
+        it( 'in the View by replacing big-image link hrefs according to a provided map', function() {
+            var img = '<value form="image">jr://images/happy.jpg</value>';
+            var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' )
+                .replace( img, img + '\n<value form="big-image">jr://images/very-happy.jpg</value>' );
+            var media = {
+                'happy.jpg': '/i/am/happy.jpg',
+                'very-happy.jpg': '/i/am/very-happy.jpg',
+            };
+            var result = transformer.transform( {
+                xform: xform,
+                media: media
+            } );
+
+            return Promise.all( [
+                expect( result ).to.eventually.have.property( 'form' ).and.not.to.contain( 'jr://images/happy.jpg' ),
+                expect( result ).to.eventually.have.property( 'form' ).and.not.to.contain( 'jr://images/very-happy.jpg' ),
+                expect( result ).to.eventually.have.property( 'form' ).and.to.contain( '/i/am/happy.jpg' ),
+                expect( result ).to.eventually.have.property( 'form' ).and.to.contain( '/i/am/very-happy.jpg' ),
             ] );
         } );
 
@@ -168,7 +189,6 @@ describe( 'transformer', function() {
                 expect( result2 ).to.eventually.have.property( 'model' ).and.to.contain( '/path/to/cities.xml' )
             ] );
         } );
-
 
         it( 'by adding a form logo <img> if needed', function() {
             var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );

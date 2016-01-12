@@ -135,13 +135,14 @@ function _replaceMediaSources( xmlDoc, mediaMap ) {
     }
 
     // iterate through each element with a src attribute
-    xmlDoc.find( '//*[@src]' ).forEach( function( mediaEl ) {
-        var src = mediaEl.attr( 'src' ).value();
+    xmlDoc.find( '//*[@src] | //a[@href]' ).forEach( function( mediaEl ) {
+        var attribute = ( mediaEl.name().toLowerCase() === 'a' ) ? 'href' : 'src';
+        var src = mediaEl.attr( attribute ).value();
         var matches = src ? src.match( /jr:\/\/[\w-]+\/(.+)/ ) : null;
         var filename = matches && matches.length ? matches[ 1 ] : null;
         var replacement = filename ? mediaMap[ filename ] : null;
         if ( replacement ) {
-            mediaEl.attr( 'src', replacement );
+            mediaEl.attr( attribute, replacement );
         }
     } );
 
