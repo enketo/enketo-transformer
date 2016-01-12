@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased]
+[1.7.2] - 2016-01-13
 ----------------------
 ##### Changed
 - added or-big-image class to image links
