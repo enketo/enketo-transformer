@@ -21,7 +21,7 @@ npm install enketo-transformer --save
 var transformer = require('enketo-transformer');
 var xform = fs.readFileSync( 'path/to/xform.xml' );
   
-var result = transformer.transform( {
+transformer.transform( {
 	// required string of XForm
     xform: xform,
     // optional string, to add theme if no theme is defined in the XForm
@@ -31,7 +31,9 @@ var result = transformer.transform( {
     	'myfile.png' : '/path/to/somefile.png',
     	'myfile.mp3' : '/another/path/to/2.mp3'
 	}
-} );
+} ).then(function( result ){
+    // do something with result
+});
 ```
 
 ## Install as app (web API)
