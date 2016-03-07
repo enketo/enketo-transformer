@@ -5,17 +5,17 @@ Enketo Transformer
 
 NodeJS library that transforms OpenRosa/ODK XForms into a format the Enketo understands. It works both as a library module, as well as a standalone app.
 
-## Prerequisites
+### Prerequisites
 
 1. nodeJS and npm (only tested on Ubuntu 14.04, on older distros the GCC compiler may not be recent enough)
 
-## Install as module
+### Install as module
 
 ```bash
 npm install enketo-transformer --save
 ```
 
-## Use as module
+### Use as module
 
 ```js
 var transformer = require('enketo-transformer');
@@ -36,11 +36,11 @@ transformer.transform( {
 });
 ```
 
-## Install as app (web API)
+### Install as app (web API)
 1. clone repo
 2. install dependencies with `npm install`
 
-## Use as app (web API)
+### Use as app (web API)
 
 1. start with `npm start`
 2. limited use with `GET /transform` with xform parameter (required, **xform URL**), or
@@ -56,7 +56,7 @@ sample POST request:
 curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.png&media[this]=that" http://localhost:8085/transform
 ```
 
-## Response format
+### Response format
 
 ```json
 {
@@ -66,12 +66,12 @@ curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.
 	
 ```
 
-## Test
+### Test
 
 * install mocha 
 * run tests with `npm test`
 
-## Develop
+### Develop
  
 A vagrant configuration file and provisioning script is included. Use DEBUG environment variable to see debug terminal output, e.g.:
 
@@ -79,6 +79,10 @@ A vagrant configuration file and provisioning script is included. Use DEBUG envi
 DEBUG=api,transformer,markdown node app.js
 ```
 
-## Change Log
+### License
+
+See [license document](./LICENSE). Also note the additional 'powered by enketo' [footer requirement of enketo-xslt](https://github.com/enketo/enketo-xslt#license) which is used in this repository and therefore applicable.
+
+### Change Log
 
 See [change log](./CHANGELOG.md)

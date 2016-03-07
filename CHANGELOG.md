@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.7.5] - 2016-03-07
+----------------------
+##### Changed
+- Updated minor modules (to force a version change).
+
+[1.7.4] - 2016-02-01
+----------------------
+##### Changed
+- Updated libxslt module.
+
 [1.7.3] - 2016-01-14
 ----------------------
 ##### Fixed
