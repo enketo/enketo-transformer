@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.7.6] - 2016-04-04
+----------------------
+##### Fixed
+- Rogue newline characters appear in empty outputs.
+- Outputs cannot be formatted in markdown.
+
 [1.7.5] - 2016-03-07
 ----------------------
 ##### Changed

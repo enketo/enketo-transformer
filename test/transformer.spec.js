@@ -111,6 +111,16 @@ describe( 'transformer', function() {
                 .and.to.contain( '<span style="color:pink;">Intro</span>' )
             ] );
         } );
+
+        it( 'and picks up formatting of <output>s', function() {
+            var xform = fs.readFileSync( './test/forms/formatted-output.xml', 'utf8' );
+            var result = transformer.transform( {
+                xform: xform
+            } );
+
+            return expect( result ).to.eventually.have.property( 'form' )
+                .and.to.contain( 'formatted: <em><span class="or-output" data-value="/output/txt"> </span></em> and' );
+        } );
     } );
 
     describe( 'manipulates media sources', function() {

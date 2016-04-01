@@ -9,8 +9,8 @@ var libxmljs = libxslt.libxmljs;
 var language = require( './language' );
 var markdown = require( './markdown' );
 var sheets = require( 'enketo-xslt' );
-var debug = require( 'debug' )( 'transformer' );
 var version = _getVersion();
+// var debug = require( 'debug' )( 'transformer' );
 
 /**
  * Performs XSLT transformation on XForm and process the result.
@@ -251,26 +251,41 @@ function _renderMarkdown( htmlDoc ) {
     var htmlStr;
     var replacements = {};
 
+    // First turn all outputs into text so *<span class="or-output></span>* can be detected
+    htmlDoc.find( '/root/form//span[contains(@class, "or-output")]' ).forEach( function( el, index ) {
+        var key = '---output-' + index;
+        var textNode = el.childNodes()[ 0 ].clone();
+        replacements[ key ] = el.toString();
+        textNode.text( key );
+        el.replace( textNode );
+        // Note that we end up in a situation where we likely have sibling text nodes...
+    } );
+
+    // Now render markdown
     htmlDoc.find( '/root/form//span[contains(@class, "question-label") or contains(@class, "or-hint")]' ).forEach( function( el, index ) {
-        el.childNodes()
-            .filter( _textNodesOnly )
-            .forEach( function( textNode, i ) {
-                var key;
-                // text() will convert &gt; to >
-                var original = textNode.text().replace( '<', '&lt;' ).replace( '>', '&gt;' );
-                var rendered = markdown.toHtml( original );
-                if ( original !== rendered ) {
-                    key = '$$$' + index + '_' + i;
-                    replacements[ key ] = rendered;
-                    textNode.text( key );
-                }
-            } );
+        var key;
+        /**
+         * Using text() is done because:
+         * a) We are certain that these <span>s do not contain other elements, other than formatting/markdown <span>s.
+         * b) This avoids the need to merge any sibling text nodes that could have been created in the previous step.
+         *
+         * Note that text() will convert &gt; to >
+         */
+        var original = el.text().replace( '<', '&lt;' ).replace( '>', '&gt;' );
+        var rendered = markdown.toHtml( original );
+        if ( original !== rendered ) {
+            key = '$$$' + index;
+            replacements[ key ] = rendered;
+            el.text( key );
+        }
     } );
 
     // TODO: does this result in self-closing tags?
     htmlStr = htmlDoc.root().get( '*' ).toString( false );
 
-    Object.keys( replacements ).forEach( function( key ) {
+    // Now replace the placeholders with the rendered HTML
+    // in reverse order so outputs are done last
+    Object.keys( replacements ).reverse().forEach( function( key ) {
         var replacement = replacements[ key ];
         if ( replacement ) {
             htmlStr = htmlStr.replace( key, replacement );
