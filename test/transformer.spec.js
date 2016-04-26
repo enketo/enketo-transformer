@@ -363,5 +363,38 @@ describe( 'transformer', function() {
 
     } );
 
+    describe( 'processes a model with namespaces', function() {
+        var xform = fs.readFileSync( './test/forms/model-namespace.xml' );
+        var result = transformer.transform( {
+            xform: xform
+        } );
+
+        it( 'leaves namespace prefixes and declarations intact on nodes', function() {
+            return Promise.all( [
+                expect( result ).to.eventually.have.property( 'model' ).and.to.contain( '<orx:instanceID' ),
+                expect( result ).to.eventually.have.property( 'model' ).and.to.contain( 'xmlns:orx="http://openrosa.org/xforms"' ),
+                expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'name="/data/orx:meta/orx:instanceID' ),
+            ] );
+        } );
+
+        it( 'leaves namespace prefixes and declarations intact on node attributes', function() {
+            return Promise.all( [
+                expect( result ).to.eventually.have.property( 'model' ).and.to.contain( '<a orx:comment="/data/a_comment"/>' ),
+            ] );
+        } );
+    } );
+
+    describe( 'supports the orx:for attribute', function() {
+        var xform = fs.readFileSync( './test/forms/for.xml' );
+        var result = transformer.transform( {
+            xform: xform
+        } );
+
+        it( 'by turning it into the data-for attribute', function() {
+            return Promise.all( [
+                expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-for="../a"' ),
+            ] );
+        } );
+    } );
 
 } );

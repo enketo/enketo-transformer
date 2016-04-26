@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+----------------------
+##### Added
+- Proper support for namespaces. **Warning: requires enketo-core 4.7.0+!**
+- Support for comment feature. 
+
 [1.7.6] - 2016-04-04
 ----------------------
 ##### Fixed
