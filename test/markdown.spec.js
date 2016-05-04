@@ -42,10 +42,10 @@ describe( 'markdown', function() {
             [ '###h3\n', '<h3>h3</h3>' ],
             [ '####h4\n', '<h4>h4</h4>' ],
             [ '#####h5\n', '<h5>h5</h5>' ],
+            [ '#h1', '<h1>h1</h1>' ],
             // incorrect headings
             [ '#h1# \n', '<h1>h1#</h1>' ],
             [ '#h1 # \n', '<h1>h1 #</h1>' ],
-            [ '#h1', '#h1' ],
             // correct links
             [ '[link](http://example.org)', '<a href="http://example.org" target="_blank">link</a>' ],
             // incorrect links

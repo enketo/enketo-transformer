@@ -8,6 +8,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Proper support for namespaces. **Warning: requires enketo-core 4.7.0+!**
 - Support for comment feature. 
 
+##### Fixed
+- Markdown headers not followed by newline are not converted.
+
 [1.7.6] - 2016-04-04
 ----------------------
 ##### Fixed

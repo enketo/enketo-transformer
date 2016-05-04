@@ -32,6 +32,7 @@ function markdownToHtml( text ) {
         .replace( /\[([^\]]*)\]\(([^\)]+)\)/gm, '<a href="$2" target="_blank">$1</a>' )
         // headers
         .replace( /(#+)([^\n]*)\n/gm, _createHeader )
+        .replace( /^(#+)([^\n]*)$/gm, _createHeader )
         // unordered lists (in JS $ matches end of line as well as end of string)
         .replace( /(\n(\*|\+|-) (.*))+$/gm, _createUnorderedList )
         // ordered lists (in JS $ matches end of line as well as end of string)
