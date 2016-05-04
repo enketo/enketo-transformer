@@ -105,6 +105,7 @@ describe( 'markdown', function() {
             [ '_<span style="color:red;">dbl</span>_', '<em><span style="color:red;">dbl</span></em>' ],
             [ '<span style="color:red;">_dbl_</span>', '<span style="color:red;"><em>dbl</em></span>' ],
             [ 'list:\n* __a__\n* _b_ \n+ [c](c)', 'list:<ul><li><strong>a</strong></li><li><em>b</em></li><li><a href="c" target="_blank">c</a></li></ul>' ],
+            [ '<span style="color:blue">[link](http://enketo.org)</span>', '<span style="color:blue"><a href="http://enketo.org" target="_blank">link</a></span>' ],
         ].forEach( function( test ) {
             var source = test[ 0 ];
             var expected = ( typeof test[ 1 ] !== 'undefined' ) ? test[ 1 ] : test[ 0 ];

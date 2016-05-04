@@ -21,7 +21,7 @@ function markdownToHtml( text ) {
         // html encoding of > for safety (not necessary in Enketo because only textContent is rendered)
         .replace( />/gm, '&gt;' )
         // span
-        .replace( /&lt;\s?span([^\/\n]*)&gt;([^\/\n]+)&lt;\/\s?span\s?&gt;/gm, _createSpan )
+        .replace( /&lt;\s?span([^\/\n]*)&gt;((?:(?!&lt;\/).)+)&lt;\/\s?span\s?&gt;/gm, _createSpan )
         // strong
         .replace( /__(.*?)__/gm, '<strong>$1</strong>' )
         .replace( /\*\*(.*?)\*\*/gm, '<strong>$1</strong>' )

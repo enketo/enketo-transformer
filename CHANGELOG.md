@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased]
+[1.8.0] - 2016-05-04
 ----------------------
 ##### Added
 - Proper support for namespaces. **Warning: requires enketo-core 4.7.0+!**
@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ##### Fixed
 - Markdown headers not followed by newline are not converted.
+- Span containing link not coverted.
 
 [1.7.6] - 2016-04-04
 ----------------------
