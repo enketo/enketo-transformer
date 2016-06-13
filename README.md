@@ -76,7 +76,7 @@ curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.
 A vagrant configuration file and provisioning script is included. Use DEBUG environment variable to see debug terminal output, e.g.:
 
 ```bash
-DEBUG=api,transformer,markdown node app.js
+DEBUG=api,transformer,markdown,language node app.js
 ```
 
 ### License

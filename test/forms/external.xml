@@ -6,6 +6,9 @@
       <instance>
         <external id="external">
           <nodeA/>
+          <meta>
+            <instanceID/>
+          </meta>
         </external>
       </instance>
       <instance id="neighborhoods" src="jr://file-csv/neighborhoods.csv" />

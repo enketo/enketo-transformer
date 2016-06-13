@@ -9,8 +9,9 @@ var libxmljs = libxslt.libxmljs;
 var language = require( './language' );
 var markdown = require( './markdown' );
 var sheets = require( 'enketo-xslt' );
+var openRosaNamespace = 'http://openrosa.org/xforms';
+var xformsNamespace = 'http://www.w3.org/2002/xforms';
 var version = _getVersion();
-// var debug = require( 'debug' )( 'transformer' );
 
 /**
  * Performs XSLT transformation on XForm and process the result.
@@ -39,7 +40,7 @@ function transform( survey ) {
         } )
         .then( function( xmlDoc ) {
             xmlDoc = _replaceMediaSources( xmlDoc, survey.media );
-
+            xmlDoc = _addInstanceIdNodeIfMissing( xmlDoc );
             survey.model = xmlDoc.root().get( '*' ).toString( false );
 
             delete survey.xform;
@@ -239,6 +240,38 @@ function _getLanguageSampleText( doc, lang ) {
         doc.get( '/root/form//span[@lang="' + lang + '" and normalize-space()]' );
 
     return ( langSampleEl && langSampleEl.text().trim().length ) ? langSampleEl.text() : 'nothing';
+}
+
+/**
+ * Temporary function to add a /meta/instanceID node if this is missing. 
+ * This used to be done in enketo-xslt but was removed when support for namespaces was added.
+ * 
+ * @param {[type]} doc libxmljs object
+ */
+function _addInstanceIdNodeIfMissing( doc ) {
+    var namespaces = {
+        xmlns: xformsNamespace,
+        orx: openRosaNamespace
+    };
+    var xformsPath = '/xmlns:root/xmlns:model/xmlns:instance/*/xmlns:meta/xmlns:instanceID';
+    var openrosaPath = '/xmlns:root/xmlns:model/xmlns:instance/*/orx:meta/orx:instanceID';
+    var instanceIdEl = doc.get( xformsPath + ' | ' + openrosaPath, namespaces );
+
+    if ( !instanceIdEl ) {
+        var rootEl = doc.get( '/xmlns:root/xmlns:model/xmlns:instance/*', namespaces );
+        var metaEl = doc.get( '/xmlns:root/xmlns:model/xmlns:instance/*/xmlns:meta', namespaces );
+
+        if ( metaEl ) {
+            metaEl
+                .node( 'instanceID' );
+        } else if ( rootEl ) {
+            rootEl
+                .node( 'meta' )
+                .node( 'instanceID' );
+        }
+    }
+
+    return doc;
 }
 
 /**

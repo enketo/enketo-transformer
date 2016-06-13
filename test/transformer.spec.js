@@ -397,4 +397,24 @@ describe( 'transformer', function() {
         } );
     } );
 
+    describe( 'for backwards compatibility of forms without a /meta/instanceID node', function() {
+        var xform1 = fs.readFileSync( './test/forms/no-instance-id.xml' );
+        var result1 = transformer.transform( {
+            xform: xform1
+        } );
+
+        it( 'adds a /meta/instanceID node', function() {
+            return expect( result1 ).to.eventually.have.property( 'model' ).and.to.contain( '<meta><instanceID/></meta>' );
+        } );
+
+        var xform2 = fs.readFileSync( './test/forms/model-namespace.xml' );
+        var result2 = transformer.transform( {
+            xform: xform2
+        } );
+
+        it( 'does not add it if it contains /meta/instanceID in the OpenRosa namespace', function() {
+            return expect( result2 ).to.eventually.have.property( 'model' ).and.to.not.contain( '<instanceID/>' );
+        } );
+    } );
+
 } );

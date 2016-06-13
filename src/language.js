@@ -2,7 +2,6 @@
 
 var tags = require( 'language-tags' );
 var stringDirection = require( 'string-direction' );
-var debug = require( 'debug' )( 'transformer-languages' );
 
 /**
  * Parses a language string into a language object. Guesses missing properties.

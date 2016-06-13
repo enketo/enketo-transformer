@@ -7,6 +7,9 @@
         <data id="for">
           <a/>
           <a_comment/>
+          <meta>
+            <instanceID/>
+          </meta>
         </data>
       </instance>
       <bind nodeset="/data/a" type="string" />

@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.8.2] - 2016-06-13
+----------------------
+##### Added
+- If incorrect XForms without /meta/instanceID are provided, add these nodes.
+
 [1.8.1] - 2016-05-20
 ----------------------
 ##### Fixed

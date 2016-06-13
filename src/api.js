@@ -13,7 +13,6 @@ var Promise = require( 'lie' );
 var request = require( 'request' );
 var express = require( 'express' );
 var router = express.Router();
-var debug = require( 'debug' )( 'api' );
 var transformer = require( './transformer' );
 
 router
@@ -87,7 +86,7 @@ function _request( options ) {
     return new Promise( function( resolve, reject ) {
         request[ method ]( options, function( error, response, body ) {
             if ( error ) {
-                debug( 'Error occurred when requesting ' + options.url, error );
+                console.log( 'Error occurred when requesting ' + options.url, error );
                 reject( error );
             } else if ( response.statusCode === 401 ) {
                 error = new Error( 'Forbidden. Authorization Required.' );
@@ -98,7 +97,7 @@ function _request( options ) {
                 error.status = response.statusCode;
                 reject( error );
             } else {
-                debug( 'response of request to ' + options.url + ' has status code: ', response.statusCode );
+                console.log( 'response of request to ' + options.url + ' has status code: ', response.statusCode );
                 resolve( {
                     xform: body
                 } );
