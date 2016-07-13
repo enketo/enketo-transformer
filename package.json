@@ -37,7 +37,7 @@
         "language-tags": "1.0.5",
         "libxslt": "0.6.3",
         "lie": "3.0.x",
-        "request": "2.69.x",
+        "request": "2.73.x",
         "string-direction": "0.1.x"
     },
     "devDependencies": {
