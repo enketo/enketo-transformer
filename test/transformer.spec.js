@@ -384,7 +384,7 @@ describe( 'transformer', function() {
         } );
     } );
 
-    describe( 'supports the orx:for attribute', function() {
+    describe( 'supports the enk:for attribute', function() {
         var xform = fs.readFileSync( './test/forms/for.xml' );
         var result = transformer.transform( {
             xform: xform
