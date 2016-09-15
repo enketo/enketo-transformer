@@ -5,7 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [1.9.0] - 2016-07-13
 ----------------------
 ##### Changed
-- Show "*" for all questions with required expressions.
+- Show "*" for all questions where the `required` attribute is not `""` and not `"false()"`.
 - Switched to enketo namespace for "for" attribute.
 
 [1.8.2] - 2016-06-13
