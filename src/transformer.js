@@ -34,7 +34,11 @@ function transform( survey ) {
             htmlDoc = _replaceTheme( htmlDoc, survey.theme );
             htmlDoc = _replaceMediaSources( htmlDoc, survey.media );
             htmlDoc = _replaceLanguageTags( htmlDoc );
-            survey.form = _renderMarkdown( htmlDoc );
+            if ( survey.markdown !== false ) {
+                survey.form = _renderMarkdown( htmlDoc );
+            } else {
+                survey.form = _docToString( htmlDoc );
+            }
 
             return _transform( sheets.xslModel, xformDoc );
         } )
@@ -314,7 +318,7 @@ function _renderMarkdown( htmlDoc ) {
     } );
 
     // TODO: does this result in self-closing tags?
-    htmlStr = htmlDoc.root().get( '*' ).toString( false );
+    htmlStr = _docToString( htmlDoc );
 
     // Now replace the placeholders with the rendered HTML
     // in reverse order so outputs are done last
@@ -330,6 +334,11 @@ function _renderMarkdown( htmlDoc ) {
 
 function _textNodesOnly( node ) {
     return node.type() === 'text';
+}
+
+function _docToString( doc ) {
+    // TODO: does this result in self-closing tags?
+    return doc.root().get( '*' ).toString( false );
 }
 
 /**

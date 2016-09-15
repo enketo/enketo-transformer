@@ -30,7 +30,9 @@ transformer.transform( {
     media: {
     	'myfile.png' : '/path/to/somefile.png',
     	'myfile.mp3' : '/another/path/to/2.mp3'
-	}
+	},
+    // optional ability to disable markdown rendering (default is true)
+    markdown: false
 } ).then(function( result ){
     // do something with result
 });

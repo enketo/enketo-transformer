@@ -30,7 +30,13 @@ router
                     method: 'get',
                     url: req.query.xform
                 } )
-                .then( transformer.transform )
+                .then( function( xform ) {
+                    return transformer.transform( {
+                        xform: xform,
+                        theme: req.query.theme,
+                        markdown: req.query.markdown !== 'false'
+                    } );
+                } )
                 .then( function( result ) {
                     res.json( result );
                 } )
@@ -54,7 +60,8 @@ router
             transformer.transform( {
                     xform: req.body.xform,
                     theme: req.body.theme,
-                    media: req.body.media
+                    media: req.body.media,
+                    markdown: req.body.markdown !== 'false'
                 } )
                 .then( function( result ) {
                     res.json( result );
@@ -98,9 +105,7 @@ function _request( options ) {
                 reject( error );
             } else {
                 console.log( 'response of request to ' + options.url + ' has status code: ', response.statusCode );
-                resolve( {
-                    xform: body
-                } );
+                resolve( body );
             }
         } );
     } );

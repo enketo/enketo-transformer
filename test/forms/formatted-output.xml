@@ -17,7 +17,7 @@
   </h:head>
   <h:body>
     <input ref="/output/nodeA">
-      <label>formatted: *<output value="/output/txt"/>* and normal text</label>
+      <label>formatted: *<output value="/output/txt"/>* and _normal_ text</label>
     </input>
   </h:body>
 </h:html>

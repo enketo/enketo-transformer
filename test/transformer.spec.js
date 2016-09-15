@@ -123,6 +123,19 @@ describe( 'transformer', function() {
         } );
     } );
 
+    describe( 'does not render markdown', function() {
+        it( 'when `markdown: false` is provided as option', function() {
+            var xform = fs.readFileSync( './test/forms/formatted-output.xml', 'utf8' );
+            var result = transformer.transform( {
+                xform: xform,
+                markdown: false
+            } );
+
+            return expect( result ).to.eventually.have.property( 'form' )
+                .and.to.contain( 'formatted: *<span class="or-output" data-value="/output/txt"> </span>* and _normal_ text' );
+        } );
+    } );
+
     describe( 'manipulates media sources', function() {
 
         it( 'in the View by replacing media elements according to a provided map', function() {
