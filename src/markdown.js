@@ -16,9 +16,9 @@
  */
 function markdownToHtml( text ) {
     var html = text
-        // html encoding of < for safety (not necessary in Enketo because only textContent is rendered)
+        // html encoding of < because libXMLJs Element.text() converts html entities
         .replace( /</gm, '&lt;' )
-        // html encoding of > for safety (not necessary in Enketo because only textContent is rendered)
+        // html encoding of < because libXMLJs Element.text() converts html entities
         .replace( />/gm, '&gt;' )
         // span
         .replace( /&lt;\s?span([^\/\n]*)&gt;((?:(?!&lt;\/).)+)&lt;\/\s?span\s?&gt;/gm, _createSpan )

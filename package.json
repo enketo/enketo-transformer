@@ -1,6 +1,6 @@
 {
     "name": "enketo-transformer",
-    "version": "1.11.0",
+    "version": "1.12.0",
     "description": "Library/app that transforms ODK-compliant XForms into a format that enketo-core consumes",
     "license": "Apache-2.0",
     "main": "src/transformer.js",
@@ -32,7 +32,7 @@
     ],
     "dependencies": {
         "body-parser": "1.15.x",
-        "enketo-xslt": "https://github.com/enketo/enketo-xslt.git#3c8c66b",
+        "enketo-xslt": "1.7.0",
         "express": "5.0.0-alpha.2",
         "language-tags": "1.0.5",
         "libxslt": "0.6.3",

@@ -98,7 +98,7 @@ describe( 'transformer', function() {
     } );
 
     describe( 'renders markdown', function() {
-        it( 'takes into account that libxmljs Element.text() converts htmlentities', function() {
+        it( 'takes into account that libxmljs Element.text() converts html entities', function() {
             var xform = fs.readFileSync( './test/forms/external.xml', 'utf8' );
             var result = transformer.transform( {
                 xform: xform
