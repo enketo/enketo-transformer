@@ -22,7 +22,8 @@ describe( 'transformer', function() {
             return Promise.all( [
                 expect( result ).to.eventually.to.be.an( 'object' ),
                 expect( result ).to.eventually.have.property( 'form' ).and.to.not.be.empty,
-                expect( result ).to.eventually.have.property( 'model' ).and.to.not.be.empty
+                expect( result ).to.eventually.have.property( 'model' ).and.to.not.be.empty,
+                expect( result ).to.eventually.have.property( 'transformerVersion' ).and.to.not.be.empty,
             ] );
         } );
 

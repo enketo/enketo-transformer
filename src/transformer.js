@@ -46,6 +46,7 @@ function transform( survey ) {
             xmlDoc = _replaceMediaSources( xmlDoc, survey.media );
             xmlDoc = _addInstanceIdNodeIfMissing( xmlDoc );
             survey.model = xmlDoc.root().get( '*' ).toString( false );
+            survey.transformerVersion = pkg.version;
 
             delete survey.xform;
             delete survey.media;
