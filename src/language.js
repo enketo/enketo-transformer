@@ -41,7 +41,7 @@ function parse( lang, sample ) {
 }
 
 /**
- * Performs IANA search to find language object with provided subtag
+ * Performs IANA search to find language object with provided description
  * 
  * @param  {string} desc language description
  * @return {<*>}         the first language object result that was found
@@ -62,7 +62,7 @@ function _getLangWithTag( tag ) {
 }
 
 /**
- * filters objects with type "language" from a list of objects
+ * Filters objects with type "language" from a list of objects
  * 
  * @param  {*} obj language object returned by 'language-tags' library
  * @return {boolean}     whether filter evaluated to true

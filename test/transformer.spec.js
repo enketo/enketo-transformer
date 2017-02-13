@@ -98,6 +98,29 @@ describe( 'transformer', function() {
 
     } );
 
+    describe( 'manipulates languages and', function() {
+        it( 'provides a languageMap as output property', function() {
+            var xform = fs.readFileSync( './test/forms/advanced-required.xml', 'utf8' );
+            var result = transformer.transform( {
+                xform: xform
+            } );
+
+            return expect( result ).to.eventually.have.property( 'languageMap' ).and.to.deep.equal( {
+                'dutch': 'nl',
+                'english': 'en'
+            } );
+        } );
+
+        it( 'provides an empty languageMap as output property if nothing was changed', function() {
+            var xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );
+            var result = transformer.transform( {
+                xform: xform
+            } );
+
+            return expect( result ).to.eventually.have.property( 'languageMap' ).and.to.deep.equal( {} );
+        } );
+    } );
+
     describe( 'renders markdown', function() {
         it( 'takes into account that libxmljs Element.text() converts html entities', function() {
             var xform = fs.readFileSync( './test/forms/external.xml', 'utf8' );

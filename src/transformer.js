@@ -9,8 +9,11 @@ var libxmljs = libxslt.libxmljs;
 var language = require( './language' );
 var markdown = require( './markdown' );
 var sheets = require( 'enketo-xslt' );
-var openRosaNamespace = 'http://openrosa.org/xforms';
-var xformsNamespace = 'http://www.w3.org/2002/xforms';
+var NAMESPACES = {
+    xmlns: 'http://www.w3.org/2002/xforms',
+    orx: 'http://openrosa.org/xforms',
+    h: 'http://www.w3.org/1999/xhtml'
+};
 var version = _getVersion();
 
 /**
@@ -20,11 +23,15 @@ var version = _getVersion();
  * @return {Promise}     promise
  */
 function transform( survey ) {
-    var xsltEndTime;
     var xformDoc;
-    var startTime = new Date().getTime();
 
     return _parseXml( survey.xform )
+        .then( function( doc ) {
+            if ( typeof survey.preprocess === 'function' ) {
+                doc = survey.preprocess.call( libxmljs, doc );
+            }
+            return doc;
+        } )
         .then( function( doc ) {
             xformDoc = doc;
 
@@ -33,7 +40,7 @@ function transform( survey ) {
         .then( function( htmlDoc ) {
             htmlDoc = _replaceTheme( htmlDoc, survey.theme );
             htmlDoc = _replaceMediaSources( htmlDoc, survey.media );
-            htmlDoc = _replaceLanguageTags( htmlDoc );
+            htmlDoc = _replaceLanguageTags( htmlDoc, survey );
             if ( survey.markdown !== false ) {
                 survey.form = _renderMarkdown( htmlDoc );
             } else {
@@ -50,6 +57,8 @@ function transform( survey ) {
 
             delete survey.xform;
             delete survey.media;
+            delete survey.preprocess;
+            delete survey.markdown;
             return survey;
         } );
 }
@@ -174,11 +183,12 @@ function _replaceMediaSources( xmlDoc, mediaMap ) {
  * @param  {[type]} doc libxmljs object
  * @return {[type]}     libxmljs object
  */
-function _replaceLanguageTags( doc ) {
+function _replaceLanguageTags( doc, survey ) {
     var languageElements;
     var languages;
     var langSelectorElement;
     var defaultLang;
+    var map = {};
 
     languageElements = doc.find( '/root/form/select[@id="form-languages"]/option' );
 
@@ -195,6 +205,10 @@ function _replaceLanguageTags( doc ) {
 
     // add or correct dir and value attributes, and amend textcontent of options in language selector
     languageElements.forEach( function( el, index ) {
+        var val = el.attr( 'value' ).value();
+        if ( val && val !== languages[ index ].tag ) {
+            map[ val ] = languages[ index ].tag;
+        }
         el.attr( {
             'data-dir': languages[ index ].dir,
             'value': languages[ index ].tag
@@ -228,6 +242,7 @@ function _replaceLanguageTags( doc ) {
         } );
     }
 
+    survey.languageMap = map;
     return doc;
 }
 
@@ -254,17 +269,13 @@ function _getLanguageSampleText( doc, lang ) {
  * @param {[type]} doc libxmljs object
  */
 function _addInstanceIdNodeIfMissing( doc ) {
-    var namespaces = {
-        xmlns: xformsNamespace,
-        orx: openRosaNamespace
-    };
     var xformsPath = '/xmlns:root/xmlns:model/xmlns:instance/*/xmlns:meta/xmlns:instanceID';
     var openrosaPath = '/xmlns:root/xmlns:model/xmlns:instance/*/orx:meta/orx:instanceID';
-    var instanceIdEl = doc.get( xformsPath + ' | ' + openrosaPath, namespaces );
+    var instanceIdEl = doc.get( xformsPath + ' | ' + openrosaPath, NAMESPACES );
 
     if ( !instanceIdEl ) {
-        var rootEl = doc.get( '/xmlns:root/xmlns:model/xmlns:instance/*', namespaces );
-        var metaEl = doc.get( '/xmlns:root/xmlns:model/xmlns:instance/*/xmlns:meta', namespaces );
+        var rootEl = doc.get( '/xmlns:root/xmlns:model/xmlns:instance/*', NAMESPACES );
+        var metaEl = doc.get( '/xmlns:root/xmlns:model/xmlns:instance/*/xmlns:meta', NAMESPACES );
 
         if ( metaEl ) {
             metaEl
@@ -364,5 +375,6 @@ function _md5( message ) {
 
 module.exports = {
     transform: transform,
-    version: version
+    version: version,
+    NAMESPACES: NAMESPACES
 };

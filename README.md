@@ -32,7 +32,10 @@ transformer.transform( {
     	'myfile.mp3' : '/another/path/to/2.mp3'
 	},
     // optional ability to disable markdown rendering (default is true)
-    markdown: false
+    markdown: false,
+    // optional preprocess function that transforms the XForm (as libXMLJs object) to 
+    // e.g. correct incompatible XForm syntax before Enketo's tranformation takes place 
+    preprocess: function(doc){ return doc; },
 } ).then(function( result ){
     // do something with result
 });
@@ -63,7 +66,9 @@ curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.
 ```json
 {
 	"form" : "<form>.....</form>",
-	"model": "<model>...</model>"
+	"model": "<model>...</model>",
+    "transformerVersion": "1.13.0",
+    "languageMap": { "Français": "fr", "English": "en" }
 }
 	
 ```
