@@ -31,7 +31,7 @@
         "Transformer"
     ],
     "dependencies": {
-        "body-parser": "1.15.x",
+        "body-parser": "1.16.x",
         "enketo-xslt": "1.7.0",
         "express": "5.0.0-alpha.2",
         "language-tags": "1.0.5",
