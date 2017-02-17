@@ -3,7 +3,6 @@
 var express = require( 'express' );
 var app = express();
 var bodyParser = require( 'body-parser' );
-var debug = require( 'debug' )( 'app.js' );
 var config = require( './config/config.json' );
 
 for ( var item in config ) {

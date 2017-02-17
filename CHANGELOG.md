@@ -2,12 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased]
+[1.14.0] - 2016-02-17
 ---------------------
 ##### Added
 - Ability to pass an XForm preprocessor function.
 - Output a languageMap property to the result.
 - Support for "accept" attribute for upload mediatype.
+
+##### Fixed
+- Missing debug module dependency.
 
 [1.13.0] - 2016-12-20
 ---------------------
