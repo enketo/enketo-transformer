@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ##### Added
 - Ability to pass an XForm preprocessor function.
 - Output a languageMap property to the result.
+- Support for "accept" attribute for upload mediatype.
 
 [1.13.0] - 2016-12-20
 ---------------------
