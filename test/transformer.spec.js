@@ -6,6 +6,8 @@ var chai = require( 'chai' );
 var chaiAsPromised = require( 'chai-as-promised' );
 var expect = chai.expect;
 var fs = require( 'fs' );
+var DOMParser = require( 'xmldom' ).DOMParser;
+var parser = new DOMParser();
 var transformer = require( '../src/transformer' );
 
 chai.use( chaiAsPromised );
@@ -396,6 +398,30 @@ describe( 'transformer', function() {
                 expect( result ).to.eventually.have.property( 'form' ).and.to.contain( '<textarea' ),
                 expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'or-appearance-rows-5' )
             ] );
+        } );
+
+    } );
+
+    describe( 'processes autocomplete questions by producing <datalist> elements', function() {
+
+        it( 'and outputs <datalist> elements', function() {
+            var xform = fs.readFileSync( './test/forms/autocomplete.xml' );
+            var result = transformer.transform( {
+                xform: xform
+            } );
+            return result.then( function( res ) {
+                var doc = parser.parseFromString( res.form, 'text/xml' );
+                return Promise.all( [
+                    expect( doc ).to.be.an( 'object' ),
+                    expect( doc.getElementsByTagName( 'select' ) ).to.have.length( 4 ),
+                    expect( doc.getElementsByTagName( 'datalist' ) ).to.have.length( 2 ),
+                    expect( doc.getElementById( 'selectoneautocompletethree' ).nodeName.toLowerCase() ).to.equal( 'datalist' ),
+                    expect( doc.getElementsByTagName( 'input' )[ 0 ].getAttribute( 'list' ) ).to.equal( 'selectoneautocompletethree' ),
+                    expect( doc.getElementsByTagName( 'input' )[ 0 ].getAttribute( 'type' ) ).to.equal( 'text' ),
+                    expect( doc.getElementById( 'selectoneautocompletefour' ).nodeName.toLowerCase() ).to.equal( 'datalist' ),
+                    expect( doc.getElementsByTagName( 'input' )[ 1 ].getAttribute( 'list' ) ).to.equal( 'selectoneautocompletefour' )
+                ] );
+            } );
         } );
 
     } );
