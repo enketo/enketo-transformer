@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.15.1] - 2016-03-15
+---------------------
+##### Changed
+- Updated XSLT module
+
 [1.15.0] - 2016-02-28
 ---------------------
 ##### Added
