@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.15.2] - 2016-03-22
+----------------------
+##### Changed
+- Only add 'note' class to readonly questions that do not have a calculate bind attribute.
+
 [1.15.1] - 2016-03-15
 ---------------------
 ##### Changed
