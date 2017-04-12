@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.16.0] - 2017-04-12
+---------------------
+##### Changed
+- Repeat output now includes a repeat-info element. **Warning: backwards-incompatible change**
+
 [1.15.2] - 2016-03-22
 ----------------------
 ##### Changed
