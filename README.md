@@ -22,19 +22,19 @@ var transformer = require('enketo-transformer');
 var xform = fs.readFileSync( 'path/to/xform.xml' );
   
 transformer.transform( {
-	// required string of XForm
+    // required string of XForm
     xform: xform,
     // optional string, to add theme if no theme is defined in the XForm
     theme: 'sometheme', 
     // optional map, to replace jr://..../myfile.png URLs
     media: {
-    	'myfile.png' : '/path/to/somefile.png',
-    	'myfile.mp3' : '/another/path/to/2.mp3'
-	},
+        'myfile.png' : '/path/to/somefile.png',
+        'myfile.mp3' : '/another/path/to/2.mp3'
+    },
     // optional ability to disable markdown rendering (default is true)
     markdown: false,
     // optional preprocess function that transforms the XForm (as libXMLJs object) to 
-    // e.g. correct incompatible XForm syntax before Enketo's tranformation takes place 
+    // e.g. correct incompatible XForm syntax before Enketo's transformation takes place 
     preprocess: function(doc){ return doc; },
 } ).then(function( result ){
     // do something with result
@@ -65,12 +65,12 @@ curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.
 
 ```json
 {
-	"form" : "<form>.....</form>",
-	"model": "<model>...</model>",
+    "form" : "<form>.....</form>",
+    "model": "<model>...</model>",
     "transformerVersion": "1.13.0",
     "languageMap": { "Français": "fr", "English": "en" }
 }
-	
+    
 ```
 
 ### Test
