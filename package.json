@@ -41,8 +41,8 @@
         "string-direction": "0.1.x"
     },
     "devDependencies": {
-        "chai": "3.5.x",
-        "chai-as-promised": "6.0.x",
+        "chai": "4.0.x",
+        "chai-as-promised": "7.1.x",
         "xmldom": "0.1.x"
     }
 }
