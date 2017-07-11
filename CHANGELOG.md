@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.18.0] - 2017-07-12
+---------------------
+##### Added
+- Optional support for oc:relevantMsg.
+
 [1.17.2] - 2017-07-03
 ---------------------
 ##### Fixed

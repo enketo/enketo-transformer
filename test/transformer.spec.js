@@ -480,4 +480,26 @@ describe( 'transformer', function() {
         } );
     } );
 
+    describe( 'oc:relevantMsg binding attributes', function() {
+        var xform = fs.readFileSync( './test/forms/relevant_constraint_required.xml' );
+
+        it( 'if includeRelevantMsg=1, are copied to or-relevant-msg elements or a default is added for relevant expressions', function() {
+            var result = transformer.transform( {
+                xform: xform,
+                includeRelevantMsg: 1
+            } );
+            return expect( result ).to.eventually.have.property( 'form' ).and.to.satisfy( function( form ) {
+                return form.match( /or-relevant-msg/g ).length === 4;
+            } );
+        } );
+
+        it( 'are ignored by default', function() {
+            var result = transformer.transform( {
+                xform: xform
+            } );
+            return expect( result ).to.eventually.have.property( 'form' ).and.not.to.contain( 'or-relevant-msg' );
+        } );
+
+    } );
+
 } );

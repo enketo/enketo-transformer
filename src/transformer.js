@@ -24,6 +24,9 @@ var version = _getVersion();
  */
 function transform( survey ) {
     var xformDoc;
+    var xsltParams = survey.includeRelevantMsg ? {
+        'include-relevant-msg': 1
+    } : {};
 
     return _parseXml( survey.xform )
         .then( function( doc ) {
@@ -35,7 +38,7 @@ function transform( survey ) {
         .then( function( doc ) {
             xformDoc = doc;
 
-            return _transform( sheets.xslForm, xformDoc );
+            return _transform( sheets.xslForm, xformDoc, xsltParams );
         } )
         .then( function( htmlDoc ) {
             htmlDoc = _replaceTheme( htmlDoc, survey.theme );
@@ -59,6 +62,7 @@ function transform( survey ) {
             delete survey.media;
             delete survey.preprocess;
             delete survey.markdown;
+            delete survey.includeRelevantMsg;
             return survey;
         } );
 }
@@ -70,13 +74,14 @@ function transform( survey ) {
  * @param  {[type]} xmlDoc libxmljs object of XML document
  * @return {Promise}       libxmljs result document object 
  */
-function _transform( xslStr, xmlDoc ) {
+function _transform( xslStr, xmlDoc, xsltParams ) {
+    var params = xsltParams || {};
     return new Promise( function( resolve, reject ) {
         libxslt.parse( xslStr, function( error, stylesheet ) {
             if ( error ) {
                 reject( error );
             } else {
-                stylesheet.apply( xmlDoc, function( error, result ) {
+                stylesheet.apply( xmlDoc, params, function( error, result ) {
                     if ( error ) {
                         reject( error );
                     } else {
