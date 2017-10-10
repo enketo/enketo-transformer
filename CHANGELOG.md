@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.21.1] - 2017-10-10
+---------------------
+##### Fixed
+- Workaround for an XLSForm limitation by moving "compact" appearance of repeat to its parent group.
+
 [1.21.0] - 2017-09-26
 ---------------------
 ##### Added
