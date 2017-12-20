@@ -31,17 +31,17 @@
         "Transformer"
     ],
     "dependencies": {
-        "body-parser": "1.17.x",
-        "enketo-xslt": "^1.15.2",
+        "body-parser": "1.18.x",
+        "enketo-xslt": "1.15.3",
         "express": "5.0.0-alpha.2",
         "language-tags": "1.0.5",
-        "libxslt": "0.6.5",
+        "libxslt": "0.7.0",
         "lie": "3.1.x",
-        "request": "2.81.x",
+        "request": "2.83.x",
         "string-direction": "0.1.x"
     },
     "devDependencies": {
-        "chai": "4.0.x",
+        "chai": "4.1.x",
         "chai-as-promised": "7.1.x",
         "xmldom": "0.1.x"
     }
