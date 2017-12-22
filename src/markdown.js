@@ -22,6 +22,11 @@ function markdownToHtml( text ) {
         .replace( />/gm, '&gt;' )
         // span
         .replace( /&lt;\s?span([^\/\n]*)&gt;((?:(?!&lt;\/).)+)&lt;\/\s?span\s?&gt;/gm, _createSpan )
+        // "\" will be used as escape character for *, _
+        .replace( /&/gm, '&amp;' )
+        .replace( /\\\\/gm, '&92;' )
+        .replace( /\\\*/gm, '&42;' )
+        .replace( /\\_/gm, '&95;' )
         // strong
         .replace( /__(.*?)__/gm, '<strong>$1</strong>' )
         .replace( /\*\*(.*?)\*\*/gm, '<strong>$1</strong>' )
@@ -37,6 +42,11 @@ function markdownToHtml( text ) {
         .replace( /(\n(\*|\+|-) (.*))+$/gm, _createUnorderedList )
         // ordered lists (in JS $ matches end of line as well as end of string)
         .replace( /(\n([0-9]+\.) (.*))+$/gm, _createOrderedList )
+        // reverting escape of special characters
+        .replace( /&95;/gm, '_' )
+        .replace( /&92;/gm, '\\' )
+        .replace( /&42;/gm, '*' )
+        .replace( /&amp;/gm, '&' )
         // paragraphs
         .replace( /([^\n]+)\n/gm, _createParagraph );
 
