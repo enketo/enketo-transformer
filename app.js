@@ -17,5 +17,5 @@ app.use( bodyParser.urlencoded( {
 require( './src/api' )( app );
 
 app.listen( app.get( 'port' ), function() {
-    console.log( 'app running on port ' + app.get( 'port' ) + '!' );
+    console.log( 'enketo-transformer running on port ' + app.get( 'port' ) + '!' );
 } );
