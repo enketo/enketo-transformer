@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.21.5] - 2017-12-25
+---------------------
+##### Fixed
+- Fails to build on Windows (10).
+
 [1.21.4] - 2017-12-22
 ---------------------
 ##### Fixed
