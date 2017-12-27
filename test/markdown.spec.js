@@ -106,6 +106,24 @@ describe( 'markdown', function() {
             [ '<span style="color:red;">_dbl_</span>', '<span style="color:red;"><em>dbl</em></span>' ],
             [ 'list:\n* __a__\n* _b_ \n+ [c](c)', 'list:<ul><li><strong>a</strong></li><li><em>b</em></li><li><a href="c" target="_blank">c</a></li></ul>' ],
             [ '<span style="color:blue">[link](http://enketo.org)</span>', '<span style="color:blue"><a href="http://enketo.org" target="_blank">link</a></span>' ],
+            // escaping special characters with backslash
+            [ 'A\\_B\\_C', 'A_B_C' ],
+            [ '_A\\_B\\_C_', '<em>A_B_C</em>' ],
+            [ 'A_B\\_C', 'A_B_C' ],
+            [ 'A\\_B_C', 'A_B_C' ],
+            [ 'A_B_C', 'A<em>B</em>C' ],
+            [ '\\__AB\\__', '_<em>AB_</em>' ],
+            [ '\\\\_AB\\_\\\\_', '\\<em>AB_\\</em>' ],
+            [ 'A\\*B\\*C', 'A*B*C' ],
+            [ '*A\\*B\\*C*', '<em>A*B*C</em>' ],
+            [ 'A*B\\*C', 'A*B*C' ],
+            [ 'A*B*C', 'A<em>B</em>C' ],
+            [ '\\**AB\\**', '*<em>AB*</em>' ],
+            [ '\\\\*AB\\*\\\\*', '\\<em>AB*\\</em>' ],
+            [ '\\a\\ b\\*c\\d\\_e', '\\a\\ b*c\\d_e' ],
+            [ '\\', '\\' ],
+            [ '\\\\', '\\' ],
+            [ '\\\\\\', '\\\\' ],
         ].forEach( function( test ) {
             var source = test[ 0 ];
             var expected = ( typeof test[ 1 ] !== 'undefined' ) ? test[ 1 ] : test[ 0 ];
