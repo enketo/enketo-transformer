@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+---------------------
+##### Added
+- Support for escaping \* and \_ characters in markdown.
+
 [1.21.5] - 2017-12-25
 ---------------------
 ##### Fixed
