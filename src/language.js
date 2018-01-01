@@ -11,11 +11,11 @@ var stringDirection = require( 'string-direction' );
  * @return {{desc: string, tag: string, dir: string, src: string}}      language object
  */
 function parse( lang, sample ) {
+    // TODO: this should be refactored
     var ianaLang;
     var language = {
         desc: lang.trim(),
         tag: lang.trim(),
-        dir: _getDirectionality( sample ),
         src: lang
     };
     var parts = lang.match( /^([^(]+)\((.*)\)\s*$/ );
@@ -23,6 +23,7 @@ function parse( lang, sample ) {
     if ( parts && parts.length > 2 ) {
         language.desc = parts[ 1 ].trim();
         language.tag = parts[ 2 ].trim();
+        ianaLang = _getLangWithTag( language.tag );
     } else {
         // First check whether lang is a known IANA subtag like 'en' or 'en-GB'
         ianaLang = _getLangWithTag( lang.split( '-' )[ 0 ] );
@@ -35,6 +36,19 @@ function parse( lang, sample ) {
                 language.tag = ianaLang.data.subtag;
             }
         }
+    }
+
+    // If known IANA subtag, do not try to detect directionality.
+    if ( ianaLang ) {
+        language.dir = [
+            'ar', 'shu', 'sqr', 'ssh', 'xaa', 'yhd', 'yud', 'aao', 'abh', 'abv', 'acm',
+            'acq', 'acw', 'acx', 'acy', 'adf', 'ads', 'aeb', 'aec', 'afb', 'ajp', 'apc', 'apd', 'arb',
+            'arq', 'ars', 'ary', 'arz', 'auz', 'avl', 'ayh', 'ayl', 'ayn', 'ayp', 'bbz', 'pga', 'he',
+            'iw', 'ps', 'pbt', 'pbu', 'pst', 'prp', 'prd', 'ur', 'ydd', 'yds', 'yih', 'ji', 'yi', 'hbo',
+            'men', 'xmn', 'fa', 'jpr', 'peo', 'pes', 'prs', 'dv', 'sam'
+        ].indexOf( ianaLang.data.subtag ) !== -1 ? 'rtl' : 'ltr';
+    } else {
+        language.dir = _getDirectionality( sample );
     }
 
     return language;
@@ -72,9 +86,9 @@ function _languagesOnly( obj ) {
 }
 
 /**
- * Obtains the directionality of a tag or language description
+ * Obtains the directionality of a text sample
  * 
- * @param  {string} tag language tag or language description
+ * @param  {string} sampl a text sample
  * @return {string}     either 'rtl' or the default 'ltr'
  */
 function _getDirectionality( sample ) {

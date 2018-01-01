@@ -104,6 +104,13 @@ describe( 'language', function() {
                 dir: 'rtl',
                 src: 'ArabicDialect (ar)'
             } ],
+            // sample contains markdown tag
+            [ 'Dari (prs)', '# نام فورم', {
+                tag: 'prs',
+                desc: 'Dari',
+                dir: 'rtl',
+                src: 'Dari (prs)'
+            } ],
             // no space before paren open
             [ 'ArabicDialect(ar)', 'رب', {
                 tag: 'ar',
