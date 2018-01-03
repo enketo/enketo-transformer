@@ -75,7 +75,6 @@ curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.
 
 ### Test
 
-* install mocha 
 * run tests with `npm test`
 
 ### Develop
