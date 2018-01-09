@@ -32,7 +32,7 @@
     ],
     "dependencies": {
         "body-parser": "1.18.x",
-        "enketo-xslt": "1.15.5",
+        "enketo-xslt": "1.16.0",
         "express": "5.0.0-alpha.2",
         "language-tags": "1.0.5",
         "libxslt": "0.6.5",

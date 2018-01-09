@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+---------------------
+##### Added
+- Pass oc:external attribute (custom).
+
 [1.22.1] - 2018-01-03
 ---------------------
 ##### Changed
