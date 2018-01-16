@@ -2,10 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased]
+[1.23.0] - 2018-01-16
 ---------------------
 ##### Added
 - Pass oc:external attribute (custom).
+
+##### Fixed
+- Readonly questions do not get custom constraint message.
 
 [1.22.1] - 2018-01-03
 ---------------------
