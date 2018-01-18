@@ -14,7 +14,7 @@ const router = express.Router();
 const transformer = require( './transformer' );
 
 router
-    .get( '/', (req, res) => {
+    .get( '/', ( req, res ) => {
         // NOTE: req.query.xform is a URL
         if ( req.app.get( 'secure' ) ) {
             res.status( 405 ).send( 'Not Allowed' );
@@ -29,10 +29,10 @@ router
                     url: req.query.xform
                 } )
                 .then( xform => transformer.transform( {
-                xform,
-                theme: req.query.theme,
-                markdown: req.query.markdown !== 'false'
-            } ) )
+                    xform,
+                    theme: req.query.theme,
+                    markdown: req.query.markdown !== 'false'
+                } ) )
                 .then( result => {
                     res.json( result );
                 } )
@@ -43,7 +43,7 @@ router
                 } );
         }
     } )
-    .post( '/', (req, res) => {
+    .post( '/', ( req, res ) => {
         // NOTE: req.query.xform is an XML string
         if ( req.app.get( 'secure' ) ) {
             res.status( 405 ).send( 'Not Allowed' );
@@ -78,25 +78,22 @@ router
  * @return { Promise }
  */
 function _request( options ) {
-    let method;
-    let error;
-
     options.headers = options.headers || {};
     options.headers[ 'X-OpenRosa-Version' ] = '1.0';
 
-    method = options.method || 'get';
+    const method = options.method || 'get';
 
-    return new Promise( (resolve, reject) => {
-        request[ method ]( options, (error, response, body) => {
+    return new Promise( ( resolve, reject ) => {
+        request[ method ]( options, ( error, response, body ) => {
             if ( error ) {
                 console.log( `Error occurred when requesting ${options.url}`, error );
                 reject( error );
             } else if ( response.statusCode === 401 ) {
-                error = new Error( 'Forbidden. Authorization Required.' );
+                const error = new Error( 'Forbidden. Authorization Required.' );
                 error.status = response.statusCode;
                 reject( error );
             } else if ( response.statusCode < 200 || response.statusCode >= 300 ) {
-                error = new Error( `Request to ${options.url} failed.` );
+                const error = new Error( `Request to ${options.url} failed.` );
                 error.status = response.statusCode;
                 reject( error );
             } else {

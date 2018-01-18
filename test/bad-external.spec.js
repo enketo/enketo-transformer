@@ -21,15 +21,6 @@ describe( 'for incompatible forms that require preprocessing', () => {
         }
 
         doc.find( '/h:html/h:body//xmlns:input[@query]', NAMESPACES ).forEach( input => {
-            let query;
-            let ref;
-            let match;
-            let id;
-            let bind;
-            let children;
-            let attrs;
-            let select1;
-            let itemset;
             const q = input.attr( 'query' );
             const r = input.attr( 'ref' );
 
@@ -37,15 +28,15 @@ describe( 'for incompatible forms that require preprocessing', () => {
                 return;
             }
 
-            query = q.value();
-            ref = r.value();
+            const query = q.value();
+            const ref = r.value();
 
             /**
              * Preprocess Model
              * - add instances
              */
-            match = query.match( /^instance\('([^\)]+)'\)/ );
-            id = match && match.length ? match[ 1 ] : null;
+            const match = query.match( /^instance\('([^\)]+)'\)/ );
+            const id = match && match.length ? match[ 1 ] : null;
 
             if ( id && !model.get( `//xmlns:instance[@id="${id}"]`, NAMESPACES ) ) {
                 model
@@ -61,7 +52,7 @@ describe( 'for incompatible forms that require preprocessing', () => {
              * Preprocess Bind
              * - correct type
              */
-            bind = doc.get( `/h:html/h:head/xmlns:model/xmlns:bind[@nodeset="${ref}"]`, NAMESPACES );
+            const bind = doc.get( `/h:html/h:head/xmlns:model/xmlns:bind[@nodeset="${ref}"]`, NAMESPACES );
             if ( bind ) {
                 bind.attr( {
                     type: 'select1'
@@ -72,9 +63,9 @@ describe( 'for incompatible forms that require preprocessing', () => {
              * Preprocess Body
              * - convert <input> to <select1> + <itemset>
              */
-            children = input.childNodes();
-            attrs = input.attrs();
-            select1 = new libxmljs.Element( doc, 'select1' ).namespace( NAMESPACES.xmlns );
+            const children = input.childNodes();
+            const attrs = input.attrs();
+            const select1 = new libxmljs.Element( doc, 'select1' ).namespace( NAMESPACES.xmlns );
 
             // add all attributes including unknowns, except the query attribute
             attrs.forEach( attr => {

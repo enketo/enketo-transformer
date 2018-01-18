@@ -18,8 +18,8 @@ npm install enketo-transformer --save
 ### Use as module
 
 ```js
-var transformer = require('enketo-transformer');
-var xform = fs.readFileSync( 'path/to/xform.xml' );
+const transformer = require('enketo-transformer');
+const xform = fs.readFileSync( 'path/to/xform.xml' );
   
 transformer.transform( {
     // required string of XForm
@@ -35,7 +35,7 @@ transformer.transform( {
     markdown: false,
     // optional preprocess function that transforms the XForm (as libXMLJs object) to 
     // e.g. correct incompatible XForm syntax before Enketo's transformation takes place 
-    preprocess: function(doc){ return doc; },
+    preprocess: doc => doc,
 } ).then(function( result ){
     // do something with result
 });

@@ -74,12 +74,12 @@ function transform( survey ) {
  */
 function _transform( xslStr, xmlDoc, xsltParams ) {
     const params = xsltParams || {};
-    return new Promise( (resolve, reject) => {
-        libxslt.parse( xslStr, (error, stylesheet) => {
+    return new Promise( ( resolve, reject ) => {
+        libxslt.parse( xslStr, ( error, stylesheet ) => {
             if ( error ) {
                 reject( error );
             } else {
-                stylesheet.apply( xmlDoc, params, (error, result) => {
+                stylesheet.apply( xmlDoc, params, ( error, result ) => {
                     if ( error ) {
                         reject( error );
                     } else {
@@ -100,7 +100,7 @@ function _transform( xslStr, xmlDoc, xsltParams ) {
 function _parseXml( xmlStr ) {
     let doc;
 
-    return new Promise( (resolve, reject) => {
+    return new Promise( ( resolve, reject ) => {
         try {
             doc = libxmljs.parseXml( xmlStr );
             resolve( doc );
@@ -118,16 +118,14 @@ function _parseXml( xmlStr ) {
  * @return {[type]}       libxmljs object
  */
 function _replaceTheme( doc, theme ) {
-    let formClassAttr;
-    let formClassValue;
     const HAS_THEME = /(theme-)[^"'\s]+/;
 
     if ( !theme ) {
         return doc;
     }
 
-    formClassAttr = doc.root().get( '/root/form' ).attr( 'class' );
-    formClassValue = formClassAttr.value();
+    const formClassAttr = doc.root().get( '/root/form' ).attr( 'class' );
+    const formClassValue = formClassAttr.value();
 
     if ( HAS_THEME.test( formClassValue ) ) {
         formClassAttr.value( formClassValue.replace( HAS_THEME, `$1${theme}` ) );
@@ -146,9 +144,6 @@ function _replaceTheme( doc, theme ) {
  * @return {Promise}         libxmljs object
  */
 function _replaceMediaSources( xmlDoc, mediaMap ) {
-    let formLogo;
-    let formLogoEl;
-
     if ( !mediaMap ) {
         return xmlDoc;
     }
@@ -166,8 +161,8 @@ function _replaceMediaSources( xmlDoc, mediaMap ) {
     } );
 
     // add form logo <img> element if applicable
-    formLogo = mediaMap[ 'form_logo.png' ];
-    formLogoEl = xmlDoc.get( '//*[@class="form-logo"]' );
+    const formLogo = mediaMap[ 'form_logo.png' ];
+    const formLogoEl = xmlDoc.get( '//*[@class="form-logo"]' );
     if ( formLogo && formLogoEl ) {
         formLogoEl
             .node( 'img' )
@@ -188,16 +183,12 @@ function _replaceMediaSources( xmlDoc, mediaMap ) {
  * @return {[type]}     libxmljs object
  */
 function _replaceLanguageTags( doc, survey ) {
-    let languageElements;
-    let languages;
-    let langSelectorElement;
-    let defaultLang;
     const map = {};
 
-    languageElements = doc.find( '/root/form/select[@id="form-languages"]/option' );
+    const languageElements = doc.find( '/root/form/select[@id="form-languages"]/option' );
 
     // List of parsed language objects
-    languages = languageElements.map( el => {
+    const languages = languageElements.map( el => {
         const lang = el.text();
         return language.parse( lang, _getLanguageSampleText( doc, lang ) );
     } );
@@ -208,7 +199,7 @@ function _replaceLanguageTags( doc, survey ) {
     }
 
     // add or correct dir and value attributes, and amend textcontent of options in language selector
-    languageElements.forEach( (el, index) => {
+    languageElements.forEach( ( el, index ) => {
         const val = el.attr( 'value' ).value();
         if ( val && val !== languages[ index ].tag ) {
             map[ val ] = languages[ index ].tag;
@@ -232,9 +223,9 @@ function _replaceLanguageTags( doc, survey ) {
     } );
 
     // correct default lang attribute
-    langSelectorElement = doc.get( '/root/form/*[@data-default-lang]' );
+    const langSelectorElement = doc.get( '/root/form/*[@data-default-lang]' );
     if ( langSelectorElement ) {
-        defaultLang = langSelectorElement.attr( 'data-default-lang' ).value();
+        const defaultLang = langSelectorElement.attr( 'data-default-lang' ).value();
         languages.some( lang => {
             if ( lang.src === defaultLang ) {
                 langSelectorElement.attr( {
@@ -301,11 +292,10 @@ function _addInstanceIdNodeIfMissing( doc ) {
  * @return {[type]}     libxmljs object
  */
 function _renderMarkdown( htmlDoc ) {
-    let htmlStr;
     const replacements = {};
 
     // First turn all outputs into text so *<span class="or-output></span>* can be detected
-    htmlDoc.find( '/root/form//span[contains(@class, "or-output")]' ).forEach( (el, index) => {
+    htmlDoc.find( '/root/form//span[contains(@class, "or-output")]' ).forEach( ( el, index ) => {
         const key = `---output-${index}`;
         const textNode = el.childNodes()[ 0 ].clone();
         replacements[ key ] = el.toString();
@@ -315,7 +305,7 @@ function _renderMarkdown( htmlDoc ) {
     } );
 
     // Now render markdown
-    htmlDoc.find( '/root/form//span[contains(@class, "question-label") or contains(@class, "or-hint")]' ).forEach( (el, index) => {
+    htmlDoc.find( '/root/form//span[contains(@class, "question-label") or contains(@class, "or-hint")]' ).forEach( ( el, index ) => {
         let key;
         /**
          * Using text() is done because:
@@ -334,7 +324,7 @@ function _renderMarkdown( htmlDoc ) {
     } );
 
     // TODO: does this result in self-closing tags?
-    htmlStr = _docToString( htmlDoc );
+    let htmlStr = _docToString( htmlDoc );
 
     // Now replace the placeholders with the rendered HTML
     // in reverse order so outputs are done last

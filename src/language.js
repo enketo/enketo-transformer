@@ -86,7 +86,7 @@ function _languagesOnly( obj ) {
 /**
  * Obtains the directionality of a text sample
  * 
- * @param  {string} sampl a text sample
+ * @param  {string} sample a text sample
  * @return {string}     either 'rtl' or the default 'ltr'
  */
 function _getDirectionality( sample ) {
