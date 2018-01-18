@@ -13,6 +13,7 @@
  * @return {string}      transformed text content of a textnode
  */
 function markdownToHtml( text ) {
+    // note: in JS $ matches end of line as well as end of string, and ^ both beginning of line and string
     const html = text
         // html encoding of < because libXMLJs Element.text() converts html entities
         .replace( /</gm, '&lt;' )
@@ -34,11 +35,10 @@ function markdownToHtml( text ) {
         // links
         .replace( /\[([^\]]*)\]\(([^\)]+)\)/gm, '<a href="$2" target="_blank">$1</a>' )
         // headers
-        .replace( /(#+)([^\n]*)\n/gm, _createHeader )
-        .replace( /^(#+)([^\n]*)$/gm, _createHeader )
-        // unordered lists (in JS $ matches end of line as well as end of string)
+        .replace( /^(#+)([^\n]*)(\n|$)/gm, _createHeader )
+        // unordered lists 
         .replace( /(\n(\*|\+|-) (.*))+$/gm, _createUnorderedList )
-        // ordered lists (in JS $ matches end of line as well as end of string)
+        // ordered lists 
         .replace( /(\n([0-9]+\.) (.*))+$/gm, _createOrderedList )
         // reverting escape of special characters
         .replace( /&95;/gm, '_' )

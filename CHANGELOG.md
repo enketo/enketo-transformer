@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+---------------------
+##### Changed
+- Markdown headers now work at the start of any line, even if not followed by a newline.
+
+##### Fixed
+- Markdown headers in the middle of a string are not always ignored.
+
 [1.23.0] - 2018-01-16
 ---------------------
 ##### Added
