@@ -4,7 +4,5 @@ dist: trusty
 node_js:
   - "6"
   - "8"
-before_script:
-  - npm install -g mocha
 after_script:
   - npm install enketo-transformer
