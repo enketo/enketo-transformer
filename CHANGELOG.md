@@ -4,6 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]
 ---------------------
+##### Added
+- Support for escaping \# characters in markdown.
+
 ##### Changed
 - Markdown headers now work at the start of any line, even if not followed by a newline.
 

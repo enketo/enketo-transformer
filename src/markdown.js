@@ -26,6 +26,7 @@ function markdownToHtml( text ) {
         .replace( /\\\\/gm, '&92;' )
         .replace( /\\\*/gm, '&42;' )
         .replace( /\\_/gm, '&95;' )
+        .replace( /\\#/gm, '&35;' )
         // strong
         .replace( /__(.*?)__/gm, '<strong>$1</strong>' )
         .replace( /\*\*(.*?)\*\*/gm, '<strong>$1</strong>' )
@@ -41,6 +42,7 @@ function markdownToHtml( text ) {
         // ordered lists 
         .replace( /(\n([0-9]+\.) (.*))+$/gm, _createOrderedList )
         // reverting escape of special characters
+        .replace( /&35;/gm, '#' )
         .replace( /&95;/gm, '_' )
         .replace( /&92;/gm, '\\' )
         .replace( /&42;/gm, '*' )
