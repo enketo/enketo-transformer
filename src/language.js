@@ -1,7 +1,5 @@
-'use strict';
-
-var tags = require( 'language-tags' );
-var stringDirection = require( 'string-direction' );
+const tags = require( 'language-tags' );
+const stringDirection = require( 'string-direction' );
 
 /**
  * Parses a language string into a language object. Guesses missing properties.
@@ -12,13 +10,13 @@ var stringDirection = require( 'string-direction' );
  */
 function parse( lang, sample ) {
     // TODO: this should be refactored
-    var ianaLang;
-    var language = {
+    let ianaLang;
+    const language = {
         desc: lang.trim(),
         tag: lang.trim(),
         src: lang
     };
-    var parts = lang.match( /^([^(]+)\((.*)\)\s*$/ );
+    const parts = lang.match( /^([^(]+)\((.*)\)\s*$/ );
 
     if ( parts && parts.length > 2 ) {
         language.desc = parts[ 1 ].trim();
@@ -61,7 +59,7 @@ function parse( lang, sample ) {
  * @return {<*>}         the first language object result that was found
  */
 function _getLangWithDesc( desc ) {
-    var results = ( desc ) ? tags.search( desc ).filter( _languagesOnly ) : [];
+    const results = ( desc ) ? tags.search( desc ).filter( _languagesOnly ) : [];
     return results[ 0 ] || '';
 }
 
@@ -92,7 +90,7 @@ function _languagesOnly( obj ) {
  * @return {string}     either 'rtl' or the default 'ltr'
  */
 function _getDirectionality( sample ) {
-    var direction = stringDirection.getDirection( sample );
+    const direction = stringDirection.getDirection( sample );
     if ( direction !== 'rtl' ) {
         return 'ltr';
     }
@@ -100,5 +98,5 @@ function _getDirectionality( sample ) {
 }
 
 module.exports = {
-    parse: parse
+    parse
 };

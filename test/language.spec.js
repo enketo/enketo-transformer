@@ -1,20 +1,17 @@
-/* global describe, it*/
-'use strict';
+const chai = require( 'chai' );
+const expect = chai.expect;
+const language = require( '../src/language' );
 
-var chai = require( 'chai' );
-var expect = chai.expect;
-var language = require( '../src/language' );
+describe( 'language', () => {
 
-describe( 'language', function() {
+    describe( 'parser', () => {
+        let test;
 
-    describe( 'parser', function() {
-        var test;
-
-        test = function( t ) {
-            var name = t[ 0 ];
-            var sample = t[ 1 ];
-            var expected = t[ 2 ];
-            it( 'parses "' + name + '" with sample "' + sample + '" correctly', function() {
+        test = t => {
+            const name = t[ 0 ];
+            const sample = t[ 1 ];
+            const expected = t[ 2 ];
+            it( `parses "${name}" with sample "${sample}" correctly`, () => {
                 expect( language.parse( name, sample ) ).to.deep.equal( expected );
             } );
         };

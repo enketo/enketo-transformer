@@ -1,20 +1,18 @@
-'use strict';
-
-var Promise = require( 'lie' );
-var fs = require( 'fs' );
-var pkg = require( '../package' );
-var crypto = require( 'crypto' );
-var libxslt = require( 'libxslt' );
-var libxmljs = libxslt.libxmljs;
-var language = require( './language' );
-var markdown = require( './markdown' );
-var sheets = require( 'enketo-xslt' );
-var NAMESPACES = {
+const Promise = require( 'lie' );
+const fs = require( 'fs' );
+const pkg = require( '../package' );
+const crypto = require( 'crypto' );
+const libxslt = require( 'libxslt' );
+const libxmljs = libxslt.libxmljs;
+const language = require( './language' );
+const markdown = require( './markdown' );
+const sheets = require( 'enketo-xslt' );
+const NAMESPACES = {
     xmlns: 'http://www.w3.org/2002/xforms',
     orx: 'http://openrosa.org/xforms',
     h: 'http://www.w3.org/1999/xhtml'
 };
-var version = _getVersion();
+const version = _getVersion();
 
 /**
  * Performs XSLT transformation on XForm and process the result.
@@ -23,24 +21,24 @@ var version = _getVersion();
  * @return {Promise}     promise
  */
 function transform( survey ) {
-    var xformDoc;
-    var xsltParams = survey.includeRelevantMsg ? {
+    let xformDoc;
+    const xsltParams = survey.includeRelevantMsg ? {
         'include-relevant-msg': 1
     } : {};
 
     return _parseXml( survey.xform )
-        .then( function( doc ) {
+        .then( doc => {
             if ( typeof survey.preprocess === 'function' ) {
                 doc = survey.preprocess.call( libxmljs, doc );
             }
             return doc;
         } )
-        .then( function( doc ) {
+        .then( doc => {
             xformDoc = doc;
 
             return _transform( sheets.xslForm, xformDoc, xsltParams );
         } )
-        .then( function( htmlDoc ) {
+        .then( htmlDoc => {
             htmlDoc = _replaceTheme( htmlDoc, survey.theme );
             htmlDoc = _replaceMediaSources( htmlDoc, survey.media );
             htmlDoc = _replaceLanguageTags( htmlDoc, survey );
@@ -52,7 +50,7 @@ function transform( survey ) {
 
             return _transform( sheets.xslModel, xformDoc );
         } )
-        .then( function( xmlDoc ) {
+        .then( xmlDoc => {
             xmlDoc = _replaceMediaSources( xmlDoc, survey.media );
             xmlDoc = _addInstanceIdNodeIfMissing( xmlDoc );
             survey.model = xmlDoc.root().get( '*' ).toString( false );
@@ -75,13 +73,13 @@ function transform( survey ) {
  * @return {Promise}       libxmljs result document object 
  */
 function _transform( xslStr, xmlDoc, xsltParams ) {
-    var params = xsltParams || {};
-    return new Promise( function( resolve, reject ) {
-        libxslt.parse( xslStr, function( error, stylesheet ) {
+    const params = xsltParams || {};
+    return new Promise( (resolve, reject) => {
+        libxslt.parse( xslStr, (error, stylesheet) => {
             if ( error ) {
                 reject( error );
             } else {
-                stylesheet.apply( xmlDoc, params, function( error, result ) {
+                stylesheet.apply( xmlDoc, params, (error, result) => {
                     if ( error ) {
                         reject( error );
                     } else {
@@ -100,9 +98,9 @@ function _transform( xslStr, xmlDoc, xsltParams ) {
  * @return {Promise}       libxmljs result document object
  */
 function _parseXml( xmlStr ) {
-    var doc;
+    let doc;
 
-    return new Promise( function( resolve, reject ) {
+    return new Promise( (resolve, reject) => {
         try {
             doc = libxmljs.parseXml( xmlStr );
             resolve( doc );
@@ -120,8 +118,9 @@ function _parseXml( xmlStr ) {
  * @return {[type]}       libxmljs object
  */
 function _replaceTheme( doc, theme ) {
-    var formClassAttr, formClassValue,
-        HAS_THEME = /(theme-)[^"'\s]+/;
+    let formClassAttr;
+    let formClassValue;
+    const HAS_THEME = /(theme-)[^"'\s]+/;
 
     if ( !theme ) {
         return doc;
@@ -131,9 +130,9 @@ function _replaceTheme( doc, theme ) {
     formClassValue = formClassAttr.value();
 
     if ( HAS_THEME.test( formClassValue ) ) {
-        formClassAttr.value( formClassValue.replace( HAS_THEME, '$1' + theme ) );
+        formClassAttr.value( formClassValue.replace( HAS_THEME, `$1${theme}` ) );
     } else {
-        formClassAttr.value( formClassValue + ' ' + 'theme-' + theme );
+        formClassAttr.value( `${formClassValue} theme-${theme}` );
     }
 
     return doc;
@@ -147,20 +146,20 @@ function _replaceTheme( doc, theme ) {
  * @return {Promise}         libxmljs object
  */
 function _replaceMediaSources( xmlDoc, mediaMap ) {
-    var formLogo;
-    var formLogoEl;
+    let formLogo;
+    let formLogoEl;
 
     if ( !mediaMap ) {
         return xmlDoc;
     }
 
     // iterate through each element with a src attribute
-    xmlDoc.find( '//*[@src] | //a[@href]' ).forEach( function( mediaEl ) {
-        var attribute = ( mediaEl.name().toLowerCase() === 'a' ) ? 'href' : 'src';
-        var src = mediaEl.attr( attribute ).value();
-        var matches = src ? src.match( /jr:\/\/[\w-]+\/(.+)/ ) : null;
-        var filename = matches && matches.length ? matches[ 1 ] : null;
-        var replacement = filename ? mediaMap[ filename ] : null;
+    xmlDoc.find( '//*[@src] | //a[@href]' ).forEach( mediaEl => {
+        const attribute = ( mediaEl.name().toLowerCase() === 'a' ) ? 'href' : 'src';
+        const src = mediaEl.attr( attribute ).value();
+        const matches = src ? src.match( /jr:\/\/[\w-]+\/(.+)/ ) : null;
+        const filename = matches && matches.length ? matches[ 1 ] : null;
+        const replacement = filename ? mediaMap[ filename ] : null;
         if ( replacement ) {
             mediaEl.attr( attribute, replacement );
         }
@@ -189,17 +188,17 @@ function _replaceMediaSources( xmlDoc, mediaMap ) {
  * @return {[type]}     libxmljs object
  */
 function _replaceLanguageTags( doc, survey ) {
-    var languageElements;
-    var languages;
-    var langSelectorElement;
-    var defaultLang;
-    var map = {};
+    let languageElements;
+    let languages;
+    let langSelectorElement;
+    let defaultLang;
+    const map = {};
 
     languageElements = doc.find( '/root/form/select[@id="form-languages"]/option' );
 
     // List of parsed language objects
-    languages = languageElements.map( function( el ) {
-        var lang = el.text();
+    languages = languageElements.map( el => {
+        const lang = el.text();
         return language.parse( lang, _getLanguageSampleText( doc, lang ) );
     } );
 
@@ -209,8 +208,8 @@ function _replaceLanguageTags( doc, survey ) {
     }
 
     // add or correct dir and value attributes, and amend textcontent of options in language selector
-    languageElements.forEach( function( el, index ) {
-        var val = el.attr( 'value' ).value();
+    languageElements.forEach( (el, index) => {
+        const val = el.attr( 'value' ).value();
         if ( val && val !== languages[ index ].tag ) {
             map[ val ] = languages[ index ].tag;
         }
@@ -221,11 +220,11 @@ function _replaceLanguageTags( doc, survey ) {
     } );
 
     // correct lang attributes
-    languages.forEach( function( lang ) {
+    languages.forEach( lang => {
         if ( lang.src === lang.tag ) {
             return;
         }
-        doc.find( '/root/form//*[@lang="' + lang.src + '"]' ).forEach( function( el ) {
+        doc.find( `/root/form//*[@lang="${lang.src}"]` ).forEach( el => {
             el.attr( {
                 lang: lang.tag
             } );
@@ -236,7 +235,7 @@ function _replaceLanguageTags( doc, survey ) {
     langSelectorElement = doc.get( '/root/form/*[@data-default-lang]' );
     if ( langSelectorElement ) {
         defaultLang = langSelectorElement.attr( 'data-default-lang' ).value();
-        languages.some( function( lang ) {
+        languages.some( lang => {
             if ( lang.src === defaultLang ) {
                 langSelectorElement.attr( {
                     'data-default-lang': lang.tag
@@ -261,8 +260,8 @@ function _replaceLanguageTags( doc, survey ) {
 function _getLanguageSampleText( doc, lang ) {
     // First find non-empty text content of a hint with that lang attribute.
     // If not found, find any span with that lang attribute.
-    var langSampleEl = doc.get( '/root/form//span[contains(@class, "or-hint") and @lang="' + lang + '" and normalize-space()]' ) ||
-        doc.get( '/root/form//span[@lang="' + lang + '" and normalize-space()]' );
+    const langSampleEl = doc.get( `/root/form//span[contains(@class, "or-hint") and @lang="${lang}" and normalize-space()]` ) ||
+        doc.get( `/root/form//span[@lang="${lang}" and normalize-space()]` );
 
     return ( langSampleEl && langSampleEl.text().trim().length ) ? langSampleEl.text() : 'nothing';
 }
@@ -274,13 +273,13 @@ function _getLanguageSampleText( doc, lang ) {
  * @param {[type]} doc libxmljs object
  */
 function _addInstanceIdNodeIfMissing( doc ) {
-    var xformsPath = '/xmlns:root/xmlns:model/xmlns:instance/*/xmlns:meta/xmlns:instanceID';
-    var openrosaPath = '/xmlns:root/xmlns:model/xmlns:instance/*/orx:meta/orx:instanceID';
-    var instanceIdEl = doc.get( xformsPath + ' | ' + openrosaPath, NAMESPACES );
+    const xformsPath = '/xmlns:root/xmlns:model/xmlns:instance/*/xmlns:meta/xmlns:instanceID';
+    const openrosaPath = '/xmlns:root/xmlns:model/xmlns:instance/*/orx:meta/orx:instanceID';
+    const instanceIdEl = doc.get( `${xformsPath} | ${openrosaPath}`, NAMESPACES );
 
     if ( !instanceIdEl ) {
-        var rootEl = doc.get( '/xmlns:root/xmlns:model/xmlns:instance/*', NAMESPACES );
-        var metaEl = doc.get( '/xmlns:root/xmlns:model/xmlns:instance/*/xmlns:meta', NAMESPACES );
+        const rootEl = doc.get( '/xmlns:root/xmlns:model/xmlns:instance/*', NAMESPACES );
+        const metaEl = doc.get( '/xmlns:root/xmlns:model/xmlns:instance/*/xmlns:meta', NAMESPACES );
 
         if ( metaEl ) {
             metaEl
@@ -302,13 +301,13 @@ function _addInstanceIdNodeIfMissing( doc ) {
  * @return {[type]}     libxmljs object
  */
 function _renderMarkdown( htmlDoc ) {
-    var htmlStr;
-    var replacements = {};
+    let htmlStr;
+    const replacements = {};
 
     // First turn all outputs into text so *<span class="or-output></span>* can be detected
-    htmlDoc.find( '/root/form//span[contains(@class, "or-output")]' ).forEach( function( el, index ) {
-        var key = '---output-' + index;
-        var textNode = el.childNodes()[ 0 ].clone();
+    htmlDoc.find( '/root/form//span[contains(@class, "or-output")]' ).forEach( (el, index) => {
+        const key = `---output-${index}`;
+        const textNode = el.childNodes()[ 0 ].clone();
         replacements[ key ] = el.toString();
         textNode.text( key );
         el.replace( textNode );
@@ -316,8 +315,8 @@ function _renderMarkdown( htmlDoc ) {
     } );
 
     // Now render markdown
-    htmlDoc.find( '/root/form//span[contains(@class, "question-label") or contains(@class, "or-hint")]' ).forEach( function( el, index ) {
-        var key;
+    htmlDoc.find( '/root/form//span[contains(@class, "question-label") or contains(@class, "or-hint")]' ).forEach( (el, index) => {
+        let key;
         /**
          * Using text() is done because:
          * a) We are certain that these <span>s do not contain other elements, other than formatting/markdown <span>s.
@@ -325,10 +324,10 @@ function _renderMarkdown( htmlDoc ) {
          *
          * Note that text() will convert &gt; to >
          */
-        var original = el.text().replace( '<', '&lt;' ).replace( '>', '&gt;' );
-        var rendered = markdown.toHtml( original );
+        const original = el.text().replace( '<', '&lt;' ).replace( '>', '&gt;' );
+        const rendered = markdown.toHtml( original );
         if ( original !== rendered ) {
-            key = '$$$' + index;
+            key = `$$$${index}`;
             replacements[ key ] = rendered;
             el.text( key );
         }
@@ -339,8 +338,8 @@ function _renderMarkdown( htmlDoc ) {
 
     // Now replace the placeholders with the rendered HTML
     // in reverse order so outputs are done last
-    Object.keys( replacements ).reverse().forEach( function( key ) {
-        var replacement = replacements[ key ];
+    Object.keys( replacements ).reverse().forEach( key => {
+        const replacement = replacements[ key ];
         if ( replacement ) {
             htmlStr = htmlStr.replace( key, replacement );
         }
@@ -373,13 +372,13 @@ function _getVersion() {
  * @return {string}         The hash
  */
 function _md5( message ) {
-    var hash = crypto.createHash( 'md5' );
+    const hash = crypto.createHash( 'md5' );
     hash.update( message );
     return hash.digest( 'hex' );
 }
 
 module.exports = {
-    transform: transform,
-    version: version,
-    NAMESPACES: NAMESPACES
+    transform,
+    version,
+    NAMESPACES
 };

@@ -1,13 +1,10 @@
-/* global describe, it*/
-'use strict';
+const chai = require( 'chai' );
+const expect = chai.expect;
+const markdown = require( '../src/markdown' );
 
-var chai = require( 'chai' );
-var expect = chai.expect;
-var markdown = require( '../src/markdown' );
+describe( 'markdown', () => {
 
-describe( 'markdown', function() {
-
-    describe( 'rendering', function() {
+    describe( 'rendering', () => {
 
         [
             // correct emphasis
@@ -124,10 +121,10 @@ describe( 'markdown', function() {
             [ '\\', '\\' ],
             [ '\\\\', '\\' ],
             [ '\\\\\\', '\\\\' ],
-        ].forEach( function( test ) {
-            var source = test[ 0 ];
-            var expected = ( typeof test[ 1 ] !== 'undefined' ) ? test[ 1 ] : test[ 0 ];
-            it( 'renders "' + source + '" correctly', function() {
+        ].forEach( test => {
+            const source = test[ 0 ];
+            const expected = ( typeof test[ 1 ] !== 'undefined' ) ? test[ 1 ] : test[ 0 ];
+            it( `renders "${source}" correctly`, () => {
                 expect( markdown.toHtml( source ) ).to.equal( expected );
             } );
         } );

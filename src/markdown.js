@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Transforms XForm label and hint textnode content with a subset of Markdown into HTML
  * 
@@ -15,7 +13,7 @@
  * @return {string}      transformed text content of a textnode
  */
 function markdownToHtml( text ) {
-    var html = text
+    const html = text
         // html encoding of < because libXMLJs Element.text() converts html entities
         .replace( /</gm, '&lt;' )
         // html encoding of < because libXMLJs Element.text() converts html entities
@@ -54,40 +52,40 @@ function markdownToHtml( text ) {
 }
 
 function _createHeader( match, hashtags, content ) {
-    var level = hashtags.length;
-    return '<h' + level + '>' + content.replace( /#+$/, '' ).trim() + '</h' + level + '>';
+    const level = hashtags.length;
+    return `<h${level}>${content.replace( /#+$/, '' ).trim()}</h${level}>`;
 }
 
 function _createUnorderedList( match ) {
-    var items = match.replace( /\n?(\*|\+|-)(.*)/gm, _createItem );
-    return '<ul>' + items + '</ul>';
+    const items = match.replace( /\n?(\*|\+|-)(.*)/gm, _createItem );
+    return `<ul>${items}</ul>`;
 }
 
 function _createOrderedList( match ) {
-    var items = match.replace( /\n?([0-9]+\.)(.*)/gm, _createItem );
-    return '<ol>' + items + '</ol>';
+    const items = match.replace( /\n?([0-9]+\.)(.*)/gm, _createItem );
+    return `<ol>${items}</ol>`;
 }
 
 function _createItem( match, bullet, content ) {
-    return '<li>' + content.trim() + '</li>';
+    return `<li>${content.trim()}</li>`;
 }
 
 function _createParagraph( match, line ) {
-    var trimmed = line.trim();
+    const trimmed = line.trim();
     if ( /^<\/?(ul|ol|li|h|p|bl)/i.test( trimmed ) ) {
         return line;
     }
-    return '<p>' + trimmed + '</p>';
+    return `<p>${trimmed}</p>`;
 }
 
 function _createSpan( match, attributes, content ) {
-    var sanitizedAttributes = _sanitizeAttributes( attributes );
-    return '<span' + sanitizedAttributes + '>' + content + '</span>';
+    const sanitizedAttributes = _sanitizeAttributes( attributes );
+    return `<span${sanitizedAttributes}>${content}</span>`;
 }
 
 function _sanitizeAttributes( attributes ) {
-    var styleMatches = attributes.match( /( style=(["'])[^"']*\2)/ );
-    var style = ( styleMatches && styleMatches.length ) ? styleMatches[ 0 ] : '';
+    const styleMatches = attributes.match( /( style=(["'])[^"']*\2)/ );
+    const style = ( styleMatches && styleMatches.length ) ? styleMatches[ 0 ] : '';
     return style;
 }
 
