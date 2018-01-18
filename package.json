@@ -1,6 +1,6 @@
 {
     "name": "enketo-transformer",
-    "version": "1.23.0",
+    "version": "1.24.0",
     "description": "Library/app that transforms ODK-compliant XForms into a format that enketo-core consumes",
     "license": "Apache-2.0",
     "main": "src/transformer.js",
@@ -43,7 +43,7 @@
     "devDependencies": {
         "chai": "4.1.x",
         "chai-as-promised": "7.1.x",
-        "mocha": "^4.1.0",
+        "mocha": "^5.0.0",
         "xmldom": "0.1.x"
     }
 }

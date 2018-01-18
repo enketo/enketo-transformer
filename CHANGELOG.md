@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased]
+[1.24.0] - 2018-01-18
 ---------------------
 ##### Added
 - Support for escaping \# characters in markdown.
