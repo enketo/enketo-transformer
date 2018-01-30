@@ -36,7 +36,7 @@ function markdownToHtml( text ) {
         // links
         .replace( /\[([^\]]*)\]\(([^\)]+)\)/gm, '<a href="$2" target="_blank">$1</a>' )
         // headers
-        .replace( /^(#+)([^\n]*)(\n|$)/gm, _createHeader )
+        .replace( /^\s*(#+)\s?([^\n]*)(\n|$)/gm, _createHeader )
         // unordered lists 
         .replace( /(\n(\*|\+|-) (.*))+$/gm, _createUnorderedList )
         // ordered lists 
@@ -55,7 +55,7 @@ function markdownToHtml( text ) {
 
 function _createHeader( match, hashtags, content ) {
     const level = hashtags.length;
-    return `<h${level}>${content.replace( /#+$/, '' ).trim()}</h${level}>`;
+    return `<h${level}>${content.replace( /#+$/, '' )}</h${level}>`;
 }
 
 function _createUnorderedList( match ) {

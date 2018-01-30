@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.24.1] - 2018-01-30
+---------------------
+##### Fixed
+- Markdown headers preceded by whitespace fail to render as header.
+- Deliberate whitespace after or before header tags is trimmed when it shouldn't be.
+
 [1.24.0] - 2018-01-18
 ---------------------
 ##### Added

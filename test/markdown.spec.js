@@ -29,11 +29,11 @@ describe( 'markdown', () => {
             // correct headings
             [ '#h1\n', '<h1>h1</h1>' ],
             [ '# h1\n', '<h1>h1</h1>' ],
-            [ '# h1 \n', '<h1>h1</h1>' ],
+            [ '# h1 \n', '<h1>h1 </h1>' ],
             [ '#h1#\n', '<h1>h1</h1>' ],
             [ '#h1####\n', '<h1>h1</h1>' ],
             [ '# h1\n', '<h1>h1</h1>' ],
-            [ '#    h1\n', '<h1>h1</h1>' ],
+            [ '#    h1\n', '<h1>   h1</h1>' ],
             [ '# h1#\n', '<h1>h1</h1>' ],
             [ '##h2\n', '<h2>h2</h2>' ],
             [ '###h3\n', '<h3>h3</h3>' ],
@@ -41,9 +41,10 @@ describe( 'markdown', () => {
             [ '#####h5\n', '<h5>h5</h5>' ],
             [ '#h1', '<h1>h1</h1>' ],
             [ '## A\n## B\n## C', '<h2>A</h2><h2>B</h2><h2>C</h2>' ],
+            [ ' ##### Word Recall Score: ', '<h5>Word Recall Score: </h5>' ],
             // incorrect headings
-            [ '#h1# \n', '<h1>h1#</h1>' ],
-            [ '#h1 # \n', '<h1>h1 #</h1>' ],
+            [ '#h1# \n', '<h1>h1# </h1>' ],
+            [ '#h1 # \n', '<h1>h1 # </h1>' ],
             [ 'this is number #1' ],
             [ 'this is number #1 and this is #2.' ],
             // correct links
