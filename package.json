@@ -1,6 +1,6 @@
 {
     "name": "enketo-transformer",
-    "version": "1.24.1",
+    "version": "1.25.0",
     "description": "Library/app that transforms ODK-compliant XForms into a format that enketo-core consumes",
     "license": "Apache-2.0",
     "main": "src/transformer.js",
@@ -16,7 +16,8 @@
     "contributors": [],
     "scripts": {
         "start": "node app.js",
-        "test": "mocha test/*.spec.js"
+        "test": "mocha test/*.spec.js",
+        "develop": "DEBUG=api,transformer,markdown,language node app.js & http-server test/forms -p 8081"
     },
     "repository": {
         "type": "git",
@@ -32,7 +33,7 @@
     ],
     "dependencies": {
         "body-parser": "1.18.x",
-        "enketo-xslt": "1.16.1",
+        "enketo-xslt": "1.17.0",
         "express": "5.0.0-alpha.2",
         "language-tags": "1.0.5",
         "libxslt": "0.6.5",
@@ -43,6 +44,7 @@
     "devDependencies": {
         "chai": "4.1.x",
         "chai-as-promised": "7.1.x",
+        "http-server": "^0.11.1",
         "mocha": "^5.0.0",
         "xmldom": "0.1.x"
     }

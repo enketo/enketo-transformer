@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.25.0] - 2018-02-19
+---------------------
+##### Added
+- Support for appearance "new", "new-front", "new-rear" on media upload questions.
+
 [1.24.1] - 2018-01-30
 ---------------------
 ##### Fixed
