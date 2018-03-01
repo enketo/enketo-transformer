@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.25.1] - 2018-03-01
+---------------------
+##### Fixed
+- Markdown headers not limited from h1-h6 as they should be.
+
 [1.25.0] - 2018-02-19
 ---------------------
 ##### Added

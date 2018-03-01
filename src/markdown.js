@@ -36,7 +36,7 @@ function markdownToHtml( text ) {
         // links
         .replace( /\[([^\]]*)\]\(([^\)]+)\)/gm, '<a href="$2" target="_blank">$1</a>' )
         // headers
-        .replace( /^\s*(#+)\s?([^\n]*)(\n|$)/gm, _createHeader )
+        .replace( /^\s*(#{1,6})\s?([^#][^\n]*)(\n|$)/gm, _createHeader )
         // unordered lists 
         .replace( /(\n(\*|\+|-) (.*))+$/gm, _createUnorderedList )
         // ordered lists 

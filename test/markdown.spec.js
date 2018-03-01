@@ -47,6 +47,7 @@ describe( 'markdown', () => {
             [ '#h1 # \n', '<h1>h1 # </h1>' ],
             [ 'this is number #1' ],
             [ 'this is number #1 and this is #2.' ],
+            [ '####### A\nB', '<p>####### A</p>B' ],
             // correct links
             [ '[link](http://example.org)', '<a href="http://example.org" target="_blank">link</a>' ],
             // incorrect links
