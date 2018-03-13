@@ -48,7 +48,9 @@ function markdownToHtml( text ) {
         .replace( /&42;/gm, '*' )
         .replace( /&amp;/gm, '&' )
         // paragraphs
-        .replace( /([^\n]+)\n/gm, _createParagraph );
+        .replace( /([^\n]+)\n{2,}/gm, _createParagraph )
+        // any remaining newline characters
+        .replace( /([^\n]+)\n/gm, '$1<br>' );
 
     return html;
 }

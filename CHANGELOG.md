@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.25.2] - 2018-03-13
+---------------------
+##### Changed
+- In Markdown, make a distinction between paragraphs (2+ subsequent new lines) and simple new lines.
+
+##### Fixed
+- In Markdown, newline characters are not converted if they follow a heading.
+
 [1.25.1] - 2018-03-01
 ---------------------
 ##### Fixed

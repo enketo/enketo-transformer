@@ -47,7 +47,7 @@ describe( 'markdown', () => {
             [ '#h1 # \n', '<h1>h1 # </h1>' ],
             [ 'this is number #1' ],
             [ 'this is number #1 and this is #2.' ],
-            [ '####### A\nB', '<p>####### A</p>B' ],
+            [ '####### A\nB', '####### A<br>B' ],
             // correct links
             [ '[link](http://example.org)', '<a href="http://example.org" target="_blank">link</a>' ],
             // incorrect links
@@ -58,29 +58,29 @@ describe( 'markdown', () => {
             [ '<span>a</span>', '<span>a</span>' ],
             [ '&lt;span&gt;a&lt;/span&gt;', '<span>a</span>' ],
             [ '<span style="color:red;">red</span>' ],
-            [ '<span>bad\nunaffected <span style="color: purple">el</span>.', '<p>&lt;span&gt;bad</p>unaffected <span style="color: purple">el</span>.' ],
+            [ '<span>bad\nunaffected <span style="color: purple">el</span>.', '&lt;span&gt;bad<br>unaffected <span style="color: purple">el</span>.' ],
             [ '<span style=\'color:red;\'>red</span>' ],
             [ '<span style="color:red;">c</span><span style="color:blue;">r</span>' ],
             [ '><', '&gt;&lt;' ],
             // sanitized html
-            [ '<span style="color:red;" onclick="alert(\"gotcha!\")">click me</span>', '<span style="color:red;">click me</span>' ],
-            [ '<span onclick="alert(\"gotcha!\")" style="color:red;">click me</span>', '<span style="color:red;">click me</span>' ],
+            [ '<span style="color:red;" onclick="alert("gotcha!")">click me</span>', '<span style="color:red;">click me</span>' ],
+            [ '<span onclick="alert("gotcha!")" style="color:red;">click me</span>', '<span style="color:red;">click me</span>' ],
             // incorrect html
             [ '<span>a<span>', '&lt;span&gt;a&lt;span&gt;' ],
             [ '<span>a b c', '&lt;span&gt;a b c' ],
             // unsupported html
             [ '<div>a</div>', '&lt;div&gt;a&lt;/div&gt;' ],
-            [ '<button onclick="$=null;eval=\"evil\";">get awesomeness</button>',
-                '&lt;button onclick="$=null;eval=\"evil\";"&gt;get awesomeness&lt;/button&gt;'
+            [ '<button onclick="$=null;eval="evil";">get awesomeness</button>',
+                '&lt;button onclick="$=null;eval="evil";"&gt;get awesomeness&lt;/button&gt;'
             ],
             [ '<script src="hack.js"></script>', '&lt;script src="hack.js"&gt;&lt;/script&gt;' ],
             [ '&lt;script src="hack.js"&gt;&lt;/script&gt;', '&lt;script src="hack.js"&gt;&lt;/script&gt;' ],
             // correct unordered lists
-            [ '\n* a\n* b\n', '<ul><li>a</li><li>b</li></ul>' ], // note: pyxform trims labels starting with \n
+            [ '\n* a\n* b\n', '<ul><li>a</li><li>b</li></ul><br>' ], // note: pyxform trims labels starting with \n
             [ '\n* ', '<ul><li></li></ul>' ],
-            [ '\n* a\n* 2.\n', '<ul><li>a</li><li>2.</li></ul>' ],
+            [ '\n* a\n* 2.\n', '<ul><li>a</li><li>2.</li></ul><br>' ],
             [ 'list:\n* a\n* b \n+ c   \n+ d', 'list:<ul><li>a</li><li>b</li><li>c</li><li>d</li></ul>' ],
-            [ 'list:\n\n* a\n* b \n+ c   \n+ d', '<p>list:</p><ul><li>a</li><li>b</li><li>c</li><li>d</li></ul>' ],
+            [ 'list:\n\n* a\n* b \n+ c   \n+ d', 'list:<br><ul><li>a</li><li>b</li><li>c</li><li>d</li></ul>' ],
             // incorrect unordered lists            
             [ '-', '-' ],
             [ '*', '*' ],
@@ -92,22 +92,24 @@ describe( 'markdown', () => {
             [ '\n3. ', '<ol><li></li></ol>' ],
             [ '\n1. 2.\n2. b', '<ol><li>2.</li><li>b</li></ol>' ],
             [ 'list:\n1. a\n2. b \n501. c   \n6. d', 'list:<ol><li>a</li><li>b</li><li>c</li><li>d</li></ol>' ],
-            [ 'list:\n\n1. a\n2. b \n501. c   \n6. d', '<p>list:</p><ol><li>a</li><li>b</li><li>c</li><li>d</li></ol>' ],
+            [ 'list:\n\n1. a\n2. b \n501. c   \n6. d', 'list:<br><ol><li>a</li><li>b</li><li>c</li><li>d</li></ol>' ],
             // incorrect ordered lists            
             [ '3.', '3.' ],
             [ '3. ', '3. ' ],
             [ '3. a', '3. a' ],
             // correct combos
             [ 'format __s__ and _e_\nformat **s** and *e*',
-                '<p>format <strong>s</strong> and <em>e</em></p>format <strong>s</strong> and <em>e</em>'
+                'format <strong>s</strong> and <em>e</em><br>format <strong>s</strong> and <em>e</em>'
             ],
             [ '_e_ and <span style="color:red;">red</span> \n*e* and <span style="color:red;">red</span>',
-                '<p><em>e</em> and <span style="color:red;">red</span></p><em>e</em> and <span style="color:red;">red</span>'
+                '<em>e</em> and <span style="color:red;">red</span> <br><em>e</em> and <span style="color:red;">red</span>'
             ],
             [ '_<span style="color:red;">dbl</span>_', '<em><span style="color:red;">dbl</span></em>' ],
             [ '<span style="color:red;">_dbl_</span>', '<span style="color:red;"><em>dbl</em></span>' ],
             [ 'list:\n* __a__\n* _b_ \n+ [c](c)', 'list:<ul><li><strong>a</strong></li><li><em>b</em></li><li><a href="c" target="_blank">c</a></li></ul>' ],
             [ '<span style="color:blue">[link](http://enketo.org)</span>', '<span style="color:blue"><a href="http://enketo.org" target="_blank">link</a></span>' ],
+            [ '# heading\nline1\nline2', '<h1>heading</h1>line1<br>line2' ],
+            [ '####### heading7\nline1\nline2', '####### heading7<br>line1<br>line2' ],
             // escaping special characters with backslash
             [ 'A\\_B\\_C', 'A_B_C' ],
             [ '_A\\_B\\_C_', '<em>A_B_C</em>' ],
