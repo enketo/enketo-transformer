@@ -20,7 +20,7 @@ function markdownToHtml( text ) {
         // html encoding of < because libXMLJs Element.text() converts html entities
         .replace( />/gm, '&gt;' )
         // span
-        .replace( /&lt;\s?span([^\/\n]*)&gt;((?:(?!&lt;\/).)+)&lt;\/\s?span\s?&gt;/gm, _createSpan )
+        .replace( /&lt;\s?span([^/\n]*)&gt;((?:(?!&lt;\/).)+)&lt;\/\s?span\s?&gt;/gm, _createSpan )
         // "\" will be used as escape character for *, _
         .replace( /&/gm, '&amp;' )
         .replace( /\\\\/gm, '&92;' )
@@ -32,9 +32,9 @@ function markdownToHtml( text ) {
         .replace( /\*\*(.*?)\*\*/gm, '<strong>$1</strong>' )
         // emphasis
         .replace( /_([^\s][^_\n]*)_/gm, '<em>$1</em>' )
-        .replace( /\*([^\s][^\*\n]*)\*/gm, '<em>$1</em>' )
+        .replace( /\*([^\s][^*\n]*)\*/gm, '<em>$1</em>' )
         // links
-        .replace( /\[([^\]]*)\]\(([^\)]+)\)/gm, '<a href="$2" target="_blank">$1</a>' )
+        .replace( /\[([^\]]*)\]\(([^)]+)\)/gm, '<a href="$2" target="_blank">$1</a>' )
         // headers
         .replace( /^\s*(#{1,6})\s?([^#][^\n]*)(\n|$)/gm, _createHeader )
         // unordered lists 
