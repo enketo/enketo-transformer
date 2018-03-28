@@ -131,6 +131,7 @@ describe( 'markdown', () => {
             [ '\\', '\\' ],
             [ '\\\\', '\\' ],
             [ '\\\\\\', '\\\\' ],
+            [ '&92;' ]
         ].forEach( test => {
             const source = test[ 0 ];
             const expected = ( typeof test[ 1 ] !== 'undefined' ) ? test[ 1 ] : test[ 0 ];
