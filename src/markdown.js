@@ -21,6 +21,10 @@ function markdownToHtml( text ) {
         .replace( />/gm, '&gt;' )
         // span
         .replace( /&lt;\s?span([^/\n]*)&gt;((?:(?!&lt;\/).)+)&lt;\/\s?span\s?&gt;/gm, _createSpan )
+        // sup
+        .replace( /&lt;\s?sup([^/\n]*)&gt;((?:(?!&lt;\/).)+)&lt;\/\s?sup\s?&gt;/gm, _createSup )
+        // sub
+        .replace( /&lt;\s?sub([^/\n]*)&gt;((?:(?!&lt;\/).)+)&lt;\/\s?sub\s?&gt;/gm, _createSub )
         // "\" will be used as escape character for *, _
         .replace( /&/gm, '&amp;' )
         .replace( /\\\\/gm, '&92;' )
@@ -85,6 +89,16 @@ function _createParagraph( match, line ) {
 function _createSpan( match, attributes, content ) {
     const sanitizedAttributes = _sanitizeAttributes( attributes );
     return `<span${sanitizedAttributes}>${content}</span>`;
+}
+
+function _createSup( match, attributes, content ) {
+    // ignore attributes completely
+    return `<sup>${content}</sup>`;
+}
+
+function _createSub( match, attributes, content ) {
+    // ignore attributes completely
+    return `<sub>${content}</sub>`;
 }
 
 function _sanitizeAttributes( attributes ) {

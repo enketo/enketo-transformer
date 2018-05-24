@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+--------------------
+##### Added
+- Support for `<sup>` and `<sup>` (superscript and subscript).
+
 [1.25.2] - 2018-03-13
 ---------------------
 ##### Changed
