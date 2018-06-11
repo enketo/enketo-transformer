@@ -1,5 +1,4 @@
 const Promise = require( 'lie' );
-const fs = require( 'fs' );
 const pkg = require( '../package' );
 const crypto = require( 'crypto' );
 const libxslt = require( 'libxslt' );
