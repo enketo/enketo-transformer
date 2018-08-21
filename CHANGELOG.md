@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.29.0] - 2018-08-31
+---------------------
+##### Added
+- Propagate custom oc:constraint-type and oc:required-type attributes.
+
+##### Changed
+- Correct deprecated "form-data-post" value for _method_ attribute of submission element to "post".
+
 [1.28.4] - 2018-08-21
 ---------------------
 ##### Fixed

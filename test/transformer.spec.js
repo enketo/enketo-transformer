@@ -340,7 +340,6 @@ describe( 'transformer', () => {
 
     } );
 
-
     describe( 'processes multiline questions', () => {
 
         it( 'and outputs a textarea for appearance="multiline" on text input', () => {
@@ -459,6 +458,13 @@ describe( 'transformer', () => {
         } );
 
         it( 'does not add it if it contains /meta/instanceID in the OpenRosa namespace', () => expect( result2 ).to.eventually.have.property( 'model' ).and.to.not.contain( '<instanceID/>' ) );
+    } );
+
+    describe( 'converts deprecated', () => {
+        const xform = fs.readFileSync( './test/forms/deprecated.xml' );
+        const result = transformer.transform( { xform } );
+
+        it( 'method="form-data-post" to "post" in submission element', () => expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'method="post"' ) );
     } );
 
     describe( 'oc:relevantMsg binding attributes', () => {
