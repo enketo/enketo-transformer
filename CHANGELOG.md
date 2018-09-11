@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.30.0] - 2018-09-11
+---------------------
+##### Changed
+- Print hints are now guidance hints (`form="guidance"`) to comply with ODK XForms Specification.
+
 [1.29.0] - 2018-08-31
 ---------------------
 ##### Added
