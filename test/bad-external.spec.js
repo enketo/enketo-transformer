@@ -82,7 +82,7 @@ describe( 'for incompatible forms that require preprocessing', () => {
             } );
 
             // add the itemset with fixed label and value references
-            itemset = select1
+            const itemset = select1
                 .node( 'itemset' )
                 .namespace( NAMESPACES.xmlns )
                 .attr( {

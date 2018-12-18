@@ -36,18 +36,7 @@ function parse( lang, sample ) {
         }
     }
 
-    // If known IANA subtag, do not try to detect directionality.
-    if ( ianaLang ) {
-        language.dir = [
-            'ar', 'shu', 'sqr', 'ssh', 'xaa', 'yhd', 'yud', 'aao', 'abh', 'abv', 'acm',
-            'acq', 'acw', 'acx', 'acy', 'adf', 'ads', 'aeb', 'aec', 'afb', 'ajp', 'apc', 'apd', 'arb',
-            'arq', 'ars', 'ary', 'arz', 'auz', 'avl', 'ayh', 'ayl', 'ayn', 'ayp', 'bbz', 'pga', 'he',
-            'iw', 'ps', 'pbt', 'pbu', 'pst', 'prp', 'prd', 'ur', 'ydd', 'yds', 'yih', 'ji', 'yi', 'hbo',
-            'men', 'xmn', 'fa', 'jpr', 'peo', 'pes', 'prs', 'dv', 'sam'
-        ].indexOf( ianaLang.data.subtag ) !== -1 ? 'rtl' : 'ltr';
-    } else {
-        language.dir = _getDirectionality( sample );
-    }
+    language.dir = _getDirectionality( sample );
 
     return language;
 }
@@ -91,8 +80,8 @@ function _languagesOnly( obj ) {
  */
 function _getDirectionality( sample ) {
     const direction = stringDirection.getDirection( sample );
-    if ( direction !== 'rtl' ) {
-        return 'ltr';
+    if ( direction !== 'ltr' ) {
+        return 'rtl';
     }
     return direction;
 }

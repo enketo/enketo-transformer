@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.30.1] - 2018-12-18
+---------------------
+##### Fixed
+- Sorani (Kurdish) not detected as RTL + other general issues with RTL detection.
+
 [1.30.0] - 2018-09-11
 ---------------------
 ##### Changed

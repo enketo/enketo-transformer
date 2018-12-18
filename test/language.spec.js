@@ -108,6 +108,13 @@ describe( 'language', () => {
                 dir: 'rtl',
                 src: 'Dari (prs)'
             } ],
+            // sample returns 'bidi' directionality -> rtl
+            [ 'Sorani (ckb)', 'رهگهز', {
+                tag: 'ckb',
+                desc: 'Sorani', // or Central Kurdish?
+                dir: 'rtl',
+                src: 'Sorani (ckb)'
+            } ],
             // no space before paren open
             [ 'ArabicDialect(ar)', 'رب', {
                 tag: 'ar',
