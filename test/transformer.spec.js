@@ -433,17 +433,6 @@ describe( 'transformer', () => {
         ] ) );
     } );
 
-    describe( 'supports the enk:for attribute', () => {
-        const xform = fs.readFileSync( './test/forms/for.xml' );
-        const result = transformer.transform( {
-            xform
-        } );
-
-        it( 'by turning it into the data-for attribute', () => Promise.all( [
-            expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-for="../a"' ),
-        ] ) );
-    } );
-
     describe( 'for backwards compatibility of forms without a /meta/instanceID node', () => {
         const xform1 = fs.readFileSync( './test/forms/no-instance-id.xml' );
         const result1 = transformer.transform( {
@@ -465,26 +454,6 @@ describe( 'transformer', () => {
         const result = transformer.transform( { xform } );
 
         it( 'method="form-data-post" to "post" in submission element', () => expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'method="post"' ) );
-    } );
-
-    describe( 'oc:relevantMsg binding attributes', () => {
-        const xform = fs.readFileSync( './test/forms/relevant_constraint_required.xml' );
-
-        it( 'if includeRelevantMsg=1, are copied to or-relevant-msg elements or a default is added for relevant expressions', () => {
-            const result = transformer.transform( {
-                xform,
-                includeRelevantMsg: 1
-            } );
-            return expect( result ).to.eventually.have.property( 'form' ).and.to.satisfy( form => form.match( /or-relevant-msg/g ).length === 4 );
-        } );
-
-        it( 'are ignored by default', () => {
-            const result = transformer.transform( {
-                xform
-            } );
-            return expect( result ).to.eventually.have.property( 'form' ).and.not.to.contain( 'or-relevant-msg' );
-        } );
-
     } );
 
     describe( 'itext ids for itemsets are extracted', () => {
@@ -517,6 +486,69 @@ describe( 'transformer', () => {
             } );
             return expect( result ).to.eventually.have.property( 'form' ).and.to.match( MATCH );
         } );
+    } );
+
+
+    describe( 'custom stuff', () => {
+
+        describe( 'supports the enk:for attribute', () => {
+            const xform = fs.readFileSync( './test/forms/for.xml' );
+            const result = transformer.transform( {
+                xform
+            } );
+
+            it( 'by turning it into the data-for attribute', () => Promise.all( [
+                expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-for="../a"' ),
+            ] ) );
+        } );
+
+        describe( 'oc:relevantMsg binding attributes', () => {
+            const xform = fs.readFileSync( './test/forms/relevant_constraint_required.xml' );
+
+            it( 'if includeRelevantMsg=1, are copied to or-relevant-msg elements or a default is added for relevant expressions', () => {
+                const result = transformer.transform( {
+                    xform,
+                    includeRelevantMsg: 1
+                } );
+                return expect( result ).to.eventually.have.property( 'form' ).and.to.satisfy( form => form.match( /or-relevant-msg/g ).length === 4 );
+            } );
+
+            it( 'are ignored by default', () => {
+                const result = transformer.transform( {
+                    xform
+                } );
+                return expect( result ).to.eventually.have.property( 'form' ).and.not.to.contain( 'or-relevant-msg' );
+            } );
+
+        } );
+
+        describe( 'multiple OC constraints', () => {
+            const xform = fs.readFileSync( './test/forms/oc-custom-multiple-constraints.xml' );
+            const result = transformer.transform( { xform } );
+
+            describe( 'are added via oc:constraint[N] attribute', () => {
+                it( 'works for N=1', () => {
+                    return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'oc-constraint1=". != \'a\'"' );
+                } );
+
+                it( 'works for N=20', () => {
+                    return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'oc-constraint20=". != \'c\'"' );
+                } );
+
+            } );
+
+            describe( 'can get individual constraint messages with the oc:constraint[N]Msg attribute', () => {
+                it( 'works for N=1', () => {
+                    return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'class="oc-constraint1-msg' );
+                } );
+
+                it( 'works for N=20', () => {
+                    return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'class="oc-constraint20-msg' );
+                } );
+            } );
+
+        } );
+
     } );
 
 } );
