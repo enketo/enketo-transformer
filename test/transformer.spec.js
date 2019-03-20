@@ -528,23 +528,33 @@ describe( 'transformer', () => {
 
             describe( 'are added via oc:constraint[N] attribute', () => {
                 it( 'works for N=1', () => {
-                    return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'oc-constraint1=". != \'a\'"' );
+                    return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-constraint1=". != \'a\'"' );
                 } );
 
                 it( 'works for N=20', () => {
-                    return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'oc-constraint20=". != \'c\'"' );
+                    return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-constraint20=". != \'c\'"' );
                 } );
+
+                it( 'ignores oc:constraint without a number', () => {
+                    return expect( result ).to.eventually.have.property( 'form' ).and.to.not.contain( 'constraint to be ignored' );
+                } )
+
 
             } );
 
             describe( 'can get individual constraint messages with the oc:constraint[N]Msg attribute', () => {
                 it( 'works for N=1', () => {
-                    return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'class="oc-constraint1-msg' );
+                    return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'class="or-constraint1-msg' );
                 } );
 
                 it( 'works for N=20', () => {
-                    return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'class="oc-constraint20-msg' );
+                    return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'class="or-constraint20-msg' );
                 } );
+
+                it( 'ignores constraint messages without a number', () => {
+                    // The text "msg to be ignored is actually part of the result but is not present in a .or-constraint-msg span elmement
+                    return expect( result ).to.eventually.have.property( 'form' ).and.not.to.match( /or-constraint-msg [^>]+>msg to be ignored/ );
+                } )
             } );
 
         } );

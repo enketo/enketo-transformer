@@ -33,7 +33,7 @@
     ],
     "dependencies": {
         "body-parser": "1.18.x",
-        "enketo-xslt": "github:enketo/enketo-xslt.git#9ff0766",
+        "enketo-xslt": "github:enketo/enketo-xslt.git#02dd6e6",
         "express": "5.0.0-alpha.6",
         "language-tags": "1.0.5",
         "libxslt": "0.6.5",

@@ -17,7 +17,7 @@
                     </orx:meta>
                 </data>
             </instance>
-            <bind constraint="string-length(.) &gt; 10" jr:constraintMsg="needs &gt; 10" oc:constraint1=". != 'a'" oc:constraint2=". != 'b'" oc:constraint20=". != 'c'" oc:constraint1Msg="oc constraint 1 message" oc:constraint20Msg="oc constraint 20 message" nodeset="/data/something" type="string"/>
+            <bind constraint="string-length(.) &gt; 10" jr:constraintMsg="needs &gt; 10" oc:constraint="constraint to be ignored" oc:constraint1=". != 'a'" oc:constraint2=". != 'b'" oc:constraint20=". != 'c'" oc:constraintMsg="msg to be ignored" oc:constraint1Msg="oc constraint 1 message" oc:constraint20Msg="oc constraint 20 message" nodeset="/data/something" type="string"/>
             <bind nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
         </model>
     </h:head>
