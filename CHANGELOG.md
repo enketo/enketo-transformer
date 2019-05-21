@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.31.1]
+---------------------
+##### Changed
+- `columns-flex` is now `columns-pack` (last-minute spec change).
+
 [1.31.0]
 ---------------------
 ##### Changed
