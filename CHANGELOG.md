@@ -2,12 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[1.31.1]
+[Unreleased]
+---------------------
+##### Added
+- Support for orx:max-pixels
+
+[1.31.1] - 2019-05-21
 ---------------------
 ##### Changed
 - `columns-flex` is now `columns-pack` (last-minute spec change).
 
-[1.31.0]
+[1.31.0] - 2019-05-17
 ---------------------
 ##### Changed
 - Convert deprecated select/1 appearances to new appearances.
