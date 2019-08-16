@@ -1,9 +1,13 @@
-/** 
+/**
+ * @module api
+ */
+
+/**
  * This is not a robust, secure web API. It is just a quick starting point.
  * This is repo is not used in production as a web API (only as a library).
  *
  * See inventory of work to be done here: https://github.com/enketo/enketo-transformer/labels/web-api-only.
- * 
+ *
  * PRs are very welcome!
  */
 
@@ -71,11 +75,11 @@ router
     } );
 
 /**
- * Sends a request to an OpenRosa server. Only for basic retrieval of 
+ * Sends a request to an OpenRosa server. Only for basic retrieval of
  * public forms that do not require authentication.
  *
- * @param  { {url: string, method: string} } options  request options object
- * @return { Promise }
+ * @param { {url: string, method: string} } options - Request options object.
+ * @return { Promise<Error|object> } a promise that resolves in request body.
  */
 function _request( options ) {
     options.headers = options.headers || {};

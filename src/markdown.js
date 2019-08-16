@@ -1,16 +1,20 @@
 /**
+ * @module markdown
+ */
+
+/**
  * Transforms XForm label and hint textnode content with a subset of Markdown into HTML
- * 
+ *
  * Supported:
- * - _, __, *, **, [](), #, ##, ###, ####, #####, 
+ * - _, __, *, **, [](), #, ##, ###, ####, #####,
  * - span tags and html-encoded span tags,
  * - single-level unordered markdown lists and single-level ordered markdown lists
  * - newline characters
- * 
+ *
  * Also HTML encodes any unsupported HTML tags for safe use inside web-based clients
- * 
- * @param  {string} text text content of a textnode
- * @return {string}      transformed text content of a textnode
+ *
+ * @param {string} text - Text content of a textnode.
+ * @return {string} transformed text content of a textnode.
  */
 function markdownToHtml( text ) {
     // note: in JS $ matches end of line as well as end of string, and ^ both beginning of line and string
@@ -41,9 +45,9 @@ function markdownToHtml( text ) {
         .replace( /\[([^\]]*)\]\(([^)]+)\)/gm, '<a href="$2" target="_blank">$1</a>' )
         // headers
         .replace( /^\s*(#{1,6})\s?([^#][^\n]*)(\n|$)/gm, _createHeader )
-        // unordered lists 
+        // unordered lists
         .replace( /(\n(\*|\+|-) (.*))+$/gm, _createUnorderedList )
-        // ordered lists 
+        // ordered lists
         .replace( /(\n([0-9]+\.) (.*))+$/gm, _createOrderedList )
         // reverting escape of special characters
         .replace( /&35;/gm, '#' )
