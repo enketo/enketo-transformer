@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>Home - Enketo Transformer</title>
+    
+    <meta name="description" content="Library/app that transforms ODK-compliant XForms into a format that enketo-core consumes" />
+    
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav class="wrap">
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/enketo/enketo-transformer" target="_blank" class="menu-item" id="repository" >Github repo</a></h2><h2><a href="https://github.com/enketo/enketo-transformer/blob/master/CHANGELOG.md" target="_blank" class="menu-item" id="change-log" >Change log</a></h2><h3>Modules</h3><ul><li><a href="module-api.html">api</a><ul class='methods'><li data-type='method'><a href="module-api.html#~_request">_request</a></li></ul></li><li><a href="module-language.html">language</a><ul class='methods'><li data-type='method'><a href="module-language.html#~_getDirectionality">_getDirectionality</a></li><li data-type='method'><a href="module-language.html#~_getLangWithDesc">_getLangWithDesc</a></li><li data-type='method'><a href="module-language.html#~_getLangWithTag">_getLangWithTag</a></li><li data-type='method'><a href="module-language.html#~_languagesOnly">_languagesOnly</a></li><li data-type='method'><a href="module-language.html#~parse">parse</a></li></ul></li><li><a href="module-markdown.html">markdown</a><ul class='methods'><li data-type='method'><a href="module-markdown.html#~markdownToHtml">markdownToHtml</a></li></ul></li><li><a href="module-transformer.html">transformer</a><ul class='methods'><li data-type='method'><a href="module-transformer.html#~_addInstanceIdNodeIfMissing">_addInstanceIdNodeIfMissing</a></li><li data-type='method'><a href="module-transformer.html#~_getLanguageSampleText">_getLanguageSampleText</a></li><li data-type='method'><a href="module-transformer.html#~_getVersion">_getVersion</a></li><li data-type='method'><a href="module-transformer.html#~_md5">_md5</a></li><li data-type='method'><a href="module-transformer.html#~_parseXml">_parseXml</a></li><li data-type='method'><a href="module-transformer.html#~_renderMarkdown">_renderMarkdown</a></li><li data-type='method'><a href="module-transformer.html#~_replaceLanguageTags">_replaceLanguageTags</a></li><li data-type='method'><a href="module-transformer.html#~_replaceMediaSources">_replaceMediaSources</a></li><li data-type='method'><a href="module-transformer.html#~_replaceTheme">_replaceTheme</a></li><li data-type='method'><a href="module-transformer.html#~_transform">_transform</a></li><li data-type='method'><a href="module-transformer.html#~transform">transform</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+    <section class="package">
+        <h3> </h3>		
+    </section>
+
+
+
+
+
+
+
+
+
+    
+
+
+
+    <section class="readme">
+        <article><p><a href="http://badge.fury.io/js/enketo-transformer"><img src="https://badge.fury.io/js/enketo-transformer.svg" alt="npm version"></a> <a href="https://travis-ci.org/enketo/enketo-transformer"><img src="https://travis-ci.org/enketo/enketo-transformer.svg?branch=master" alt="Build Status"></a> <a href="https://david-dm.org/enketo/enketo-transformer"><img src="https://david-dm.org/enketo/enketo-transformer.svg" alt="Dependency Status"></a></p>
+<h1 id="enketo-transformer">Enketo Transformer</h1>
+<p>NodeJS library that transforms OpenRosa/ODK XForms into a format the Enketo understands. It works both as a library module, as well as a standalone app.</p>
+<h3 id="prerequisites">Prerequisites</h3>
+<ol>
+<li>nodeJS 8 and npm</li>
+</ol>
+<h3 id="install-as-module">Install as module</h3>
+<pre class="prettyprint source lang-bash"><code>npm install enketo-transformer --save
+</code></pre>
+<h3 id="use-as-module">Use as module</h3>
+<pre class="prettyprint source lang-js"><code>const transformer = require('enketo-transformer');
+const xform = fs.readFileSync( 'path/to/xform.xml' );
+
+transformer.transform( {
+    // required string of XForm
+    xform: xform,
+    // optional string, to add theme if no theme is defined in the XForm
+    theme: 'sometheme',
+    // optional map, to replace jr://..../myfile.png URLs
+    media: {
+        'myfile.png' : '/path/to/somefile.png',
+        'myfile.mp3' : '/another/path/to/2.mp3'
+    },
+    // optional ability to disable markdown rendering (default is true)
+    markdown: false,
+    // optional preprocess function that transforms the XForm (as libXMLJs object) to
+    // e.g. correct incompatible XForm syntax before Enketo's transformation takes place
+    preprocess: doc => doc,
+} ).then(function( result ){
+    // do something with result
+});
+</code></pre>
+<h3 id="install-as-app-(web-api)">Install as app (web API)</h3>
+<ol>
+<li>clone repo</li>
+<li>install dependencies with <code>npm install</code></li>
+</ol>
+<h3 id="use-as-app-(web-api)">Use as app (web API)</h3>
+<ol>
+<li>start with <code>npm start</code></li>
+<li>limited use with <code>GET /transform</code> with xform parameter (required, <strong>xform URL</strong>), or</li>
+<li>full-featured use with: <code>POST /transform</code> with URL-encoded body including <code>xform</code> (required, <strong>full XForm as a string</strong>), <code>theme</code> (optional, string), and <code>media</code> (optional, map) parameters</li>
+</ol>
+<p>sample GET request:</p>
+<pre class="prettyprint source"><code>curl http://localhost:8085/transform?xform=https://example.com/forms/78372/form.xml
+</code></pre>
+<p>sample POST request:</p>
+<pre class="prettyprint source lang-bash"><code>curl -d &quot;xform=&lt;xform>x&lt;/xform>&theme=plain&media[myfile.png]=/path/to/somefile.png&media[this]=that&quot; http://localhost:8085/transform
+</code></pre>
+<h3 id="response-format">Response format</h3>
+<pre class="prettyprint source lang-json"><code>{
+    &quot;form&quot; : &quot;&lt;form>.....&lt;/form>&quot;,
+    &quot;model&quot;: &quot;&lt;model>...&lt;/model>&quot;,
+    &quot;transformerVersion&quot;: &quot;1.13.0&quot;,
+    &quot;languageMap&quot;: { &quot;Français&quot;: &quot;fr&quot;, &quot;English&quot;: &quot;en&quot; }
+}
+
+</code></pre>
+<h3 id="test">Test</h3>
+<ul>
+<li>run tests with <code>npm test</code></li>
+</ul>
+<h3 id="develop">Develop</h3>
+<p>The script <code>npm run develop</code> runs the app on port 8085 and also serves test/forms on port 8081. You could test the transformation output by placing an XForm in test/forms and running
+http://localhost:8085/transform?xform=http://localhost:8081/autocomplete.xml</p>
+<p>A vagrant configuration file and provisioning script is also included. Use DEBUG environment variable to see debug terminal output, e.g.:</p>
+<pre class="prettyprint source lang-bash"><code>DEBUG=api,transformer,markdown,language node app.js
+</code></pre>
+<h3 id="license">License</h3>
+<p>See <a href="https://github.com/enketo/enketo-validate/blob/master/LICENSE">license document</a>. Also note the additional 'powered by enketo' <a href="https://github.com/enketo/enketo-xslt#license">footer requirement of enketo-xslt</a> which is used in this repository and therefore applicable.</p>
+<h3 id="change-log">Change Log</h3>
+<p>See <a href="https://github.com/enketo/enketo-transformer/blob/master/CHANGELOG.md">change log</a></p></article>
+    </section>
+
+
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+
+</body>
+</html>

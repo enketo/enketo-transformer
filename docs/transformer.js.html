@@ -1,4 +1,53 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>transformer.js - Enketo Transformer</title>
+    
+    <meta name="description" content="Library/app that transforms ODK-compliant XForms into a format that enketo-core consumes" />
+    
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav class="wrap">
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/enketo/enketo-transformer" target="_blank" class="menu-item" id="repository" >Github repo</a></h2><h2><a href="https://github.com/enketo/enketo-transformer/blob/master/CHANGELOG.md" target="_blank" class="menu-item" id="change-log" >Change log</a></h2><h3>Modules</h3><ul><li><a href="module-api.html">api</a><ul class='methods'><li data-type='method'><a href="module-api.html#~_request">_request</a></li></ul></li><li><a href="module-language.html">language</a><ul class='methods'><li data-type='method'><a href="module-language.html#~_getDirectionality">_getDirectionality</a></li><li data-type='method'><a href="module-language.html#~_getLangWithDesc">_getLangWithDesc</a></li><li data-type='method'><a href="module-language.html#~_getLangWithTag">_getLangWithTag</a></li><li data-type='method'><a href="module-language.html#~_languagesOnly">_languagesOnly</a></li><li data-type='method'><a href="module-language.html#~parse">parse</a></li></ul></li><li><a href="module-markdown.html">markdown</a><ul class='methods'><li data-type='method'><a href="module-markdown.html#~markdownToHtml">markdownToHtml</a></li></ul></li><li><a href="module-transformer.html">transformer</a><ul class='methods'><li data-type='method'><a href="module-transformer.html#~_addInstanceIdNodeIfMissing">_addInstanceIdNodeIfMissing</a></li><li data-type='method'><a href="module-transformer.html#~_getLanguageSampleText">_getLanguageSampleText</a></li><li data-type='method'><a href="module-transformer.html#~_getVersion">_getVersion</a></li><li data-type='method'><a href="module-transformer.html#~_md5">_md5</a></li><li data-type='method'><a href="module-transformer.html#~_parseXml">_parseXml</a></li><li data-type='method'><a href="module-transformer.html#~_renderMarkdown">_renderMarkdown</a></li><li data-type='method'><a href="module-transformer.html#~_replaceLanguageTags">_replaceLanguageTags</a></li><li data-type='method'><a href="module-transformer.html#~_replaceMediaSources">_replaceMediaSources</a></li><li data-type='method'><a href="module-transformer.html#~_replaceTheme">_replaceTheme</a></li><li data-type='method'><a href="module-transformer.html#~_transform">_transform</a></li><li data-type='method'><a href="module-transformer.html#~transform">transform</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">transformer.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * @module transformer
  */
 
@@ -74,7 +123,7 @@ function transform( survey ) {
  * @param {string} xslStr
  * @param {object} xmlDoc - libxmljs object of XML document
  * @param {object} xsltParams - Params object.
- * @return {Promise<Error|object>} libxmljs result document object.
+ * @return {Promise&lt;Error|object>} libxmljs result document object.
  */
 function _transform( xslStr, xmlDoc, xsltParams ) {
     const params = xsltParams || {};
@@ -99,7 +148,7 @@ function _transform( xslStr, xmlDoc, xsltParams ) {
  * Parses and XML string into a libxmljs object.
  *
  * @param  {string} xmlStr - XML string.
- * @return {Promise<Error|object>} libxmljs result document object.
+ * @return {Promise&lt;Error|object>} libxmljs result document object.
  */
 function _parseXml( xmlStr ) {
     let doc;
@@ -144,7 +193,7 @@ function _replaceTheme( doc, theme ) {
  * Replaces xformManifest urls with URLs according to an internal Enketo Express url format.
  *
  * @param {object} xmlDoc - libxmljs object.
- * @param {Array<*>} mediaMap
+ * @param {Array&lt;*>} mediaMap
  * @return {object} libxmljs object
  */
 function _replaceMediaSources( xmlDoc, mediaMap ) {
@@ -157,17 +206,17 @@ function _replaceMediaSources( xmlDoc, mediaMap ) {
         const attribute = ( mediaEl.name().toLowerCase() === 'a' ) ? 'href' : 'src';
         const src = mediaEl.attr( attribute ).value();
         const matches = src ? src.match( /jr:\/\/[\w-]+\/(.+)/ ) : null;
-        const filename = matches && matches.length ? matches[ 1 ] : null;
+        const filename = matches &amp;&amp; matches.length ? matches[ 1 ] : null;
         const replacement = filename ? mediaMap[ filename ] : null;
         if ( replacement ) {
             mediaEl.attr( attribute, replacement );
         }
     } );
 
-    // add form logo <img> element if applicable
+    // add form logo &lt;img> element if applicable
     const formLogo = mediaMap[ 'form_logo.png' ];
     const formLogoEl = xmlDoc.get( '//*[@class="form-logo"]' );
-    if ( formLogo && formLogoEl ) {
+    if ( formLogo &amp;&amp; formLogoEl ) {
         formLogoEl
             .node( 'img' )
             .attr( 'src', formLogo )
@@ -206,7 +255,7 @@ function _replaceLanguageTags( doc, survey ) {
     // add or correct dir and value attributes, and amend textcontent of options in language selector
     languageElements.forEach( ( el, index ) => {
         const val = el.attr( 'value' ).value();
-        if ( val && val !== languages[ index ].tag ) {
+        if ( val &amp;&amp; val !== languages[ index ].tag ) {
             map[ val ] = languages[ index ].tag;
         }
         el.attr( {
@@ -259,7 +308,7 @@ function _getLanguageSampleText( doc, lang ) {
     const langSampleEl = doc.get( `/root/form//span[contains(@class, "or-hint") and @lang="${lang}" and normalize-space() and not(./text() = '-')]` ) ||
         doc.get( `/root/form//span[@lang="${lang}" and normalize-space() and not(./text() = '-')]` );
 
-    return ( langSampleEl && langSampleEl.text().trim().length ) ? langSampleEl.text() : 'nothing';
+    return ( langSampleEl &amp;&amp; langSampleEl.text().trim().length ) ? langSampleEl.text() : 'nothing';
 }
 
 /**
@@ -300,7 +349,7 @@ function _addInstanceIdNodeIfMissing( doc ) {
 function _renderMarkdown( htmlDoc ) {
     const replacements = {};
 
-    // First turn all outputs into text so *<span class="or-output></span>* can be detected
+    // First turn all outputs into text so *&lt;span class="or-output>&lt;/span>* can be detected
     htmlDoc.find( '/root/form//span[contains(@class, "or-output")]' ).forEach( ( el, index ) => {
         const key = `---output-${index}`;
         const textNode = el.childNodes()[ 0 ].clone();
@@ -315,12 +364,12 @@ function _renderMarkdown( htmlDoc ) {
         let key;
         /**
          * Using text() is done because:
-         * a) We are certain that these <span>s do not contain other elements, other than formatting/markdown <span>s.
+         * a) We are certain that these &lt;span>s do not contain other elements, other than formatting/markdown &lt;span>s.
          * b) This avoids the need to merge any sibling text nodes that could have been created in the previous step.
          *
-         * Note that text() will convert &gt; to >
+         * Note that text() will convert &amp;gt; to >
          */
-        const original = el.text().replace( '<', '&lt;' ).replace( '>', '&gt;' );
+        const original = el.text().replace( '&lt;', '&amp;lt;' ).replace( '>', '&amp;gt;' );
         const rendered = markdown.toHtml( original );
         if ( original !== rendered ) {
             key = `$$$${index}`;
@@ -375,3 +424,30 @@ module.exports = {
     version,
     NAMESPACES
 };
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+
+</body>
+</html>
