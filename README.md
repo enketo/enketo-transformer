@@ -5,6 +5,8 @@ Enketo Transformer
 
 NodeJS library that transforms OpenRosa/ODK XForms into a format the Enketo understands. It works both as a library module, as well as a standalone app.
 
+[Technical Documentation](http://enketo.github.io/enketo-transformer/)
+
 ### Prerequisites
 
 1. nodeJS 8 and npm
