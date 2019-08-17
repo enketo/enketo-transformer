@@ -1,6 +1,9 @@
 .vagrant
 .grunt
 node_modules
+npm-debug.log
 *.sublime-project
 *.sublime-workspace
 *.code-workspace
+.DS_Store
+Thumbs.db

@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.33.0] - 2019-08-02
+---------------------
+##### Changed
+- Guidance hints are now added as a `<details>` element.
+
 [1.32.0] - 2019-07-01
 ---------------------
 ##### Added

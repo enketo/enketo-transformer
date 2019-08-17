@@ -1,9 +1,11 @@
-Enketo Transformer 
-=================
-
 [![npm version](https://badge.fury.io/js/enketo-transformer.svg)](http://badge.fury.io/js/enketo-transformer) [![Build Status](https://travis-ci.org/enketo/enketo-transformer.svg?branch=master)](https://travis-ci.org/enketo/enketo-transformer) [![Dependency Status](https://david-dm.org/enketo/enketo-transformer.svg)](https://david-dm.org/enketo/enketo-transformer)
 
+Enketo Transformer
+=================
+
 NodeJS library that transforms OpenRosa/ODK XForms into a format the Enketo understands. It works both as a library module, as well as a standalone app.
+
+[Technical Documentation](https://enketo.github.io/enketo-transformer/)
 
 ### Prerequisites
 
@@ -20,12 +22,12 @@ npm install enketo-transformer --save
 ```js
 const transformer = require('enketo-transformer');
 const xform = fs.readFileSync( 'path/to/xform.xml' );
-  
+
 transformer.transform( {
     // required string of XForm
     xform: xform,
     // optional string, to add theme if no theme is defined in the XForm
-    theme: 'sometheme', 
+    theme: 'sometheme',
     // optional map, to replace jr://..../myfile.png URLs
     media: {
         'myfile.png' : '/path/to/somefile.png',
@@ -33,8 +35,8 @@ transformer.transform( {
     },
     // optional ability to disable markdown rendering (default is true)
     markdown: false,
-    // optional preprocess function that transforms the XForm (as libXMLJs object) to 
-    // e.g. correct incompatible XForm syntax before Enketo's transformation takes place 
+    // optional preprocess function that transforms the XForm (as libXMLJs object) to
+    // e.g. correct incompatible XForm syntax before Enketo's transformation takes place
     preprocess: doc => doc,
 } ).then(function( result ){
     // do something with result
@@ -42,6 +44,7 @@ transformer.transform( {
 ```
 
 ### Install as app (web API)
+
 1. clone repo
 2. install dependencies with `npm install`
 
@@ -56,7 +59,7 @@ sample GET request:
 curl http://localhost:8085/transform?xform=https://example.com/forms/78372/form.xml
 ```
 
-sample POST request: 
+sample POST request:
 ```bash
 curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.png&media[this]=that" http://localhost:8085/transform
 ```
@@ -70,7 +73,7 @@ curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.
     "transformerVersion": "1.13.0",
     "languageMap": { "Français": "fr", "English": "en" }
 }
-    
+
 ```
 
 ### Test
@@ -78,7 +81,7 @@ curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.
 * run tests with `npm test`
 
 ### Develop
- 
+
 The script `npm run develop` runs the app on port 8085 and also serves test/forms on port 8081. You could test the transformation output by placing an XForm in test/forms and running
 http://localhost:8085/transform?xform=http://localhost:8081/autocomplete.xml
 
@@ -90,8 +93,8 @@ DEBUG=api,transformer,markdown,language node app.js
 
 ### License
 
-See [license document](./LICENSE). Also note the additional 'powered by enketo' [footer requirement of enketo-xslt](https://github.com/enketo/enketo-xslt#license) which is used in this repository and therefore applicable.
+See [license document](https://github.com/enketo/enketo-validate/blob/master/LICENSE). Also note the additional 'powered by enketo' [footer requirement of enketo-xslt](https://github.com/enketo/enketo-xslt#license) which is used in this repository and therefore applicable.
 
 ### Change Log
 
-See [change log](./CHANGELOG.md)
+See [change log](https://github.com/enketo/enketo-transformer/blob/master/CHANGELOG.md)

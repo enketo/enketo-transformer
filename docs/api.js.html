@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>api.js - Enketo Transformer</title>
+    
+    <meta name="description" content="Library/app that transforms ODK-compliant XForms into a format that enketo-core consumes" />
+    
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav class="wrap">
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/enketo/enketo-transformer" target="_blank" class="menu-item" id="repository" >Github repo</a></h2><h2><a href="https://github.com/enketo/enketo-transformer/blob/master/CHANGELOG.md" target="_blank" class="menu-item" id="change-log" >Change log</a></h2><h3>Modules</h3><ul><li><a href="module-api.html">api</a><ul class='methods'><li data-type='method'><a href="module-api.html#~_request">_request</a></li></ul></li><li><a href="module-language.html">language</a><ul class='methods'><li data-type='method'><a href="module-language.html#~_getDirectionality">_getDirectionality</a></li><li data-type='method'><a href="module-language.html#~_getLangWithDesc">_getLangWithDesc</a></li><li data-type='method'><a href="module-language.html#~_getLangWithTag">_getLangWithTag</a></li><li data-type='method'><a href="module-language.html#~_languagesOnly">_languagesOnly</a></li><li data-type='method'><a href="module-language.html#~parse">parse</a></li></ul></li><li><a href="module-markdown.html">markdown</a><ul class='methods'><li data-type='method'><a href="module-markdown.html#~markdownToHtml">markdownToHtml</a></li></ul></li><li><a href="module-transformer.html">transformer</a><ul class='methods'><li data-type='method'><a href="module-transformer.html#~_addInstanceIdNodeIfMissing">_addInstanceIdNodeIfMissing</a></li><li data-type='method'><a href="module-transformer.html#~_getLanguageSampleText">_getLanguageSampleText</a></li><li data-type='method'><a href="module-transformer.html#~_getVersion">_getVersion</a></li><li data-type='method'><a href="module-transformer.html#~_md5">_md5</a></li><li data-type='method'><a href="module-transformer.html#~_parseXml">_parseXml</a></li><li data-type='method'><a href="module-transformer.html#~_renderMarkdown">_renderMarkdown</a></li><li data-type='method'><a href="module-transformer.html#~_replaceLanguageTags">_replaceLanguageTags</a></li><li data-type='method'><a href="module-transformer.html#~_replaceMediaSources">_replaceMediaSources</a></li><li data-type='method'><a href="module-transformer.html#~_replaceTheme">_replaceTheme</a></li><li data-type='method'><a href="module-transformer.html#~_transform">_transform</a></li><li data-type='method'><a href="module-transformer.html#~transform">transform</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">api.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @module api
+ */
+
+/**
+ * This is not a robust, secure web API. It is just a quick starting point.
+ * This is repo is not used in production as a web API (only as a library).
+ *
+ * See inventory of work to be done here: https://github.com/enketo/enketo-transformer/labels/web-api-only.
+ *
+ * PRs are very welcome!
+ */
+
+const Promise = require( 'lie' );
+const request = require( 'request' );
+const express = require( 'express' );
+const router = express.Router();
+const transformer = require( './transformer' );
+
+router
+    .get( '/', ( req, res ) => {
+        // NOTE: req.query.xform is a URL
+        if ( req.app.get( 'secure' ) ) {
+            res.status( 405 ).send( 'Not Allowed' );
+        } else if ( !req.query.xform ) {
+            res.status( 400 ).send( 'Bad Request.' );
+        } else {
+            // allow requests from anywhere
+            res.set( 'Access-Control-Allow-Origin', '*' );
+
+            _request( {
+                    method: 'get',
+                    url: req.query.xform
+                } )
+                .then( xform => transformer.transform( {
+                    xform,
+                    theme: req.query.theme,
+                    markdown: req.query.markdown !== 'false'
+                } ) )
+                .then( result => {
+                    res.json( result );
+                } )
+                .catch( error => {
+                    error.status = error.status || 500;
+                    error.message = error.message || 'Unknown error.';
+                    res.status( error.status ).send( `${error.message} (stack: ${error.stack})` );
+                } );
+        }
+    } )
+    .post( '/', ( req, res ) => {
+        // NOTE: req.query.xform is an XML string
+        if ( req.app.get( 'secure' ) ) {
+            res.status( 405 ).send( 'Not Allowed' );
+        } else if ( !req.body.xform ) {
+            res.status( 400 ).send( 'Bad Request.' );
+        } else {
+            // allow requests from anywhere
+            res.set( 'Access-Control-Allow-Origin', '*' );
+
+            transformer.transform( {
+                    xform: req.body.xform,
+                    theme: req.body.theme,
+                    media: req.body.media,
+                    markdown: req.body.markdown !== 'false'
+                } )
+                .then( result => {
+                    res.json( result );
+                } )
+                .catch( error => {
+                    error.status = error.status || 500;
+                    error.message = error.message || 'Unknown error.';
+                    res.status( error.status ).send( `${error.message} (stack: ${error.stack})` );
+                } );
+        }
+    } );
+
+/**
+ * Sends a request to an OpenRosa server. Only for basic retrieval of
+ * public forms that do not require authentication.
+ *
+ * @param { {url: string, method: string} } options - Request options object.
+ * @return { Promise&lt;Error|object> } a promise that resolves in request body.
+ */
+function _request( options ) {
+    options.headers = options.headers || {};
+    options.headers[ 'X-OpenRosa-Version' ] = '1.0';
+
+    const method = options.method || 'get';
+
+    return new Promise( ( resolve, reject ) => {
+        request[ method ]( options, ( error, response, body ) => {
+            if ( error ) {
+                console.log( `Error occurred when requesting ${options.url}`, error );
+                reject( error );
+            } else if ( response.statusCode === 401 ) {
+                const error = new Error( 'Forbidden. Authorization Required.' );
+                error.status = response.statusCode;
+                reject( error );
+            } else if ( response.statusCode &lt; 200 || response.statusCode >= 300 ) {
+                const error = new Error( `Request to ${options.url} failed.` );
+                error.status = response.statusCode;
+                reject( error );
+            } else {
+                console.log( `response of request to ${options.url} has status code: `, response.statusCode );
+                resolve( body );
+            }
+        } );
+    } );
+}
+
+module.exports = app => {
+    app.use( '/transform', router );
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+
+</body>
+</html>
