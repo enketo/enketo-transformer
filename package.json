@@ -16,7 +16,7 @@
     "contributors": [],
     "scripts": {
         "start": "node app.js",
-        "test": "nyc --reporter=html --reporter=text mocha test/*.spec.js",
+        "test": "nyc mocha test/*.spec.js && node update-readme-with-shield-badge.js",
         "build-docs": "rimraf docs && ./node_modules/.bin/jsdoc -c jsdoc.config.js",
         "develop": "DEBUG=api,transformer,markdown,language node app.js & http-server test/forms -p 8081"
     },
@@ -48,6 +48,7 @@
         "docdash": "^1.1.1",
         "eslint": "^6.1.0",
         "eslint-plugin-jsdoc": "^15.8.1",
+        "istanbul-reporter-shield-badge": "^1.2.0",
         "http-server": "^0.11.1",
         "jsdoc": "^3.6.3",
         "mocha": "^5.0.0",
