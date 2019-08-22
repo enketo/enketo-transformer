@@ -276,6 +276,13 @@
             <select_media/>
             <my_trigger/>
           </display_widgets>
+          <range_widgets>
+            <default/>
+            <no_ticks/>
+            <vertical/>
+            <picker/>
+            <readonly/>
+          </range_widgets>
           <meta>
             <instanceID/>
           </meta>
@@ -550,6 +557,11 @@
       <bind nodeset="/widgets/display_widgets/text_media" type="string"/>
       <bind nodeset="/widgets/display_widgets/select_media" type="select1"/>
       <bind nodeset="/widgets/display_widgets/my_trigger" required="true()"/>
+      <bind nodeset="/widgets/range_widgets/default" required="false()"/>
+      <bind nodeset="/widgets/range_widgets/no_ticks" required="false()"/>
+      <bind nodeset="/widgets/range_widgets/vertical" required="false()"/>
+      <bind nodeset="/widgets/range_widgets/picker" required="false()"/>
+      <bind nodeset="/widgets/range_widgets/default_readonly" required="false()" readonly="true()"/>
       <bind calculate="concat('uuid:', uuid())" nodeset="/widgets/meta/instanceID" readonly="true()" type="string"/>
       <bind calculate="'02190a2c50aa4477bed06b13f4fb8969'" nodeset="/widgets/formhub/uuid" type="string"/>
     </model>
@@ -1118,6 +1130,29 @@ The decimal number you entered was <output value=" /widgets/number_widgets/my_de
         <label>Acknowledge widget</label>
         <hint>Need to push button to proceed to next question in ODK. In enketo no user action is required, the message is simply displayed the same as a note.</hint>
       </trigger>
+    </group>
+    <group ref="/widgets/range_widgets">
+      <label>Range widgets</label>
+      <range end="50" ref="/widgets/range_widgets/default" start="0" step="3">
+        <label>Default</label>
+        <hint>Default appearance or when appearance is empty.</hint>
+      </range>
+      <range appearance="no-ticks" end="50" ref="/widgets/range_widgets/no_ticks" start="0" step="3">
+        <label>No Ticks</label>
+        <hint>Set appearance = no-ticks.</hint>
+      </range>
+      <range appearance="vertical" end="50" ref="/widgets/range_widgets/vertical" start="0" step="3">
+        <label>Vertical</label>
+        <hint>Set appearance = vertical.</hint>
+      </range>
+      <range appearance="picker" end="50" ref="/widgets/range_widgets/picker" start="0" step="3">
+        <label>Picker</label>
+        <hint>Set appearance = picker.</hint>
+      </range>
+      <range end="50" ref="/widgets/range_widgets/default_readonly" start="0" step="3">
+        <label>Read Only</label>
+        <hint>Set readonly = true().</hint>
+      </range>
     </group>
   </h:body>
 </h:html>

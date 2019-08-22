@@ -519,4 +519,54 @@ describe( 'transformer', () => {
         } );
     } );
 
+    describe( 'transform range widget', () => {
+        const xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );
+        const result = transformer.transform( { xform } );
+
+        it( 'with empty appearance', () => {
+            return result.then( res => {
+                let doc = parser.parseFromString( res.form, 'text/xml' );
+                return Promise.all( [
+                    expect( doc.getElementsByTagName( 'input' )[ 91 ].getAttribute( 'name' ) ).to.equal( '/widgets/range_widgets/default' )
+                ] );
+            } );   
+        } );
+
+        it( 'with no_ticks appearance', () => {
+            return result.then( res => {
+                let doc = parser.parseFromString( res.form, 'text/xml' );
+                return Promise.all( [
+                    expect( doc.getElementsByTagName( 'input' )[ 92 ].getAttribute( 'name' ) ).to.equal( '/widgets/range_widgets/no_ticks' )
+                ] );
+            } );   
+        } );
+
+        it( 'with vertical appearance', () => {
+            return result.then( res => {
+                let doc = parser.parseFromString( res.form, 'text/xml' );
+                return Promise.all( [
+                    expect( doc.getElementsByTagName( 'input' )[ 93 ].getAttribute( 'name' ) ).to.equal( '/widgets/range_widgets/vertical' )
+                ] );
+            } );   
+        } );
+
+        it( 'with picker appearance', () => {
+            return result.then( res => {
+                let doc = parser.parseFromString( res.form, 'text/xml' );
+                return Promise.all( [
+                    expect( doc.getElementsByTagName( 'input' )[ 94 ].getAttribute( 'name' ) ).to.equal( '/widgets/range_widgets/picker' )
+                ] );
+            } );   
+        } );
+
+        it( 'with readonly appearance', () => {
+            return result.then( res => {
+                let doc = parser.parseFromString( res.form, 'text/xml' );
+                return Promise.all( [
+                    expect( doc.getElementsByTagName( 'input' )[ 95 ].getAttribute( 'name' ) ).to.equal( '/widgets/range_widgets/default_readonly' )
+                ] );
+            } );   
+        } );
+    } );
+
 } );
