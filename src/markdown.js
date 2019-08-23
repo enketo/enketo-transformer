@@ -13,6 +13,7 @@
  *
  * Also HTML encodes any unsupported HTML tags for safe use inside web-based clients
  *
+ * @static
  * @param {string} text - Text content of a textnode.
  * @return {string} transformed text content of a textnode.
  */

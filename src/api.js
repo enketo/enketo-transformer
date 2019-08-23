@@ -1,9 +1,7 @@
 /**
  * @module api
- */
-
-/**
- * This is not a robust, secure web API. It is just a quick starting point.
+ *
+ * @description This is not a robust, secure web API. It is just a quick starting point.
  * This is repo is not used in production as a web API (only as a library).
  *
  * See inventory of work to be done here: https://github.com/enketo/enketo-transformer/labels/web-api-only.
