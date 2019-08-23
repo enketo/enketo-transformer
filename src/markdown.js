@@ -64,25 +64,50 @@ function markdownToHtml( text ) {
     return html;
 }
 
+/**
+ * @param {string} match - The matched substring.
+ * @param {*} hashtags - Before header text. `#` gives `<h1>`, `####` gives `<h4>`.
+ * @param {string} content - Header text.
+ * @return {string} HTML string.
+ */
 function _createHeader( match, hashtags, content ) {
     const level = hashtags.length;
     return `<h${level}>${content.replace( /#+$/, '' )}</h${level}>`;
 }
 
+/**
+ * @param {string} match - The matched substring.
+ * @return {string} HTML string.
+ */
 function _createUnorderedList( match ) {
     const items = match.replace( /\n?(\*|\+|-)(.*)/gm, _createItem );
     return `<ul>${items}</ul>`;
 }
 
+/**
+ * @param {string} match - The matched substring.
+ * @return {string} HTML string.
+ */
 function _createOrderedList( match ) {
     const items = match.replace( /\n?([0-9]+\.)(.*)/gm, _createItem );
     return `<ol>${items}</ol>`;
 }
 
+/**
+ * @param {string} match - The matched substring.
+ * @param {*} bullet - unused?
+ * @param {string} content - Item text.
+ * @return {string} HTML string.
+ */
 function _createItem( match, bullet, content ) {
     return `<li>${content.trim()}</li>`;
 }
 
+/**
+ * @param {string} match - The matched substring.
+ * @param {string} line
+ * @return {string} HTML string.
+ */
 function _createParagraph( match, line ) {
     const trimmed = line.trim();
     if ( /^<\/?(ul|ol|li|h|p|bl)/i.test( trimmed ) ) {
@@ -91,21 +116,43 @@ function _createParagraph( match, line ) {
     return `<p>${trimmed}</p>`;
 }
 
+/**
+ * @param {string} match - The matched substring.
+ * @param {string} attributes - Attributes to be added for `<span>`
+ * @param {string} content - Span text.
+ * @return {string} HTML string.
+ */
 function _createSpan( match, attributes, content ) {
     const sanitizedAttributes = _sanitizeAttributes( attributes );
     return `<span${sanitizedAttributes}>${content}</span>`;
 }
 
+/**
+ * @param {string} match - The matched substring.
+ * @param {string} attributes - unused?
+ * @param {string} content - Sup text.
+ * @return {string} HTML string.
+ */
 function _createSup( match, attributes, content ) {
     // ignore attributes completely
     return `<sup>${content}</sup>`;
 }
 
+/**
+ * @param {string} match - The matched substring.
+ * @param {string} attributes - unused?
+ * @param {string} content - Sub text.
+ * @return {string} HTML string.
+ */
 function _createSub( match, attributes, content ) {
     // ignore attributes completely
     return `<sub>${content}</sub>`;
 }
 
+/**
+ * @param {string} attributes
+ * @return {string} style
+ */
 function _sanitizeAttributes( attributes ) {
     const styleMatches = attributes.match( /( style=(["'])[^"']*\2)/ );
     const style = ( styleMatches && styleMatches.length ) ? styleMatches[ 0 ] : '';
