@@ -95,7 +95,7 @@ function _createOrderedList( match ) {
 
 /**
  * @param {string} match - The matched substring.
- * @param {*} bullet - unused?
+ * @param {*} bullet
  * @param {string} content - Item text.
  * @return {string} HTML string.
  */
@@ -129,7 +129,7 @@ function _createSpan( match, attributes, content ) {
 
 /**
  * @param {string} match - The matched substring.
- * @param {string} attributes - unused?
+ * @param {string} attributes
  * @param {string} content - Sup text.
  * @return {string} HTML string.
  */
@@ -140,7 +140,7 @@ function _createSup( match, attributes, content ) {
 
 /**
  * @param {string} match - The matched substring.
- * @param {string} attributes - unused?
+ * @param {string} attributes
  * @param {string} content - Sub text.
  * @return {string} HTML string.
  */
