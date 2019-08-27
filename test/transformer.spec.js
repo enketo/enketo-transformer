@@ -519,4 +519,33 @@ describe( 'transformer', () => {
         } );
     } );
 
+
+    describe( 'range questions', () => {
+
+        it( 'with "picker" appearance, have the same HTML form output as the equivalent select-one-minimal question', () => {
+            const selectMinimalXform = fs.readFileSync( './test/forms/select-one-numbers.xml', 'utf8' );
+            const rangePickerXform = fs.readFileSync( './test/forms/range-picker.xml', 'utf8' );
+
+            return Promise.all( [
+                transformer.transform( { xform: selectMinimalXform } ),
+                transformer.transform( { xform: rangePickerXform } )
+            ] ).then( results => {
+                // eliminate some acceptable differences:
+                const modifiedSelectMinimalResult = results[ 0 ].form
+                    .replace( 'or-appearance-minimal', '' )
+                    .replace( /data-type-xml=".+" /, '' )
+                    .replace( /data-name=".+" /, '' );
+                const modifiedRangePickerResult = results[ 1 ].form
+                    .replace( 'or-appearance-picker', '' )
+                    .replace( /data-type-xml=".+" /, '' )
+                    .replace( /min=".+" /, '' )
+                    .replace( /max=".+" /, '' )
+                    .replace( /step=".+" /, '' );
+
+                expect( modifiedSelectMinimalResult ).to.equal( modifiedRangePickerResult );
+            } );
+
+        } );
+    } );
+
 } );
