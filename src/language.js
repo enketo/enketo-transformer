@@ -16,6 +16,7 @@ const stringDirection = require( 'string-direction' );
 /**
  * Parses a language string into a language object. Guesses missing properties.
  *
+ * @static
  * @see http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
  * @param {string} lang - Language strings as included in the XForm.
  * @param {string} sample - A text sample.

@@ -10,16 +10,28 @@ const libxmljs = libxslt.libxmljs;
 const language = require( './language' );
 const markdown = require( './markdown' );
 const sheets = require( 'enketo-xslt' );
+/**
+ * @constant
+ * @static
+ * @type object
+ * @default
+ */
 const NAMESPACES = {
     xmlns: 'http://www.w3.org/2002/xforms',
     orx: 'http://openrosa.org/xforms',
     h: 'http://www.w3.org/1999/xhtml'
 };
+/**
+ * @constant
+ * @static
+ * @type string
+ */
 const version = _getVersion();
 
 /**
  * Performs XSLT transformation on XForm and process the result.
  *
+ * @static
  * @param {{xform: string, theme: string}} survey - Survey object with at least an xform property.
  * @return {Promise} promise
  */
@@ -184,7 +196,7 @@ function _replaceMediaSources( xmlDoc, mediaMap ) {
  * @see  http://www.w3.org/International/questions/qa-choosing-language-tags
  *
  * @param {object} doc - libxmljs object.
- * @param {object} survey
+ * @param {object} survey - Survey object.
  * @return {object} libxmljs object.
  */
 function _replaceLanguageTags( doc, survey ) {
@@ -344,6 +356,10 @@ function _renderMarkdown( htmlDoc ) {
     return htmlStr;
 }
 
+/**
+ * @param {object} doc - libxmljs object.
+ * @return {string} stringified document.
+ */
 function _docToString( doc ) {
     // TODO: does this result in self-closing tags?
     return doc.root().get( '*' ).toString( false );
