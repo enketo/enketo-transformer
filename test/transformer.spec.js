@@ -232,6 +232,28 @@ describe( 'transformer', () => {
             ] );
         } );
 
+        it( `in the model for binary questions that contain a default value by copying to a 
+            src attribute and resolving the URL according to a provided map`, () => {
+            const xform = fs.readFileSync( './test/forms/image-default.xml', 'utf8' );
+            const media = {
+                'happy.jpg': 'https://feelings/happy.jpg',
+                'unhappy.jpg': 'https://feelings/unhappy.jpg',
+                'indifferent.png': 'https://feelings/indifferent.png'
+            };
+
+            const result = transformer.transform( {
+                xform,
+                media
+            } );
+
+            return Promise.all( [
+                expect( result ).to.eventually.have.property( 'model' )
+                .and.to.contain( '<ann src="https://feelings/unhappy.jpg">jr://images/unhappy.jpg</ann>' ),
+                expect( result ).to.eventually.have.property( 'model' )
+                .and.to.contain( '<dra src="https://feelings/indifferent.png">jr://images/indifferent.png</dra>' )
+            ] );
+        } );
+
         it( 'by adding a form logo <img> if needed', () => {
             const xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );
             const media = {
