@@ -34,7 +34,6 @@
     ],
     "dependencies": {
         "body-parser": "1.19.x",
-        "enketo-xslt": "1.25.0",
         "express": "^5.0.0-alpha.7",
         "language-tags": "1.0.5",
         "libxslt": "0.6.5",

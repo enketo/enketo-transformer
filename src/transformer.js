@@ -9,7 +9,10 @@ const libxslt = require( 'libxslt' );
 const libxmljs = libxslt.libxmljs;
 const language = require( './language' );
 const markdown = require( './markdown' );
-const sheets = require( 'enketo-xslt' );
+const fs = require( 'fs' );
+const path = require( 'path' );
+const xslForm = fs.readFileSync( path.join( __dirname, './xsl/openrosa2html5form.xsl' ), 'utf8' );
+const xslModel = fs.readFileSync( path.join( __dirname, './xsl/openrosa2xmlmodel.xsl' ), 'utf8' );
 /**
  * @constant
  * @static
@@ -52,7 +55,7 @@ function transform( survey ) {
         .then( doc => {
             xformDoc = doc;
 
-            return _transform( sheets.xslForm, xformDoc, xsltParams );
+            return _transform( xslForm, xformDoc, xsltParams );
         } )
         .then( htmlDoc => {
             htmlDoc = _replaceTheme( htmlDoc, survey.theme );
@@ -64,7 +67,7 @@ function transform( survey ) {
                 survey.form = _docToString( htmlDoc );
             }
 
-            return _transform( sheets.xslModel, xformDoc );
+            return _transform( xslModel, xformDoc );
         } )
         .then( xmlDoc => {
             xmlDoc = _replaceMediaSources( xmlDoc, survey.media );
@@ -394,7 +397,7 @@ function _docToString( doc ) {
  * @return {string} hash representing version of XSL stylesheets
  */
 function _getVersion() {
-    return _md5( sheets.xslForm + sheets.xslModel + pkg.version );
+    return _md5( xslForm + xslModel + pkg.version );
 }
 
 /**
@@ -412,5 +415,9 @@ function _md5( message ) {
 module.exports = {
     transform,
     version,
-    NAMESPACES
+    NAMESPACES,
+    sheets: {
+        xslForm,
+        xslModel
+    }
 };
