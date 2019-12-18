@@ -7,6 +7,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ##### Added
 - Support for binary defaults.
 
+##### Changed
+- Moved enketo-xslt to this repo.
+
 [1.35.0] - 2019-10-16
 ---------------------
 ##### Changed
