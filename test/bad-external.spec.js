@@ -152,7 +152,6 @@ describe( 'for incompatible forms that require preprocessing', () => {
         return result.then( res => {
             const doc = parser.parseFromString( res.form, 'text/xml' );
             const selects = doc.getElementsByTagName( 'select' );
-            const inputs = doc.getElementsByTagName( 'input' );
             return Promise.all( [
                 expect( selects ).to.have.length( 2 ), // language selector and the one with appearance=minimal
                 expect( selects[ 1 ].getAttribute( 'name' ) ).to.equal( '/select_one_external/city2' ),
