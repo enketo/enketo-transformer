@@ -62,7 +62,7 @@
 
 
     <section class="readme">
-        <article><p><img src="https://img.shields.io/badge/coverage-97.28%25-brightgreen.svg" alt="coverage-shield-badge-1">
+        <article><p><img src="https://img.shields.io/badge/coverage-97.46%25-brightgreen.svg" alt="coverage-shield-badge-1">
 <a href="http://badge.fury.io/js/enketo-transformer"><img src="https://badge.fury.io/js/enketo-transformer.svg" alt="npm version"></a> <a href="https://travis-ci.org/enketo/enketo-transformer"><img src="https://travis-ci.org/enketo/enketo-transformer.svg?branch=master" alt="Build Status"></a> <a href="https://david-dm.org/enketo/enketo-transformer"><img src="https://david-dm.org/enketo/enketo-transformer.svg" alt="Dependency Status"></a></p>
 <h1 id="enketo-transformer">Enketo Transformer</h1>
 <p>NodeJS library that transforms OpenRosa/ODK XForms into a format the Enketo understands. It works both as a library module, as well as a standalone app.</p>
@@ -134,7 +134,18 @@ http://localhost:8085/transform?xform=http://localhost:8081/autocomplete.xml</p>
 <pre class="prettyprint source lang-bash"><code>DEBUG=api,transformer,markdown,language node app.js
 </code></pre>
 <h3 id="license">License</h3>
-<p>See <a href="https://github.com/enketo/enketo-validate/blob/master/LICENSE">license document</a>. Also note the additional 'powered by enketo' <a href="https://github.com/enketo/enketo-xslt#license">footer requirement of enketo-xslt</a> which is used in this repository and therefore applicable.</p>
+<p>See <a href="./LICENSE">license document</a>.</p>
+<p>In addition, any product that uses enketo-transformer or parts thereof is required to have a &quot;Powered by Enketo&quot; footer, according to the specifications below, on all screens in which the output of enketo-xslt, or parts thereof, are used, unless explicity exempted from this requirement by Enketo LLC in writing. Partners and sponsors of the Enketo Project, listed on <a href="https://enketo.org/#about">https://enketo.org/#about</a> and on <a href="https://github.com/enketo/enketo-core#sponsors">https://github.com/enketo/enketo-core#sponsors</a> are exempted from this requirements and so are contributors listed in <a href="./package.json">package.json</a>.</p>
+<p>The aim of this requirement is to force adopters to give something back to the Enketo project, by at least spreading the word and thereby encouraging further adoption.</p>
+<p>Specifications:</p>
+<ol>
+<li>The word &quot;Enketo&quot; is displayed using Enketo's logo.</li>
+<li>The minimum font-size of &quot;Powered by&quot; is 12 points.</li>
+<li>The minimum height of the Enketo logo matches the font-size used.</li>
+<li>The Enketo logo is hyperlinked to https://enketo.org</li>
+</ol>
+<p>Example:</p>
+<p>Powered by <a href="https://enketo.org"><img height="16" style="height: 16px;" src="https://enketo.org/media/images/logos/enketo_bare_150x56.png" /></a></p>
 <h3 id="change-log">Change Log</h3>
 <p>See <a href="https://github.com/enketo/enketo-transformer/blob/master/CHANGELOG.md">change log</a></p></article>
     </section>

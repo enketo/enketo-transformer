@@ -58,7 +58,10 @@ const libxslt = require( 'libxslt' );
 const libxmljs = libxslt.libxmljs;
 const language = require( './language' );
 const markdown = require( './markdown' );
-const sheets = require( 'enketo-xslt' );
+const fs = require( 'fs' );
+const path = require( 'path' );
+const xslForm = fs.readFileSync( path.join( __dirname, './xsl/openrosa2html5form.xsl' ), 'utf8' );
+const xslModel = fs.readFileSync( path.join( __dirname, './xsl/openrosa2xmlmodel.xsl' ), 'utf8' );
 /**
  * @constant
  * @static
@@ -97,10 +100,11 @@ function transform( survey ) {
             }
             return doc;
         } )
+        .then( _processBinaryDefaults )
         .then( doc => {
             xformDoc = doc;
 
-            return _transform( sheets.xslForm, xformDoc, xsltParams );
+            return _transform( xslForm, xformDoc, xsltParams );
         } )
         .then( htmlDoc => {
             htmlDoc = _replaceTheme( htmlDoc, survey.theme );
@@ -112,7 +116,7 @@ function transform( survey ) {
                 survey.form = _docToString( htmlDoc );
             }
 
-            return _transform( sheets.xslModel, xformDoc );
+            return _transform( xslModel, xformDoc );
         } )
         .then( xmlDoc => {
             xmlDoc = _replaceMediaSources( xmlDoc, survey.media );
@@ -154,6 +158,28 @@ function _transform( xslStr, xmlDoc, xsltParams ) {
             }
         } );
     } );
+}
+
+function _processBinaryDefaults( doc ) {
+    doc.find( '/h:html/h:head/xmlns:model/xmlns:bind[@type="binary"]', NAMESPACES )
+        .forEach( bind => {
+            const nodeset = bind.attr( 'nodeset' );
+
+            if ( nodeset &amp;&amp; nodeset.value() ) {
+                const path = `/h:html/h:head/xmlns:model/xmlns:instance${nodeset.value().replace(/\//g, '/xmlns:')}`;
+                const dataNode = doc.get( path, NAMESPACES );
+                if ( dataNode ) {
+                    const value = dataNode.text();
+                    // Very crude URL checker which is fine for now,
+                    // because at this point we don't expect anything other than jr://
+                    if ( /^[a-zA-Z]+:\/\//.test( value ) ) {
+                        dataNode.attr( { 'src': value } );
+                    }
+                }
+            }
+        } );
+
+    return doc;
 }
 
 /**
@@ -420,7 +446,7 @@ function _docToString( doc ) {
  * @return {string} hash representing version of XSL stylesheets
  */
 function _getVersion() {
-    return _md5( sheets.xslForm + sheets.xslModel + pkg.version );
+    return _md5( xslForm + xslModel + pkg.version );
 }
 
 /**
@@ -438,9 +464,12 @@ function _md5( message ) {
 module.exports = {
     transform,
     version,
-    NAMESPACES
-};
-</code></pre>
+    NAMESPACES,
+    sheets: {
+        xslForm,
+        xslModel
+    }
+};</code></pre>
         </article>
     </section>
 
