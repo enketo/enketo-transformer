@@ -108,27 +108,24 @@ function _transform( xslStr, xmlDoc, xsltParams ) {
     } );
 }
 
-
 function _processBinaryDefaults( doc ) {
-    //const primaryInstanceChild = doc.get( '/h:html/h:head/xmlns:model/xmlns:instance/*', NAMESPACES );
-    //console.log( 'root:', primaryInstanceChild.name() );
-    const binaryBinds = doc.find( '/h:html/h:head/xmlns:model/xmlns:bind[@type="binary"]', NAMESPACES );
-    binaryBinds.forEach( bind => {
-        const nodeset = bind.attr( 'nodeset' );
+    doc.find( '/h:html/h:head/xmlns:model/xmlns:bind[@type="binary"]', NAMESPACES )
+        .forEach( bind => {
+            const nodeset = bind.attr( 'nodeset' );
 
-        if ( nodeset && nodeset.value() ) {
-            const path = `/h:html/h:head/xmlns:model/xmlns:instance${nodeset.value().replace(/\//g, '/xmlns:')}`;
-            const dataNode = doc.get( path, NAMESPACES );
-            if ( dataNode ) {
-                const value = dataNode.text();
-                // Very crude URL checker which is fine for now,
-                // because at this point we don't expect anything other than jr://
-                if ( /^[a-zA-Z]+:\/\//.test( value ) ) {
-                    dataNode.attr( { 'src': value } );
+            if ( nodeset && nodeset.value() ) {
+                const path = `/h:html/h:head/xmlns:model/xmlns:instance${nodeset.value().replace(/\//g, '/xmlns:')}`;
+                const dataNode = doc.get( path, NAMESPACES );
+                if ( dataNode ) {
+                    const value = dataNode.text();
+                    // Very crude URL checker which is fine for now,
+                    // because at this point we don't expect anything other than jr://
+                    if ( /^[a-zA-Z]+:\/\//.test( value ) ) {
+                        dataNode.attr( { 'src': value } );
+                    }
                 }
             }
-        }
-    } );
+        } );
 
     return doc;
 }
