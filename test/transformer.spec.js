@@ -9,6 +9,16 @@ const transformer = require( '../src/transformer' );
 
 chai.use( chaiAsPromised );
 
+function parseHtmlForm( transformationResult ) {
+    return parser.parseFromString( transformationResult.form, 'text/html' );
+}
+
+function findElementByName( htmlDoc, tagName, nameAttributeValue ) {
+    const elements = Array.prototype.slice.call( htmlDoc.getElementsByTagName( tagName ) );
+    const target = elements.find( el => el.getAttribute( 'name' ) === nameAttributeValue );
+    return target || null;
+}
+
 describe( 'transformer', () => {
 
     describe( 'transforms valid XForms', () => {
@@ -418,11 +428,8 @@ describe( 'transformer', () => {
 
         it( 'and outputs <datalist> elements', () => {
             const xform = fs.readFileSync( './test/forms/autocomplete.xml' );
-            const result = transformer.transform( {
-                xform
-            } );
-            return result.then( res => {
-                const doc = parser.parseFromString( res.form, 'text/xml' );
+            const transform = transformer.transform( { xform } ).then( parseHtmlForm )
+            return transform.then( doc => {
                 return Promise.all( [
                     expect( doc ).to.be.an( 'object' ),
                     expect( doc.getElementsByTagName( 'select' ) ).to.have.length( 4 ),
@@ -568,6 +575,34 @@ describe( 'transformer', () => {
             } );
 
         } );
+    } );
+
+    describe( 'setvalue actions', () => {
+        const xform = fs.readFileSync( './test/forms/setvalue.xml', 'utf8' );
+        const transform = transformer.transform( { xform } ).then( parseHtmlForm );
+
+        it( 'included in XForm body', () => {
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/b' );
+                    expect( target ).to.not.equal( null );
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'odk-instance-first-load' );
+                    expect( target.getAttribute( 'data-setvalue' ) ).to.equal( 'string-length(/data/c)' );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'string' );
+                } );
+        } );
+
+        it( 'included as XForm <bind> sibling ', () => {
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/a' );
+                    expect( target ).to.not.equal( null );
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'odk-instance-first-load' );
+                    expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '1+1' );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'int' );
+                } );
+        } );
+
     } );
 
 } );
