@@ -14,6 +14,11 @@
                     <a/>
                     <b/>
                     <c/>
+                    <my_age/>
+                    <person>
+                        <age/>
+>
+                    </person>
                     <meta>
                         <instanceID/>
                     </meta>
@@ -21,6 +26,7 @@
             </instance>
             <bind nodeset="/data/a" type="int"/>
             <bind nodeset="/data/c" type="string"/>
+            <bind nodeset="/data/person/age" type="decimal"/>
             <setvalue event="odk-instance-first-load" ref="/data/a">1+1</setvalue>
         </model>
     </h:head>
@@ -29,5 +35,14 @@
         <input ref="/data/c">
             <label>Enter</label>
         </input>
+        <input ref="/data/my_age">
+            <label>Your age</label>
+        </input>
+        <repeat nodeset="/data/person">
+            <setvalue event="odk-new-repeat" ref="/data/person/age" value="../../my_age + 2" />
+            <input ref="/data/person/age">
+                <label>Person's age</label>
+            </input>
+        </repeat>
     </h:body>
 </h:html>

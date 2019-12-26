@@ -603,6 +603,17 @@ describe( 'transformer', () => {
                 } );
         } );
 
+        it( 'with odk-new-repeat included inside a repeat ', () => {
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/person/age' );
+                    expect( target ).to.not.equal( null );
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'odk-new-repeat' );
+                    expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '../../my_age + 2' );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'decimal' );
+                } );
+        } );
+
     } );
 
 } );
