@@ -19,6 +19,11 @@ function findElementByName( htmlDoc, tagName, nameAttributeValue ) {
     return target || null;
 }
 
+function findElementsByName( htmlDoc, tagName, nameAttributeValue ) {
+    const elements = Array.prototype.slice.call( htmlDoc.getElementsByTagName( tagName ) );
+    return elements.filter( el => el.getAttribute( 'name' ) === nameAttributeValue );
+}
+
 describe( 'transformer', () => {
 
     describe( 'transforms valid XForms', () => {
@@ -606,9 +611,11 @@ describe( 'transformer', () => {
         it( 'with odk-new-repeat included inside a repeat ', () => {
             return transform
                 .then( form => {
-                    const target = findElementByName( form, 'input', '/data/person/age' );
+                    const targets = findElementsByName( form, 'input', '/data/person/age' );
+                    expect( targets.length ).to.equal( 1 );
+                    const target = targets[ 0 ];
                     expect( target ).to.not.equal( null );
-                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'odk-new-repeat' );
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'odk-new-repeat odk-instance-first-load' );
                     expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '../../my_age + 2' );
                     expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'decimal' );
                 } );

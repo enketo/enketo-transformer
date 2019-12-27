@@ -58,6 +58,7 @@ function transform( survey ) {
             return _transform( xslForm, xformDoc, xsltParams );
         } )
         .then( htmlDoc => {
+            htmlDoc = _correctSetValue( htmlDoc );
             htmlDoc = _replaceTheme( htmlDoc, survey.theme );
             htmlDoc = _replaceMediaSources( htmlDoc, survey.media );
             htmlDoc = _replaceLanguageTags( htmlDoc, survey );
@@ -130,6 +131,25 @@ function _processBinaryDefaults( doc ) {
             }
         } );
 
+    return doc;
+}
+
+/**
+ * See setvalue.xml. A <setvalue> inside a repeat that also has a question with the same name, results
+ * in one .question and .setvalue with the same name, which will leads to all kinds of problems in enketo-core
+ * as name is presumed to be unique.
+ * 
+ * This is much easier to correct in javascript than in XSLT
+ */
+function _correctSetValue( doc ) {
+    doc.find( '//*[@data-setvalue]' ).forEach( setValueEl => {
+        const name = setValueEl.attr( 'name' ).value();
+        const questionSameName = doc.get( `//*[@name="${name}" and contains(../@class, 'question')]` );
+        if ( questionSameName ) {
+            [ 'data-setvalue', 'data-event' ].forEach( att => questionSameName.attr( att, setValueEl.attr( att ).value() ) );
+            setValueEl.remove();
+        }
+    } );
     return doc;
 }
 
