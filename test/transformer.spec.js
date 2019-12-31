@@ -612,7 +612,10 @@ describe( 'transformer', () => {
             return transform
                 .then( form => {
                     const targets = findElementsByName( form, 'input', '/data/person/age' );
+                    // Duplicates added by xsl sheet are merged.
                     expect( targets.length ).to.equal( 1 );
+                    // The empty .setvalue label is removed.
+                    expect( form.getElementsByTagName( 'label' ).length ).to.equal( 5 );
                     const target = targets[ 0 ];
                     expect( target ).to.not.equal( null );
                     expect( target.getAttribute( 'data-event' ) ).to.equal( 'odk-new-repeat odk-instance-first-load' );

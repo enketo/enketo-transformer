@@ -147,7 +147,7 @@ function _correctSetValue( doc ) {
         const questionSameName = doc.get( `//*[@name="${name}" and contains(../@class, 'question')]` );
         if ( questionSameName ) {
             [ 'data-setvalue', 'data-event' ].forEach( att => questionSameName.attr( att, setValueEl.attr( att ).value() ) );
-            setValueEl.remove();
+            setValueEl.parent().remove();
         }
     } );
     return doc;
