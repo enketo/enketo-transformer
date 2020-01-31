@@ -624,6 +624,37 @@ describe( 'transformer', () => {
                 } );
         } );
 
+        it( 'with xforms-value-changed included inside an input form control', () => {
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/person/age_changed' );
+                    expect( target ).to.not.equal( null );
+                    // The nested labels are removed
+                    expect( form.getElementsByTagName( 'label' ).length ).to.equal( 5 );
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( target.getAttribute( 'data-setvalue' ) ).to.equal( 'Age changed!' );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'string' );
+                    // TODO: check location as sibling of /data/person/age 
+                    // TODO: setvalue as child of select
+                } );
+        } );
+
+        it( 'with xforms-value-changed included inside a select1 form control', () => {
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'select', '/data/my_age_changed' );
+                    expect( target ).to.not.equal( null );
+                    // The nested labels are removed
+                    expect( form.getElementsByTagName( 'label' ).length ).to.equal( 5 );
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '3+3' );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'int' );
+                    // TODO: check location as sibling of /data/person/age 
+
+                    // TODO: check range/select-without-minimal
+                } );
+        } );
+
     } );
 
 } );

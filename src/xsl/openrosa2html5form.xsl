@@ -513,6 +513,10 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                         </xsl:if>
 
                         <xsl:if test="not(local-name() = 'item' or local-name() = 'bind' or local-name = 'setvalue')">
+                            <!-- the only use case at the moment is a <setvalue> child with odk-xforms-changed event-->
+                            <xsl:if test="./xf:setvalue[@event]">
+                                <xsl:apply-templates select="./xf:setvalue[@event]" />
+                            </xsl:if>
                             <xsl:call-template name="constraint-and-required-msg" >
                                  <xsl:with-param name="binding" select="$binding"/>
                             </xsl:call-template>
@@ -873,6 +877,10 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             <xsl:if test="./xf:itemset">
                 <xsl:apply-templates select="xf:itemset" mode="labels"/>
             </xsl:if>
+            <xsl:if test="./xf:setvalue[@event]">
+                <xsl:apply-templates select="./xf:setvalue[@event]" />
+                <div>Why is this not working?</div>
+            </xsl:if>
             <xsl:call-template name="constraint-and-required-msg" >
                 <xsl:with-param name="binding" select="$binding"/>
             </xsl:call-template>
@@ -1187,7 +1195,6 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
         </xsl:choose>
     </xsl:template>
     
-
     <xsl:template match="xf:label | xf:hint | xf:bind/@jr:constraintMsg | xf:bind/@jr:requiredMsg | xf:bind/@oc:relevantMsg">
         <xsl:variable name="class">
             <xsl:if test="local-name() = 'constraintMsg'">
