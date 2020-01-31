@@ -487,7 +487,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                         </xsl:variable>
                         <xsl:element name="{$element}">
                             <xsl:choose>
-                                <xsl:when test="ancestor::odk:rank">
+                                <xsl:when test="not(local-name() = 'setvalue') and ancestor::odk:rank">
                                     <xsl:call-template name="rank-item-attributes"/>
                                 </xsl:when>
                                 <xsl:when test="local-name() = 'setvalue'">
@@ -513,6 +513,10 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                         </xsl:if>
 
                         <xsl:if test="not(local-name() = 'item' or local-name() = 'bind' or local-name = 'setvalue')">
+                            <!-- the only use case at the moment is a <setvalue> child with odk-xforms-changed event-->
+                            <xsl:if test="./xf:setvalue[@event]">
+                                <xsl:apply-templates select="./xf:setvalue[@event]" />
+                            </xsl:if>
                             <xsl:call-template name="constraint-and-required-msg" >
                                  <xsl:with-param name="binding" select="$binding"/>
                             </xsl:call-template>
@@ -873,6 +877,9 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             <xsl:if test="./xf:itemset">
                 <xsl:apply-templates select="xf:itemset" mode="labels"/>
             </xsl:if>
+            <xsl:if test="./xf:setvalue[@event]">
+                <xsl:apply-templates select="./xf:setvalue[@event]" />
+            </xsl:if>
             <xsl:call-template name="constraint-and-required-msg" >
                 <xsl:with-param name="binding" select="$binding"/>
             </xsl:call-template>
@@ -953,6 +960,10 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                     </xsl:choose>
                 </div>
             </fieldset>
+             <!-- the only use case at the moment is a <setvalue> child with odk-xforms-changed event-->
+            <xsl:if test="./xf:setvalue[@event]">
+                <xsl:apply-templates select="./xf:setvalue[@event]" />
+            </xsl:if>
             <xsl:call-template name="constraint-and-required-msg" >
                 <xsl:with-param name="binding" select="$binding"/>
             </xsl:call-template>
@@ -990,7 +1001,14 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             </xsl:call-template>
         </xsl:attribute>
         <xsl:attribute name="data-setvalue"> 
-            <xsl:value-of select="./@value | ./text()"/>
+            <xsl:choose>
+                <xsl:when test="./@value">
+                    <xsl:value-of select="./@value" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="concat('&quot;', ./text(), '&quot;')" />
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:attribute>
         <xsl:attribute name="data-event"> 
             <xsl:value-of select="./@event"/>
@@ -1187,7 +1205,6 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
         </xsl:choose>
     </xsl:template>
     
-
     <xsl:template match="xf:label | xf:hint | xf:bind/@jr:constraintMsg | xf:bind/@jr:requiredMsg | xf:bind/@oc:relevantMsg">
         <xsl:variable name="class">
             <xsl:if test="local-name() = 'constraintMsg'">
@@ -1655,7 +1672,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             <xsl:otherwise>
                 <xsl:variable name="intermediate">
                     <xsl:choose>
-                        <xsl:when test="local-name(..) = 'select1' or local-name(..) = 'select'">
+                        <xsl:when test="not(local-name() = 'setvalue') and local-name(..) = 'select1' or local-name(..) = 'select'">
                             <xsl:call-template name="node-path-helper">
                                 <xsl:with-param name="input-node" select=".." />
                             </xsl:call-template>
