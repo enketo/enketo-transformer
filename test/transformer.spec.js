@@ -639,21 +639,63 @@ describe( 'transformer', () => {
                 } );
         } );
 
-        it( 'with xforms-value-changed included inside a select1 form control', () => {
+        it( 'with xforms-value-changed included inside a select1 form control with minimal appearance', () => {
             return transform
                 .then( form => {
-                    const target = findElementByName( form, 'select', '/data/my_age_changed' );
+                    const target = findElementByName( form, 'input', '/data/my_age_changed' );
                     expect( target ).to.not.equal( null );
                     // The nested labels are removed
                     expect( form.getElementsByTagName( 'label' ).length ).to.equal( 5 );
                     expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
                     expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '3+3' );
                     expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'int' );
-                    // TODO: check location as sibling of /data/person/age 
-
-                    // TODO: check range/select-without-minimal
+                    // check location of target as sibling <select>
+                    const sibling = target.parentNode.getElementsByTagName( 'select' )[ 0 ];
+                    expect( sibling.getAttribute( 'name' ) ).to.equal( '/data/my_age' );
                 } );
         } );
+
+        it( 'with xforms-value-changed included inside a select1 form control', () => {
+            const xform2 = xform.replace( 'appearance="minimal"', '' );
+            const transform = transformer.transform( { xform: xform2 } ).then( parseHtmlForm );
+
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/my_age_changed' );
+                    expect( target ).to.not.equal( null );
+                    // The nested labels are removed
+                    expect( form.getElementsByTagName( 'label' ).length ).to.equal( 6 );
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '3+3' );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'int' );
+                    // check location of target inside same label as input[name="/data/my_age"]
+                    const radio = target.parentNode.getElementsByTagName( 'input' )[ 0 ];
+                    expect( radio.getAttribute( 'name' ) ).to.equal( '/data/my_age' );
+                } );
+        } );
+
+        it( 'with xforms-value-changed included inside a rank form control', () => {
+            const xform2 = xform.replace( 'appearance="minimal"', '' ).replace( /select1/g, 'odk:rank' );
+            const transform = transformer.transform( { xform: xform2 } ).then( parseHtmlForm );
+
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/my_age_changed' );
+                    expect( target ).to.not.equal( null );
+                    // The nested labels are removed
+                    expect( form.getElementsByTagName( 'label' ).length ).to.equal( 6 );
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '3+3' );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'int' );
+                    // check location of target inside same label as input[name="/data/my_age"]
+                    const radio = target.parentNode.getElementsByTagName( 'input' )[ 0 ];
+                    expect( radio.getAttribute( 'name' ) ).to.equal( '/data/my_age' );
+
+                } );
+        } );
+
+        // TODO: check itemset
+        // TODO: check range
 
     } );
 

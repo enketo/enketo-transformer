@@ -487,7 +487,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                         </xsl:variable>
                         <xsl:element name="{$element}">
                             <xsl:choose>
-                                <xsl:when test="ancestor::odk:rank">
+                                <xsl:when test="not(local-name() = 'setvalue') and ancestor::odk:rank">
                                     <xsl:call-template name="rank-item-attributes"/>
                                 </xsl:when>
                                 <xsl:when test="local-name() = 'setvalue'">
@@ -879,7 +879,6 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             </xsl:if>
             <xsl:if test="./xf:setvalue[@event]">
                 <xsl:apply-templates select="./xf:setvalue[@event]" />
-                <div>Why is this not working?</div>
             </xsl:if>
             <xsl:call-template name="constraint-and-required-msg" >
                 <xsl:with-param name="binding" select="$binding"/>
@@ -961,6 +960,10 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                     </xsl:choose>
                 </div>
             </fieldset>
+             <!-- the only use case at the moment is a <setvalue> child with odk-xforms-changed event-->
+            <xsl:if test="./xf:setvalue[@event]">
+                <xsl:apply-templates select="./xf:setvalue[@event]" />
+            </xsl:if>
             <xsl:call-template name="constraint-and-required-msg" >
                 <xsl:with-param name="binding" select="$binding"/>
             </xsl:call-template>
@@ -1662,7 +1665,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             <xsl:otherwise>
                 <xsl:variable name="intermediate">
                     <xsl:choose>
-                        <xsl:when test="local-name(..) = 'select1' or local-name(..) = 'select'">
+                        <xsl:when test="not(local-name() = 'setvalue') and local-name(..) = 'select1' or local-name(..) = 'select'">
                             <xsl:call-template name="node-path-helper">
                                 <xsl:with-param name="input-node" select=".." />
                             </xsl:call-template>

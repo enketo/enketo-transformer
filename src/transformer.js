@@ -158,10 +158,10 @@ function _correctSetValue( doc ) {
      * See setvalue.xml (/data/person/age_changed). A <setvalue> inside a form control results
      * in one label.question with a nested label.setvalue which is weird syntax (and possible invalid).
      */
-    doc.find( '//label[contains(@class, "question")]/label/*[@data-setvalue]' ).forEach( setValueEl => {
-        //const clone = setValueEl.clone();
-        //setValueEl.parent().addNextSibling( clone );
-        //setValueEl.parent().remove();
+    doc.find( '//*[contains(@class, "question")]//label/input[@data-setvalue]' ).forEach( setValueEl => {
+        const clone = setValueEl.clone();
+        setValueEl.parent().addNextSibling( clone );
+        setValueEl.parent().remove();
     } );
 
     return doc;
