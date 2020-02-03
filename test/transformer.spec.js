@@ -634,8 +634,9 @@ describe( 'transformer', () => {
                     expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
                     expect( target.getAttribute( 'data-setvalue' ) ).to.equal( 'Age changed!' );
                     expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'string' );
-                    // TODO: check location as sibling of /data/person/age 
-                    // TODO: setvalue as child of select
+                    // Check location as sibling of /data/person/age 
+                    const sibling = target.parentNode.getElementsByTagName( 'input' )[ 0 ];
+                    expect( sibling.getAttribute( 'name' ) ).to.equal( '/data/person/age' );
                 } );
         } );
 
@@ -694,8 +695,43 @@ describe( 'transformer', () => {
                 } );
         } );
 
-        // TODO: check itemset
-        // TODO: check range
+        it( 'with xforms-value-changed included inside a range form control', () => {
+            const xform2 = xform.replace( /<input ref="\/data\/person\/age">(.*)<\/input>/gm, '<range ref="/data/person/age">$1</range>' );
+            const transform = transformer.transform( { xform: xform2 } ).then( parseHtmlForm );
+
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/person/age_changed' );
+                    expect( target ).to.not.equal( null );
+                    // The nested labels are removed
+                    expect( form.getElementsByTagName( 'label' ).length ).to.equal( 5 );
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( target.getAttribute( 'data-setvalue' ) ).to.equal( 'Age changed!' );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'string' );
+                    // Check location as sibling of /data/person/age 
+                    const sibling = target.parentNode.getElementsByTagName( 'input' )[ 0 ];
+                    expect( sibling.getAttribute( 'name' ) ).to.equal( '/data/person/age' );
+                } );
+        } );
+
+        it( 'with xforms-value-changed included inside a select1 form control with an itemset', () => {
+            const xform2 = fs.readFileSync( './test/forms/itemset.xml', 'utf8' );;
+            const transform = transformer.transform( { xform: xform2 } ).then( parseHtmlForm );
+
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/state_changed' );
+                    expect( target ).to.not.equal( null );
+                    // The nested labels are removed
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '3+3' );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'string' );
+                    // check location of target inside same label as input[name="/data/state"]
+                    const parent = target.parentNode;
+                    expect(parent.nodeName).to.equal('fieldset');
+                    expect(parent.getElementsByTagName('input')[0].getAttribute('name')).to.equal( '/data/state' );
+                } );
+        } );
 
     } );
 
