@@ -603,7 +603,7 @@ describe( 'transformer', () => {
                     const target = findElementByName( form, 'input', '/data/a' );
                     expect( target ).to.not.equal( null );
                     expect( target.getAttribute( 'data-event' ) ).to.equal( 'odk-instance-first-load' );
-                    expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '1+1' );
+                    expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '"ab"' );
                     expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'int' );
                 } );
         } );
@@ -632,7 +632,7 @@ describe( 'transformer', () => {
                     // The nested labels are removed
                     expect( form.getElementsByTagName( 'label' ).length ).to.equal( 5 );
                     expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
-                    expect( target.getAttribute( 'data-setvalue' ) ).to.equal( 'Age changed!' );
+                    expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '"Age changed!"' );
                     expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'string' );
                     // Check location as sibling of /data/person/age 
                     const sibling = target.parentNode.getElementsByTagName( 'input' )[ 0 ];
@@ -706,7 +706,7 @@ describe( 'transformer', () => {
                     // The nested labels are removed
                     expect( form.getElementsByTagName( 'label' ).length ).to.equal( 5 );
                     expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
-                    expect( target.getAttribute( 'data-setvalue' ) ).to.equal( 'Age changed!' );
+                    expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '"Age changed!"' );
                     expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'string' );
                     // Check location as sibling of /data/person/age 
                     const sibling = target.parentNode.getElementsByTagName( 'input' )[ 0 ];
@@ -728,8 +728,8 @@ describe( 'transformer', () => {
                     expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'string' );
                     // check location of target inside same label as input[name="/data/state"]
                     const parent = target.parentNode;
-                    expect(parent.nodeName).to.equal('fieldset');
-                    expect(parent.getElementsByTagName('input')[0].getAttribute('name')).to.equal( '/data/state' );
+                    expect( parent.nodeName ).to.equal( 'fieldset' );
+                    expect( parent.getElementsByTagName( 'input' )[ 0 ].getAttribute( 'name' ) ).to.equal( '/data/state' );
                 } );
         } );
 

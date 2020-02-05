@@ -30,7 +30,7 @@
             <bind nodeset="/data/my_age_changed" type="int"/>
             <bind nodeset="/data/person/age" type="decimal"/>
 
-            <setvalue event="odk-instance-first-load" ref="/data/a">1+1</setvalue>
+            <setvalue event="odk-instance-first-load" ref="/data/a">ab</setvalue>
         </model>
     </h:head>
     <h:body>
