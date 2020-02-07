@@ -2,10 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.38.0] - 2020-02-07
+---------------------
+##### Added
+- Support for setvalue action with the xforms-value-changed event.
+
 [1.37.0] - 2019-12-31
 ----------------------
 ##### Added
-- Support for setvalue with odk-new-repeat and odk-instance-first-load events.
+- Support for setvalue action with the odk-new-repeat and odk-instance-first-load events.
 
 [1.36.0] - 2019-12-18
 ----------------------
