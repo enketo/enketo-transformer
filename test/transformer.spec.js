@@ -1,4 +1,3 @@
-const Promise = require( 'lie' );
 const chai = require( 'chai' );
 const chaiAsPromised = require( 'chai-as-promised' );
 const expect = chai.expect;
@@ -53,6 +52,14 @@ describe( 'transformer', () => {
                 } );
                 return expect( result ).to.eventually.be.rejectedWith( Error );
             } );
+        } );
+    } );
+
+    describe( 'copies attributes on the `<model>`', () => {
+        it( 'copies the odk:xforms-version attribute', () => {
+            const xform = fs.readFileSync( './test/forms/autocomplete.xml', 'utf8' );
+            const result = transformer.transform( { xform } );
+            return expect( result ).to.eventually.have.property( 'model' ).and.to.contain( 'odk:xforms-version="1.0.0"' );
         } );
     } );
 

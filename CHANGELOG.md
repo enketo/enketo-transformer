@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.38.1] - 2020-02-14
+---------------------
+##### Fixed
+- Model attributes not copied.
+
 [1.38.0] - 2020-02-07
 ---------------------
 ##### Added

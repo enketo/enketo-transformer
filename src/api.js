@@ -9,7 +9,6 @@
  * PRs are very welcome!
  */
 
-const Promise = require( 'lie' );
 const request = require( 'request' );
 const express = require( 'express' );
 const router = express.Router();

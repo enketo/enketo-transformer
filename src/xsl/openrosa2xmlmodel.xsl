@@ -22,7 +22,8 @@ Edit with care!
 
     <xsl:template match="/">
         <root>
-            <model xmlns="http://www.w3.org/2002/xforms">
+            <model>
+                <xsl:apply-templates select="//xf:model/@*" mode="include-namespace-declarations"/>
                 <xsl:apply-templates select="//xf:model/xf:instance" />
             </model>
         </root>
@@ -43,6 +44,10 @@ Edit with care!
         <xsl:attribute name="{name()}">
             <xsl:value-of select="." />
         </xsl:attribute>
+    </xsl:template>
+
+    <xsl:template match="@*" mode="include-namespace-declarations">
+        <xsl:copy-of select="."/>
     </xsl:template>
 
 </xsl:stylesheet>
