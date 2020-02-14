@@ -5,7 +5,7 @@
   xmlns:jr="http://openrosa.org/javarosa" 
   xmlns:orx="http://openrosa.org/xforms" 
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-  xmlns:odk="http://opendatakit.org/xforms">
+  xmlns:odk="http://www.opendatakit.org/xforms">
   <h:head>
     <h:title>select-one-autocomplete</h:title>
     <model odk:xforms-version="1.0.0">
