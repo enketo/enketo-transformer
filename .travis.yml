@@ -2,6 +2,6 @@ language: node_js
 sudo: true
 dist: trusty
 node_js:
-  - "8"
+  - "12"
 after_script:
   - npm install enketo-transformer

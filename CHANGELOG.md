@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.39.0] - 2020-03-26
+---------------------
+##### Removed
+- Node 8 compatibility.
+  
+##### Changed
+- Node 12 now required.
+
 [1.38.1] - 2020-02-14
 ---------------------
 ##### Fixed

@@ -58,7 +58,6 @@
  * PRs are very welcome!
  */
 
-const Promise = require( 'lie' );
 const request = require( 'request' );
 const express = require( 'express' );
 const router = express.Router();
@@ -157,8 +156,7 @@ function _request( options ) {
 
 module.exports = app => {
     app.use( '/transform', router );
-};
-</code></pre>
+};</code></pre>
         </article>
     </section>
 

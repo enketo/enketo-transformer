@@ -10,7 +10,7 @@ NodeJS library that transforms OpenRosa/ODK XForms into a format the Enketo unde
 
 ### Prerequisites
 
-1. nodeJS 8 and npm
+1. nodeJS 12 and npm
 
 ### Install as module
 
