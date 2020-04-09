@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+---------------------
+##### Added
+- Support for multiple setvalue/xforms-value-changed actions under a single question.
+- GET /support/htmlform API endpoint for developers to easily check HTML form output in developer console.
+
 [1.39.0] - 2020-03-26
 ---------------------
 ##### Removed

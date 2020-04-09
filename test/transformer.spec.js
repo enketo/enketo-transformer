@@ -740,6 +740,62 @@ describe( 'transformer', () => {
                 } );
         } );
 
+        it( 'with multiple xforms-value-changed inside a single text input', () => {
+            const xform2 = fs.readFileSync( './test/forms/setvalue-value-changed-multiple.xml', 'utf8' );
+            const transform = transformer.transform( { xform: xform2 } ).then( parseHtmlForm );
+
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/a' );
+                    expect( target ).to.not.equal( null );
+                    expect( target.hasAttribute( 'data-event' ) ).to.equal( false );
+                    expect( target.hasAttribute( 'data-setvalue' ) ).to.equal( false );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'string' );
+                    // check for 4 setvalue siblings
+                    const parent = target.parentNode;
+                    const sibs = Array.prototype.slice.call( parent.getElementsByTagName( 'input' ) ).slice( 1 );
+                    // data/b
+                    expect( sibs[ 0 ].getAttribute( 'name' ) ).to.equal( '/data/b' );
+                    expect( sibs[ 0 ].getAttribute( 'data-setvalue' ) ).to.equal( '1 + 1' );
+                    expect( sibs[ 0 ].getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( sibs[ 0 ].getAttribute( 'type' ) ).to.equal( 'hidden' );
+                    // data/c
+                    expect( sibs[ 1 ].getAttribute( 'name' ) ).to.equal( '/data/c' );
+                    expect( sibs[ 1 ].getAttribute( 'data-setvalue' ) ).to.equal( 'now()' );
+                    expect( sibs[ 1 ].getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( sibs[ 1 ].getAttribute( 'type' ) ).to.equal( 'hidden' );
+                    // data/d
+                    expect( sibs[ 2 ].getAttribute( 'name' ) ).to.equal( '/data/d' );
+                    expect( sibs[ 2 ].hasAttribute( 'data-setvalue' ) ).to.equal( true );
+                    expect( sibs[ 2 ].getAttribute( 'data-setvalue' ) ).to.equal( '' );
+                    expect( sibs[ 2 ].getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( sibs[ 2 ].getAttribute( 'type' ) ).to.equal( 'hidden' );
+                    // data/e
+                    expect( sibs[ 3 ].getAttribute( 'name' ) ).to.equal( '/data/e' );
+                    expect( sibs[ 3 ].hasAttribute( 'data-setvalue' ) ).to.equal( true );
+                    expect( sibs[ 3 ].getAttribute( 'data-setvalue' ) ).to.equal( '' );
+                    expect( sibs[ 3 ].getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( sibs[ 3 ].getAttribute( 'type' ) ).to.equal( 'hidden' );
+
+                    // other form controls
+                    const questions = Array.prototype.slice.call( form.getElementsByTagName( 'label' ) )
+                        .filter( question => question.getAttribute( 'class' ).includes( 'question' ) );
+                    expect( questions.length ).to.equal( 3 );
+
+                    const c = questions[ 1 ].getElementsByTagName( 'input' );
+                    expect( c.length ).to.equal( 1 );
+                    expect( c[ 0 ].getAttribute( 'name' ) ).to.equal( '/data/c' );
+                    expect( c[ 0 ].hasAttribute( 'data-event' ) ).to.equal( false );
+                    expect( c[ 0 ].hasAttribute( 'data-setvalue' ) ).to.equal( false );
+
+                    const d = questions[ 2 ].getElementsByTagName( 'input' );
+                    expect( d.length ).to.equal( 1 );
+                    expect( d[ 0 ].getAttribute( 'name' ) ).to.equal( '/data/d' );
+                    expect( d[ 0 ].hasAttribute( 'data-event' ) ).to.equal( false );
+                    expect( d[ 0 ].hasAttribute( 'data-setvalue' ) ).to.equal( false );
+                } );
+        } );
+
     } );
 
 } );
