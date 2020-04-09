@@ -86,6 +86,9 @@ curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.
 The script `npm run develop` runs the app on port 8085 and also serves test/forms on port 8081. You could test the transformation output by placing an XForm in test/forms and running
 http://localhost:8085/transform?xform=http://localhost:8081/autocomplete.xml
 
+There is also a helpful **GET /transform/htmlform** endpoint to easily inspect the HTML form output in the developer console. Example:
+http://localhost:8085/transform/htmlform?xform=http://localhost:8081/autocomplete.xml
+
 A vagrant configuration file and provisioning script is also included. Use DEBUG environment variable to see debug terminal output, e.g.:
 
 ```bash

@@ -15,8 +15,7 @@ const router = express.Router();
 const transformer = require( './transformer' );
 
 router
-    .get( '/', ( req, res ) => {
-        // NOTE: req.query.xform is a URL
+    .all( '/', ( req, res, next ) => {
         if ( req.app.get( 'secure' ) ) {
             res.status( 405 ).send( 'Not Allowed' );
         } else if ( !req.query.xform ) {
@@ -24,51 +23,63 @@ router
         } else {
             // allow requests from anywhere
             res.set( 'Access-Control-Allow-Origin', '*' );
-
-            _request( {
-                    method: 'get',
-                    url: req.query.xform
-                } )
-                .then( xform => transformer.transform( {
-                    xform,
-                    theme: req.query.theme,
-                    markdown: req.query.markdown !== 'false'
-                } ) )
-                .then( result => {
-                    res.json( result );
-                } )
-                .catch( error => {
-                    error.status = error.status || 500;
-                    error.message = error.message || 'Unknown error.';
-                    res.status( error.status ).send( `${error.message} (stack: ${error.stack})` );
-                } );
+            next();
         }
     } )
+    .get( '/', ( req, res ) => {
+        _request( {
+                method: 'get',
+                url: req.query.xform
+            } )
+            .then( xform => transformer.transform( {
+                xform,
+                theme: req.query.theme,
+                markdown: req.query.markdown !== 'false'
+            } ) )
+            .then( result => {
+                res.json( result );
+            } )
+            .catch( error => {
+                error.status = error.status || 500;
+                error.message = error.message || 'Unknown error.';
+                res.status( error.status ).send( `${error.message} (stack: ${error.stack})` );
+            } );
+    } )
     .post( '/', ( req, res ) => {
-        // NOTE: req.query.xform is an XML string
-        if ( req.app.get( 'secure' ) ) {
-            res.status( 405 ).send( 'Not Allowed' );
-        } else if ( !req.body.xform ) {
-            res.status( 400 ).send( 'Bad Request.' );
-        } else {
-            // allow requests from anywhere
-            res.set( 'Access-Control-Allow-Origin', '*' );
-
-            transformer.transform( {
-                    xform: req.body.xform,
-                    theme: req.body.theme,
-                    media: req.body.media,
-                    markdown: req.body.markdown !== 'false'
-                } )
-                .then( result => {
-                    res.json( result );
-                } )
-                .catch( error => {
-                    error.status = error.status || 500;
-                    error.message = error.message || 'Unknown error.';
-                    res.status( error.status ).send( `${error.message} (stack: ${error.stack})` );
-                } );
-        }
+        transformer.transform( {
+                xform: req.body.xform,
+                theme: req.body.theme,
+                media: req.body.media,
+                markdown: req.body.markdown !== 'false'
+            } )
+            .then( result => {
+                res.json( result );
+            } )
+            .catch( error => {
+                error.status = error.status || 500;
+                error.message = error.message || 'Unknown error.';
+                res.status( error.status ).send( `${error.message} (stack: ${error.stack})` );
+            } );
+    } )
+    // for development purposes, to return HTML that can be easily inspected in the developer console
+    .get( '/htmlform', ( req, res ) => {
+        _request( {
+                method: 'get',
+                url: req.query.xform
+            } )
+            .then( xform => transformer.transform( {
+                xform,
+                theme: req.query.theme,
+                markdown: req.query.markdown !== 'false'
+            } ) )
+            .then( result => {
+                res.send( result.form );
+            } )
+            .catch( error => {
+                error.status = error.status || 500;
+                error.message = error.message || 'Unknown error.';
+                res.status( error.status ).send( `${error.message} (stack: ${error.stack})` );
+            } );
     } );
 
 /**
