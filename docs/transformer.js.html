@@ -189,20 +189,6 @@ function _processBinaryDefaults( doc ) {
 function _correctSetValue( doc ) {
 
     /* 
-     * See setvalue.xml (/data/person/age). A &lt;setvalue> inside a repeat that also has a question with the same name, results
-     * in one .question and .setvalue with the same name, which will leads to all kinds of problems in enketo-core
-     * as name is presumed to be unique.
-     */
-    doc.find( '//*[@data-setvalue]' ).forEach( setValueEl => {
-        const name = setValueEl.attr( 'name' ).value();
-        const questionSameName = doc.get( `//*[@name="${name}" and contains(../@class, 'question')]` );
-        if ( questionSameName ) {
-            [ 'data-setvalue', 'data-event' ].forEach( att => questionSameName.attr( att, setValueEl.attr( att ).value() ) );
-            setValueEl.parent().remove();
-        }
-    } );
-
-    /* 
      * See setvalue.xml (/data/person/age_changed). A &lt;setvalue> inside a form control results
      * in one label.question with a nested label.setvalue which is weird syntax (and possibly invalid HTML).
      */
@@ -210,6 +196,24 @@ function _correctSetValue( doc ) {
         const clone = setValueEl.clone();
         setValueEl.parent().addNextSibling( clone );
         setValueEl.parent().remove();
+    } );
+
+    /* 
+     * See setvalue.xml (/data/person/age). A &lt;setvalue> inside a repeat to set a default value that also has a question with the same name, results
+     * in one .question and .setvalue with the same name, which will leads to all kinds of problems in enketo-core
+     * as name is presumed to be unique.
+     * 
+     * Note that a label.setvalue is always to set a default value (with odk-new-repeat, odk-instance-first-load), never
+     * a value change directive (with xforms-value-changed)
+     */
+    doc.find( '//label[contains(@class, "setvalue")]/input[@data-setvalue]' ).forEach( setValueEl => {
+        const name = setValueEl.attr( 'name' ).value();
+        const questionSameName = doc.get( `//*[@name="${name}" and contains(../@class, 'question')]` );
+        if ( questionSameName ) {
+            //console.log( 'question with same name', setValueEl.parent().attr( 'class' ).value() );
+            [ 'data-setvalue', 'data-event' ].forEach( att => questionSameName.attr( att, setValueEl.attr( att ).value() ) );
+            setValueEl.parent().remove();
+        }
     } );
 
     return doc;

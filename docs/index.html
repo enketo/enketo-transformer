@@ -69,7 +69,7 @@
 <p><a href="https://enketo.github.io/enketo-transformer/">Technical Documentation</a></p>
 <h3 id="prerequisites">Prerequisites</h3>
 <ol>
-<li>nodeJS 8 and npm</li>
+<li>nodeJS 12 and npm</li>
 </ol>
 <h3 id="install-as-module">Install as module</h3>
 <pre class="prettyprint source lang-bash"><code>npm install enketo-transformer --save
@@ -130,6 +130,8 @@ transformer.transform( {
 <h3 id="develop">Develop</h3>
 <p>The script <code>npm run develop</code> runs the app on port 8085 and also serves test/forms on port 8081. You could test the transformation output by placing an XForm in test/forms and running
 http://localhost:8085/transform?xform=http://localhost:8081/autocomplete.xml</p>
+<p>There is also a helpful <strong>GET /transform/htmlform</strong> endpoint to easily inspect the HTML form output in the developer console. Example:
+http://localhost:8085/transform/htmlform?xform=http://localhost:8081/autocomplete.xml</p>
 <p>A vagrant configuration file and provisioning script is also included. Use DEBUG environment variable to see debug terminal output, e.g.:</p>
 <pre class="prettyprint source lang-bash"><code>DEBUG=api,transformer,markdown,language node app.js
 </code></pre>
