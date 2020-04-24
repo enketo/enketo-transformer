@@ -26,7 +26,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
     version="1.0"
     >
     <xsl:param name="include-relevant-msg"/>
-    <xsl:output method="xml" omit-xml-declaration="yes" encoding="UTF-8" indent="yes"/><!-- for xml: version="1.0" -->
+    <xsl:output method="html" omit-xml-declaration="yes" encoding="UTF-8" indent="yes"/><!-- for xml: version="1.0" -->
 
     <xsl:variable name="upper-case" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
     <xsl:variable name="lower-case" select="'abcdefghijklmnopqrstuvwxyz'" />
