@@ -128,7 +128,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                         </xsl:attribute>
                     </xsl:if>
                     <xsl:text>&#10;</xsl:text>
-                    <xsl:comment>This form was created by transforming a OpenRosa-flavored (X)Form using an XSL stylesheet created by Enketo LLC.</xsl:comment>
+                    <xsl:comment>This form was created by transforming an ODK/OpenRosa-flavored (X)Form using an XSL stylesheet created by Enketo LLC.</xsl:comment>
                     <section class="form-logo">
                         <xsl:text> </xsl:text>
                     </section>
@@ -212,7 +212,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
     <xsl:template match="h:head"/> <!--[not(self::xf:model/xf:bind[@jr:preload])]" />-->
 
     <xsl:template match="xf:group">
-        <!-- NOTE: TO IMPROVE PERFORMANCE, SUPPORT FOR RELATIVE NODESET BINDINGS HAS BEEN SWITCHED OFF 
+        <!-- NOTE: TO IMPROVE PERFORMANCE, SUPPORT FOR RELATIVE NODESET BINDINGS HAS BEEN SWITCHED OFF
             To turn this back on:
             - uncomment the variable nodeset_used
             - revert back to commented-out code for variable nodeset
@@ -264,7 +264,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                 <xsl:attribute name="name">
                     <xsl:value-of select="$nodeset"/>
                 </xsl:attribute>
-                
+
                 <xsl:if test="$binding/@relevant">
                     <xsl:attribute name="data-relevant">
                         <!--<xsl:value-of select="/h:html/h:head/xf:model/xf:bind[@nodeset=$nodeset]/@relevant" />-->
@@ -287,7 +287,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
     </xsl:template>
 
     <xsl:template match="xf:repeat">
-    <!-- NOTE: TO IMPROVE PERFORMANCE, SUPPORT FOR RELATIVE NODESET BINDINGS HAS BEEN SWITCHED OFF 
+    <!-- NOTE: TO IMPROVE PERFORMANCE, SUPPORT FOR RELATIVE NODESET BINDINGS HAS BEEN SWITCHED OFF
             To turn this back on:
             - uncomment the variable nodeset_used
             - revert back to commented-out code for variable nodeset
@@ -305,7 +305,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
              </xsl:call-template>-->
              <xsl:call-template name="nodeset_used" />
         </xsl:variable>
-       
+
         <!-- note that bindings are not required -->
         <!--<xsl:variable name="binding" select="/h:html/h:head/xf:model/xf:bind[@nodeset=$nodeset_used] | /h:html/h:head/xf:model/xf:bind[@nodeset=$nodeset]" />-->
         <xsl:variable name="binding" select="/h:html/h:head/xf:model/xf:bind[@nodeset=$nodeset]" />
@@ -391,7 +391,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
 
 
     <xsl:template match="xf:input | xf:upload | xf:range | xf:item | xf:bind[@jr:preload] | xf:bind[@calculate] | xf:setvalue[@event]">
-    <!-- NOTE: TO IMPROVE PERFORMANCE, SUPPORT FOR RELATIVE NODESET BINDINGS HAS BEEN SWITCHED OFF 
+    <!-- NOTE: TO IMPROVE PERFORMANCE, SUPPORT FOR RELATIVE NODESET BINDINGS HAS BEEN SWITCHED OFF
             To turn this back on:
             - uncomment the variable nodeset_used
             - revert back to commented-out code for variable nodeset
@@ -408,18 +408,18 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
              </xsl:call-template>-->
              <xsl:call-template name="nodeset_used" />
         </xsl:variable>
-       
+
         <!-- note that bindings are not required -->
         <!--<xsl:variable name="binding" select="/h:html/h:head/xf:model/xf:bind[@nodeset=$nodeset_used] | /h:html/h:head/xf:model/xf:bind[@nodeset=$nodeset]" />-->
         <xsl:variable name="binding" select="/h:html/h:head/xf:model/xf:bind[@nodeset=$nodeset]" />
 
         <!-- If this is a bind element that also has an input, do nothing as it will be dealt with by the corresponding xf:input -->
-        <!-- Note that this test is not fully spec-compliant. It will work with XLS-form produced forms that have no relative nodes 
+        <!-- Note that this test is not fully spec-compliant. It will work with XLS-form produced forms that have no relative nodes
              and use the ref atribute only -->
-        <xsl:if test="not( local-name() = 'bind' and ( 
-            /h:html/h:body//xf:input[@ref=$nodeset] or 
-            /h:html/h:body//xf:upload[@ref=$nodeset] or 
-            /h:html/h:body//xf:select[@ref=$nodeset] or 
+        <xsl:if test="not( local-name() = 'bind' and (
+            /h:html/h:body//xf:input[@ref=$nodeset] or
+            /h:html/h:body//xf:upload[@ref=$nodeset] or
+            /h:html/h:body//xf:select[@ref=$nodeset] or
             /h:html/h:body//xf:select1[@ref=$nodeset] ) )">
             <xsl:choose>
                 <xsl:when test="(local-name() = 'range' and  contains(@appearance, 'picker'))">
@@ -460,13 +460,13 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                                 <xsl:apply-templates select="$binding/@required"/>
                             </xsl:if>
                         </xsl:if>
-                        <!-- 
+                        <!--
                             note: Hints should actually be placed in title attribute (of input) as it is semantically nicer.
                             However, to support multiple languages and parse all of them (to be available offline)
                             they are placed in the label instead.
                         -->
                         <xsl:apply-templates select="xf:hint" />
-                        
+
                         <xsl:variable name="appearance">
                             <xsl:value-of select="translate(@appearance, $upper-case, $lower-case)"/>
                         </xsl:variable>
@@ -579,7 +579,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
     <xsl:template match="xf:item" mode="select-option">
         <xsl:param name="tolerate-spaces" />
         <xsl:param name="readonly" />
-        <xsl:variable name="label_translations"> 
+        <xsl:variable name="label_translations">
             <xsl:apply-templates select="xf:label" />
         </xsl:variable>
         <xsl:variable name="value">
@@ -630,7 +630,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             </span>
         </xsl:for-each>
     </xsl:template>
-     
+
     <xsl:template match="xf:itemset" mode="templates">
         <xsl:param name="nodeset" />
         <xsl:param name="binding"/>
@@ -667,13 +667,13 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    
+
     <xsl:template match="xf:itemset" mode="labels">
         <xsl:variable name="value-ref" select="./xf:value/@ref" />
         <xsl:variable name="label-ref" select="./xf:label/@ref" />
         <xsl:variable name="iwq" select="substring-before(substring-after(@nodeset, 'instance('),')/')" />
         <!-- Needs to also deal with randomize(instance("id")/path/to/node), randomize(instance("id")/path/to/node, 3) -->
-        <!-- Super inelegant and not robust without regexp:match --> 
+        <!-- Super inelegant and not robust without regexp:match -->
         <xsl:variable name="instance-path-temp">
             <xsl:choose>
                 <xsl:when test="contains(@nodeset, 'randomize(') and contains(@nodeset, ',')">
@@ -692,8 +692,8 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             <xsl:call-template name="strip-filter">
                 <xsl:with-param name="string" select="$instance-path"/>
             </xsl:call-template>
-        </xsl:variable> 
-        <xsl:variable name="instance-id" select="substring($iwq, 2, string-length($iwq)-2)" />    
+        </xsl:variable>
+        <xsl:variable name="instance-id" select="substring($iwq, 2, string-length($iwq)-2)" />
         <span class="itemset-labels">
             <xsl:attribute name="data-value-ref">
                 <xsl:value-of select="$value-ref"/>
@@ -725,10 +725,10 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             </xsl:choose>
             <xsl:text>
             </xsl:text>
-        </span> 
+        </span>
     </xsl:template>
-    
-    <!-- 
+
+    <!--
         turns: /path/to/node[value=/some/other/node] into: /path/to/node
         this function is probably way too aggressive but will work for xls-form generated forms
         to do this properly a regexp:replace is required, but not supported in libXML
@@ -738,7 +738,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
         <xsl:param name="string"/>
         <xsl:choose>
             <xsl:when test="contains($string, '[') and contains($string, ']')">
-                <xsl:value-of select="substring-before($string, '[')"/>  
+                <xsl:value-of select="substring-before($string, '[')"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="$string"/>
@@ -750,11 +750,11 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             </xsl:call-template>
         </xsl:if>
     </xsl:template>
-    
+
     <!--
        turns STRING: '/path/to/node' into: /*[name()='path'/*[name()='to']/*[name()='node'
-    -->    
-    <!--   
+    -->
+    <!--
     <xsl:template name="string-to-path">
         <xsl:param name="path-string"/>
         <xsl:if test="starts-with($path-string, '/')">
@@ -770,7 +770,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
         </xsl:choose>
     </xsl:template>
     -->
-    
+
     <xsl:template name="select-select">
         <xsl:param name="nodeset"/>
         <xsl:param name="binding"/>
@@ -844,7 +844,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                             <xsl:with-param name="nodeset" select="$nodeset" />
                             <xsl:with-param name="binding" select="$binding" />
                             <xsl:with-param name="type" select="$type" />
-                        </xsl:call-template> 
+                        </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:attribute name="id">
@@ -864,7 +864,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                         <xsl:apply-templates select="xf:itemset" mode="templates"/>
                     </xsl:otherwise>
                 </xsl:choose>
-            </xsl:element>            
+            </xsl:element>
             <span class="or-option-translations" style="display:none;">
                 <xsl:if test="not(./xf:itemset) and $translated = 'true'">
                     <xsl:for-each select="exsl:node-set($options)/span">
@@ -885,7 +885,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             </xsl:call-template>
         </label>
     </xsl:template>
-    
+
     <xsl:template name="select-input">
         <xsl:param name="nodeset"/>
         <xsl:param name="binding"/>
@@ -969,13 +969,13 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             </xsl:call-template>
         </fieldset>
     </xsl:template>
-    
 
-    <!-- 
+
+    <!--
         Don't add any logic or names to odk:rank items
     -->
     <xsl:template name="rank-item-attributes">
-        <xsl:attribute name="value"> 
+        <xsl:attribute name="value">
             <xsl:value-of select="./xf:value"/>
         </xsl:attribute>
         <xsl:attribute name="class">
@@ -986,7 +986,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
         </xsl:attribute>
     </xsl:template>
 
-    <!-- 
+    <!--
         Don't add any logic or names to setvalue items
     -->
     <xsl:template name="setvalue-attributes">
@@ -1000,7 +1000,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                 <xsl:with-param name="nodeset" select="$nodeset"/>
             </xsl:call-template>
         </xsl:attribute>
-        <xsl:attribute name="data-setvalue"> 
+        <xsl:attribute name="data-setvalue">
             <xsl:choose>
                 <xsl:when test="./@value">
                     <xsl:value-of select="./@value" />
@@ -1010,7 +1010,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:attribute>
-        <xsl:attribute name="data-event"> 
+        <xsl:attribute name="data-event">
             <xsl:value-of select="./@event"/>
         </xsl:attribute>
         <xsl:attribute name="type">
@@ -1113,22 +1113,27 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                 <xsl:value-of select="normalize-space($binding/@oc:required-type)" />
             </xsl:attribute>
         </xsl:if>
+        <xsl:for-each select="$binding/@*[starts-with(name(), 'oc:constraint') and string-length(name()) > 13 and substring-before(name(), 'Msg') = '' ]" >
+            <xsl:attribute name="{concat('oc-', local-name(.))}">
+                <xsl:value-of select="normalize-space(.)" />
+            </xsl:attribute>
+        </xsl:for-each>
         <xsl:if test="$binding/@orx:max-pixels">
             <xsl:attribute name="data-max-pixels">
                 <xsl:value-of select="normalize-space($binding/@orx:max-pixels)" />
             </xsl:attribute>
         </xsl:if>
         <xsl:attribute name="data-type-xml">
-            <xsl:value-of select="$xml-type" /> 
+            <xsl:value-of select="$xml-type" />
         </xsl:attribute>
         <xsl:if test="$xml-type = 'decimal'">
             <xsl:attribute name="step">any</xsl:attribute>
         </xsl:if>
         <xsl:if test="$binding/@readonly = 'true()' and not($html-input-type = 'hidden')" >
-            <!-- 
+            <!--
                 This also adds a readonly attribute to <select> which is not valid HTML.
                 We could add some logic to avoid that (the <option>s already get the disabled attribute),
-                but it's an extra line of defence and doesn't really hurt. The input change handler in 
+                but it's an extra line of defence and doesn't really hurt. The input change handler in
                 Enketo Core ignores changes on a <select readonly>.
             -->
             <xsl:attribute name="readonly">readonly</xsl:attribute>
@@ -1137,17 +1142,17 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
         <!-- note that due to the unhelpful default value behavior of input type=range in HTML, we use type=number -->
             <xsl:if test="@start">
                 <xsl:attribute name="min">
-                    <xsl:value-of select="@start" /> 
+                    <xsl:value-of select="@start" />
                 </xsl:attribute>
             </xsl:if>
             <xsl:if test="@end">
-                <xsl:attribute name="max">   
-                    <xsl:value-of select="@end" /> 
+                <xsl:attribute name="max">
+                    <xsl:value-of select="@end" />
                 </xsl:attribute>
             </xsl:if>
             <xsl:if test="@step">
                 <xsl:attribute name="step">
-                    <xsl:value-of select="@step" /> 
+                    <xsl:value-of select="@step" />
                 </xsl:attribute>
             </xsl:if>
         </xsl:if>
@@ -1156,7 +1161,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                 <xsl:choose>
                     <xsl:when test="@accept">
                         <xsl:value-of select="@accept" />
-                    </xsl:when>    
+                    </xsl:when>
                     <xsl:when test="@mediatype">
                         <xsl:value-of select="@mediatype" />
                     </xsl:when>
@@ -1204,8 +1209,8 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    
-    <xsl:template match="xf:label | xf:hint | xf:bind/@jr:constraintMsg | xf:bind/@jr:requiredMsg | xf:bind/@oc:relevantMsg">
+
+    <xsl:template match="xf:label | xf:hint | xf:bind/@jr:constraintMsg | xf:bind/@jr:requiredMsg | xf:bind/@oc:relevantMsg | xf:bind/@*[starts-with(name(), 'oc:constraint') and substring(name(), string-length(name()) - string-length('Msg') +1) = 'Msg']">
         <xsl:variable name="class">
             <xsl:if test="local-name() = 'constraintMsg'">
                 <xsl:value-of select="'or-constraint-msg'" />
@@ -1225,10 +1230,13 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
              <xsl:if test="local-name() = 'label' and local-name(..) = 'item' ">
                 <xsl:value-of select="'option-label'"/>
             </xsl:if>
+            <xsl:if test="starts-with(name(), 'oc:constraint') and substring(name(), string-length(name()) - string-length('Msg') +1) = 'Msg' " >
+                <xsl:value-of select="concat('oc-', substring-before(local-name(.), 'Msg'), '-msg')"/>
+            </xsl:if>
         </xsl:variable>
         <xsl:choose>
             <xsl:when test="not(string(./@ref)) and ( string(.) or string(./xf:output/@value) ) and not(contains(.,'itext('))">
-                <span lang="">                    
+                <span lang="">
                     <xsl:attribute name="class">
                         <xsl:value-of select="concat($class, ' active')" />
                     </xsl:attribute>
@@ -1246,10 +1254,10 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-                
+
                 <xsl:variable name="refid"
                     select="substring(substring-after($ref, 'itext('),2,string-length(substring-after($ref, 'itext('))-3)"/>
-            <!-- 
+            <!--
                 ** HUGE PERFORMANCE HOG! **
                 <xsl:if test="not(/h:html/h:head/xf:model/xf:itext/xf:translation/xf:text[@id=$refid])">
                     <xsl:message>ERROR: itext(id) found with non-existing id: "<xsl:value-of select="$refid"/>". Maybe itext(path/to/node) construct was used, which is not supported.</xsl:message>
@@ -1281,7 +1289,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                     <xsl:apply-templates select="$binding/@jr:requiredMsg" />
                 </xsl:when>
                 <xsl:otherwise>
-                        <xsl:call-template name="default-required-msg"/>
+                    <xsl:call-template name="default-required-msg"/>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:if>
@@ -1291,10 +1299,13 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                     <xsl:apply-templates select="$binding/@oc:relevantMsg" />
                 </xsl:when>
                 <xsl:otherwise>
-                        <xsl:call-template name="default-relevant-msg"/>
+                    <xsl:call-template name="default-relevant-msg"/>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:if>
+        <xsl:for-each select="$binding/@*[starts-with(name(), 'oc:constraint') and substring(name(), string-length(name()) - string-length('Msg') +1) = 'Msg' ]" >
+            <xsl:apply-templates select="." />
+        </xsl:for-each>
     </xsl:template>
 
     <xsl:template name="default-constraint-msg">
@@ -1320,7 +1331,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             <xsl:variable name="itext"
                     select="substring(substring-after(@value, 'itext('),2,string-length(substring-after(@value, 'itext('))-3)"/>
             <xsl:attribute name="data-value">
-                <!-- this is just a quick hack! Need a robust itext processor that can make a distinction 
+                <!-- this is just a quick hack! Need a robust itext processor that can make a distinction
                 between id and node and figure out which instance to take node from with multiple instances -->
                 <xsl:choose>
                     <xsl:when test="string-length($itext) &gt; 0" >
@@ -1329,7 +1340,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                     <xsl:otherwise>
                         <xsl:value-of select="@value"/>
                     </xsl:otherwise>
-                </xsl:choose>    
+                </xsl:choose>
             </xsl:attribute>
             <xsl:text><!-- avoids self-closing tags on empty elements --> </xsl:text>
         </span>
@@ -1360,16 +1371,16 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
 
     <xsl:template name="translations">
         <xsl:param name="id"/>
-        <xsl:param name="class"/>        
+        <xsl:param name="class"/>
         <xsl:for-each select="/h:html/h:head/xf:model/xf:itext/xf:translation/xf:text[@id=$id]">
             <xsl:variable name="lang" select="ancestor::xf:translation/@lang"/>
             <xsl:variable name="active">
                 <xsl:if test="string($lang) = string($default-lang)">active</xsl:if>
             </xsl:variable>
             <xsl:variable name="notext">
-                <xsl:value-of select="string-length(./xf:value[@form='long' or @form='short' or not(@form)]) = 0" /> 
+                <xsl:value-of select="string-length(./xf:value[@form='long' or @form='short' or not(@form)]) = 0" />
             </xsl:variable>
-            <!-- text labels get priority -->   
+            <!-- text labels get priority -->
             <xsl:for-each select="./xf:value" >
                 <xsl:if test="not(@form = 'image' or @form = 'video' or @form = 'audio' or @form='big-image' or @form='guidance')">
                     <span>
@@ -1551,18 +1562,18 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                     </xsl:choose>-->
                     <xsl:for-each select="ancestor::*">
                        <!-- <xsl:if test="not(substring($path, 1, 1) = '/') and not(local-name() = 'body') ">-->
-                       
+
                         <!--<xsl:message>ancestor: <xsl:value-of select="local-name()" /></xsl:message>-->
                         <xsl:if test="(local-name() = 'repeat' or local-name() = 'group')">
-                                
-                                <!--substring(@nodeset, 1, 1) = '/' or substring(@ref, 1, 1) = '/' 
+
+                                <!--substring(@nodeset, 1, 1) = '/' or substring(@ref, 1, 1) = '/'
                                         )">-->
                             <!--<xsl:for-each select="descendant::*">
                                 <xsl:if test="local-name() = 'group' or local-name() = 'repeat'">-->
                                 <xsl:if test="string-length(@ref) &gt; 0 or string-length(@nodeset) &gt; 0">
                                     <xsl:value-of select="concat(@ref,@nodeset, '/')" />
                                 </xsl:if>
-                            <!--    </xsl:if>        
+                            <!--    </xsl:if>
                             </xsl:for-each>-->
                             <!-- not totally foolproof (will fail if nested group use both local and absolute paths) but probably okay, test this with multiple nested groups -->
                         </xsl:if>
@@ -1600,7 +1611,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                 </xsl:when>
                 <xsl:otherwise>
                     strictly speaking, if the parent group or repeat doesn't have a ref/nodeset, we should go
-                    one level higher. Not implemented here. 
+                    one level higher. Not implemented here.
                     <xsl:message>ERROR: Could not determine context node for relative path.</xsl:message>
                 </xsl:otherwise>
             <xsl:choose>
@@ -1613,7 +1624,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
         </xsl:if>
         <xsl:value-of select="$newpath" />
     </xsl:template>-->
-    
+
     <xsl:template name="image">
         <xsl:param name="active"/>
         <xsl:param name="notext" />
