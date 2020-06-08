@@ -39,8 +39,8 @@ const version = _getVersion();
  */
 function transform( survey ) {
     let xformDoc;
-    const xsltParams = survey.includeRelevantMsg ? {
-        'include-relevant-msg': 1
+    const xsltParams = survey.openclinica ? {
+        'openclinica': 1
     } : {};
 
     return _parseXml( survey.xform )
@@ -79,7 +79,7 @@ function transform( survey ) {
             delete survey.media;
             delete survey.preprocess;
             delete survey.markdown;
-            delete survey.includeRelevantMsg;
+            delete survey.openclinica;
             return survey;
         } );
 }

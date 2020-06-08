@@ -784,10 +784,10 @@ describe( 'custom stuff', () => {
     describe( 'oc:relevantMsg binding attributes', () => {
         const xform = fs.readFileSync( './test/forms/relevant_constraint_required.xml' );
 
-        it( 'if includeRelevantMsg=1, are copied to or-relevant-msg elements or a default is added for relevant expressions', () => {
+        it( 'if openclinica=1, are copied to or-relevant-msg elements or a default is added for relevant expressions', () => {
             const result = transformer.transform( {
                 xform,
-                includeRelevantMsg: 1
+                openclinica: 1
             } );
             return expect( result ).to.eventually.have.property( 'form' ).and.to.satisfy( form => form.match( /or-relevant-msg/g ).length === 4 );
         } );
@@ -803,37 +803,63 @@ describe( 'custom stuff', () => {
 
     describe( 'multiple OC constraints', () => {
         const xform = fs.readFileSync( './test/forms/oc-custom-multiple-constraints.xml' );
-        const result = transformer.transform( { xform } );
 
-        describe( 'are added via oc:constraint[N] attribute', () => {
-            it( 'works for N=1', () => {
-                return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-oc-constraint1=". != \'a\'"' );
+        describe( 'if openclinica=1', () => {
+            const result = transformer.transform( { xform, openclinica: 1 } );
+
+            describe('are added via oc:constraint[N] attribute', () => {
+
+                it( 'works for N=1', () => {
+                    return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-oc-constraint1=". != \'a\'"' );
+                } );
+
+                it( 'works for N=20', () => {
+                    return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-oc-constraint20=". != \'c\'"' );
+                } );
+
+                //it( 'ignores oc:constraint without a number', () => {
+                //    return expect( result ).to.eventually.have.property( 'form' ).and.to.not.contain( 'constraint to be ignored' );
+                //} );
+
+            });
+
+            describe( 'can get individual constraint messages with the oc:constraint[N]Msg attribute', () => {
+
+                it( 'works for N=1', () => {
+                    return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'class="or-constraint1-msg' );
+                } );
+
+                it( 'works for N=20', () => {
+                    return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'class="or-constraint20-msg' );
+                } );
+
+                it( 'ignores constraint messages without a number', () => {
+                    // The text "msg to be ignored is actually part of the result but is not present in a .or-constraint-msg span elmement
+                    return expect( result ).to.eventually.have.property( 'form' ).and.not.to.match( /or-constraint-msg [^>]+>msg to be ignored/ );
+                } );
             } );
-
-            it( 'works for N=20', () => {
-                return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-oc-constraint20=". != \'c\'"' );
-            } );
-
-            it( 'ignores oc:constraint without a number', () => {
-                return expect( result ).to.eventually.have.property( 'form' ).and.to.not.contain( 'constraint to be ignored' );
-            } );
-
 
         } );
 
-        describe( 'can get individual constraint messages with the oc:constraint[N]Msg attribute', () => {
-            it( 'works for N=1', () => {
-                return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'class="or-constraint1-msg' );
+        describe( 'are ignored by default', () => {
+            const result = transformer.transform( { xform } );
+
+            it( 'for N=1 (attribute)', () => {
+                return expect( result ).to.eventually.have.property( 'form' ).and.not.to.contain( 'data-oc-constraint1=". != \'a\'"' );
             } );
 
-            it( 'works for N=20', () => {
-                return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'class="or-constraint20-msg' );
+            it( 'for N=20 (attribute)', () => {
+                return expect( result ).to.eventually.have.property( 'form' ).and.not.to.contain( 'data-oc-constraint20=". != \'c\'"' );
             } );
 
-            it( 'ignores constraint messages without a number', () => {
-                // The text "msg to be ignored is actually part of the result but is not present in a .or-constraint-msg span elmement
-                return expect( result ).to.eventually.have.property( 'form' ).and.not.to.match( /or-constraint-msg [^>]+>msg to be ignored/ );
+            it( 'for N=1 (message)', () => {
+                return expect( result ).to.eventually.have.property( 'form' ).and.not.to.contain( 'class="or-constraint1-msg' );
             } );
+
+            it( 'for N=20 (message', () => {
+                return expect( result ).to.eventually.have.property( 'form' ).and.not.to.contain( 'class="or-constraint20-msg' );
+            } );
+
         } );
 
     } );
