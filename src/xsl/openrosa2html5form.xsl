@@ -1114,7 +1114,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             </xsl:attribute>
         </xsl:if>
         <xsl:for-each select="$binding/@*[starts-with(name(), 'oc:constraint') and string-length(name()) > 13 and substring-before(name(), 'Msg') = '' ]" >
-            <xsl:attribute name="{concat('data-', local-name(.))}">
+            <xsl:attribute name="{concat('data-oc-', local-name(.))}">
                 <xsl:value-of select="normalize-space(.)" />
             </xsl:attribute>
         </xsl:for-each>

@@ -807,11 +807,11 @@ describe( 'custom stuff', () => {
 
         describe( 'are added via oc:constraint[N] attribute', () => {
             it( 'works for N=1', () => {
-                return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-constraint1=". != \'a\'"' );
+                return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-oc-constraint1=". != \'a\'"' );
             } );
 
             it( 'works for N=20', () => {
-                return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-constraint20=". != \'c\'"' );
+                return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-oc-constraint20=". != \'c\'"' );
             } );
 
             it( 'ignores oc:constraint without a number', () => {
@@ -837,5 +837,5 @@ describe( 'custom stuff', () => {
         } );
 
     } );
-    
+
 } );
