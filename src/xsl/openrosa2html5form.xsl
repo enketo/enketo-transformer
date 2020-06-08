@@ -1210,29 +1210,31 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="xf:label | xf:hint | xf:bind/@jr:constraintMsg | xf:bind/@jr:requiredMsg | xf:bind/@oc:relevantMsg | xf:bind/@*[starts-with(name(), 'oc:constraint') and substring(name(), string-length(name()) - string-length('Msg') +1) = 'Msg']">
+    <xsl:template match="xf:label | xf:hint | xf:bind/@jr:constraintMsg | xf:bind/@jr:requiredMsg | xf:bind/@oc:relevantMsg | xf:bind/@*[starts-with(name(), 'oc:constraint') and string-length(local-name()) > 13 and substring(name(), string-length(name()) - string-length('Msg') +1) = 'Msg']">
         <xsl:variable name="class">
-            <xsl:if test="local-name() = 'constraintMsg'">
-                <xsl:value-of select="'or-constraint-msg'" />
-            </xsl:if>
-            <xsl:if test="local-name() = 'requiredMsg'">
-                <xsl:value-of select="'or-required-msg'" />
-            </xsl:if>
-            <xsl:if test="local-name() = 'relevantMsg'">
-                <xsl:value-of select="'or-relevant-msg'" />
-            </xsl:if>
-            <xsl:if test="local-name() = 'hint'">
-                <xsl:value-of select="'or-hint'" />
-            </xsl:if>
-            <xsl:if test="local-name() = 'label' and local-name(..) != 'item' ">
-                <xsl:value-of select="'question-label'"/>
-            </xsl:if>
-             <xsl:if test="local-name() = 'label' and local-name(..) = 'item' ">
-                <xsl:value-of select="'option-label'"/>
-            </xsl:if>
-            <xsl:if test="starts-with(name(), 'oc:constraint') and substring(name(), string-length(name()) - string-length('Msg') +1) = 'Msg' " >
-                <xsl:value-of select="concat('oc-', substring-before(local-name(.), 'Msg'), '-msg')"/>
-            </xsl:if>
+            <xsl:choose>
+                <xsl:when test="name() = 'jr:constraintMsg'">
+                    <xsl:value-of select="'or-constraint-msg'" />
+                </xsl:when>
+                <xsl:when test="local-name() = 'requiredMsg'">
+                    <xsl:value-of select="'or-required-msg'" />
+                </xsl:when>
+                <xsl:when test="local-name() = 'relevantMsg'">
+                    <xsl:value-of select="'or-relevant-msg'" />
+                </xsl:when>
+                <xsl:when test="local-name() = 'hint'">
+                    <xsl:value-of select="'or-hint'" />
+                </xsl:when>
+                <xsl:when test="local-name() = 'label' and local-name(..) != 'item' ">
+                    <xsl:value-of select="'question-label'"/>
+                </xsl:when>
+                <xsl:when test="local-name() = 'label' and local-name(..) = 'item' ">
+                    <xsl:value-of select="'option-label'"/>
+                </xsl:when>
+                <xsl:when test="starts-with(name(), 'oc:constraint') and string-length(local-name()) > 13 and substring(name(), string-length(name()) - string-length('Msg') +1) = 'Msg' " >
+                    <xsl:value-of select="concat('or-', substring-before(local-name(.), 'Msg'), '-msg')"/>
+                </xsl:when>
+            </xsl:choose>
         </xsl:variable>
         <xsl:choose>
             <xsl:when test="not(string(./@ref)) and ( string(.) or string(./xf:output/@value) ) and not(contains(.,'itext('))">
