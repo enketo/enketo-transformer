@@ -147,9 +147,9 @@ describe( 'transformer', () => {
 
             return Promise.all( [
                 expect( result ).to.eventually.have.property( 'form' )
-                .and.to.not.contain( '&lt;span style="color:pink;"&gt;Intro&lt;/span&gt;' ),
+                    .and.to.not.contain( '&lt;span style="color:pink;"&gt;Intro&lt;/span&gt;' ),
                 expect( result ).to.eventually.have.property( 'form' )
-                .and.to.contain( '<span style="color:pink;">Intro</span>' )
+                    .and.to.contain( '<span style="color:pink;">Intro</span>' )
             ] );
         } );
 
@@ -254,7 +254,7 @@ describe( 'transformer', () => {
             ] );
         } );
 
-        it( `in the model for binary questions that contain a default value by copying to a 
+        it( `in the model for binary questions that contain a default value by copying to a
             src attribute and resolving the URL according to a provided map`, () => {
             const xform = fs.readFileSync( './test/forms/image-default.xml', 'utf8' );
             const media = {
@@ -270,9 +270,9 @@ describe( 'transformer', () => {
 
             return Promise.all( [
                 expect( result ).to.eventually.have.property( 'model' )
-                .and.to.contain( '<ann src="https://feelings/unhappy.jpg">jr://images/unhappy.jpg</ann>' ),
+                    .and.to.contain( '<ann src="https://feelings/unhappy.jpg">jr://images/unhappy.jpg</ann>' ),
                 expect( result ).to.eventually.have.property( 'model' )
-                .and.to.contain( '<dra src="https://feelings/indifferent.png">jr://images/indifferent.png</dra>' )
+                    .and.to.contain( '<dra src="https://feelings/indifferent.png">jr://images/indifferent.png</dra>' )
             ] );
         } );
 
@@ -440,7 +440,7 @@ describe( 'transformer', () => {
 
         it( 'and outputs <datalist> elements', () => {
             const xform = fs.readFileSync( './test/forms/autocomplete.xml' );
-            const transform = transformer.transform( { xform } ).then( parseHtmlForm )
+            const transform = transformer.transform( { xform } ).then( parseHtmlForm );
             return transform.then( doc => {
                 return Promise.all( [
                     expect( doc ).to.be.an( 'object' ),
@@ -474,17 +474,6 @@ describe( 'transformer', () => {
         ] ) );
     } );
 
-    describe( 'supports the enk:for attribute', () => {
-        const xform = fs.readFileSync( './test/forms/for.xml' );
-        const result = transformer.transform( {
-            xform
-        } );
-
-        it( 'by turning it into the data-for attribute', () => Promise.all( [
-            expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-for="../a"' ),
-        ] ) );
-    } );
-
     describe( 'for backwards compatibility of forms without a /meta/instanceID node', () => {
         const xform1 = fs.readFileSync( './test/forms/no-instance-id.xml' );
         const result1 = transformer.transform( {
@@ -506,26 +495,6 @@ describe( 'transformer', () => {
         const result = transformer.transform( { xform } );
 
         it( 'method="form-data-post" to "post" in submission element', () => expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'method="post"' ) );
-    } );
-
-    describe( 'oc:relevantMsg binding attributes', () => {
-        const xform = fs.readFileSync( './test/forms/relevant_constraint_required.xml' );
-
-        it( 'if includeRelevantMsg=1, are copied to or-relevant-msg elements or a default is added for relevant expressions', () => {
-            const result = transformer.transform( {
-                xform,
-                includeRelevantMsg: 1
-            } );
-            return expect( result ).to.eventually.have.property( 'form' ).and.to.satisfy( form => form.match( /or-relevant-msg/g ).length === 4 );
-        } );
-
-        it( 'are ignored by default', () => {
-            const result = transformer.transform( {
-                xform
-            } );
-            return expect( result ).to.eventually.have.property( 'form' ).and.not.to.contain( 'or-relevant-msg' );
-        } );
-
     } );
 
     describe( 'itext ids for itemsets are extracted', () => {
@@ -641,7 +610,7 @@ describe( 'transformer', () => {
                     expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
                     expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '"Age changed!"' );
                     expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'string' );
-                    // Check location as sibling of /data/person/age 
+                    // Check location as sibling of /data/person/age
                     const sibling = target.parentNode.getElementsByTagName( 'input' )[ 0 ];
                     expect( sibling.getAttribute( 'name' ) ).to.equal( '/data/person/age' );
                 } );
@@ -715,7 +684,7 @@ describe( 'transformer', () => {
                     expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
                     expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '"Age changed!"' );
                     expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'string' );
-                    // Check location as sibling of /data/person/age 
+                    // Check location as sibling of /data/person/age
                     const sibling = target.parentNode.getElementsByTagName( 'input' )[ 0 ];
                     expect( sibling.getAttribute( 'name' ) ).to.equal( '/data/person/age' );
                 } );
@@ -794,8 +763,79 @@ describe( 'transformer', () => {
                     expect( d[ 0 ].hasAttribute( 'data-event' ) ).to.equal( false );
                     expect( d[ 0 ].hasAttribute( 'data-setvalue' ) ).to.equal( false );
                 } );
+
+        } );
+    });
+} );
+
+describe( 'custom stuff', () => {
+
+    describe( 'supports the enk:for attribute', () => {
+        const xform = fs.readFileSync( './test/forms/for.xml' );
+        const result = transformer.transform( {
+            xform
+        } );
+
+        it( 'by turning it into the data-for attribute', () => Promise.all( [
+            expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-for="../a"' ),
+        ] ) );
+    } );
+
+    describe( 'oc:relevantMsg binding attributes', () => {
+        const xform = fs.readFileSync( './test/forms/relevant_constraint_required.xml' );
+
+        it( 'if includeRelevantMsg=1, are copied to or-relevant-msg elements or a default is added for relevant expressions', () => {
+            const result = transformer.transform( {
+                xform,
+                includeRelevantMsg: 1
+            } );
+            return expect( result ).to.eventually.have.property( 'form' ).and.to.satisfy( form => form.match( /or-relevant-msg/g ).length === 4 );
+        } );
+
+        it( 'are ignored by default', () => {
+            const result = transformer.transform( {
+                xform
+            } );
+            return expect( result ).to.eventually.have.property( 'form' ).and.not.to.contain( 'or-relevant-msg' );
         } );
 
     } );
 
+    describe( 'multiple OC constraints', () => {
+        const xform = fs.readFileSync( './test/forms/oc-custom-multiple-constraints.xml' );
+        const result = transformer.transform( { xform } );
+
+        describe( 'are added via oc:constraint[N] attribute', () => {
+            it( 'works for N=1', () => {
+                return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-constraint1=". != \'a\'"' );
+            } );
+
+            it( 'works for N=20', () => {
+                return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-constraint20=". != \'c\'"' );
+            } );
+
+            it( 'ignores oc:constraint without a number', () => {
+                return expect( result ).to.eventually.have.property( 'form' ).and.to.not.contain( 'constraint to be ignored' );
+            } );
+
+
+        } );
+
+        describe( 'can get individual constraint messages with the oc:constraint[N]Msg attribute', () => {
+            it( 'works for N=1', () => {
+                return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'class="or-constraint1-msg' );
+            } );
+
+            it( 'works for N=20', () => {
+                return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'class="or-constraint20-msg' );
+            } );
+
+            it( 'ignores constraint messages without a number', () => {
+                // The text "msg to be ignored is actually part of the result but is not present in a .or-constraint-msg span elmement
+                return expect( result ).to.eventually.have.property( 'form' ).and.not.to.match( /or-constraint-msg [^>]+>msg to be ignored/ );
+            } );
+        } );
+
+    } );
+    
 } );
