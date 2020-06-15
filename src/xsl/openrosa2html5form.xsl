@@ -1099,7 +1099,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             </xsl:attribute>
         </xsl:if>
         <xsl:if test="$openclinica = 1">
-            <xsl:for-each select="$binding/@*[starts-with(name(), 'oc:')]" >
+            <xsl:for-each select="$binding/@*[starts-with(name(), 'oc:') and not(substring-before(name(), 'Msg'))]" >
                 <xsl:attribute name="{concat('data-oc-', local-name(.))}">
                     <xsl:value-of select="normalize-space(.)" />
                 </xsl:attribute>

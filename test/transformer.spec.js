@@ -821,6 +821,10 @@ describe( 'custom stuff', () => {
                 //    return expect( result ).to.eventually.have.property( 'form' ).and.to.not.contain( 'constraint to be ignored' );
                 //} );
 
+                it ('does not add constraint messages in this manner', () => {
+                    return expect( result ).to.eventually.have.property( 'form' ).and.to.not.contain( 'data-oc-constraint20Msg="' );
+                });
+
             });
 
             describe( 'can get individual constraint messages with the oc:constraint[N]Msg attribute', () => {
@@ -837,6 +841,7 @@ describe( 'custom stuff', () => {
                     // The text "msg to be ignored is actually part of the result but is not present in a .or-constraint-msg span elmement
                     return expect( result ).to.eventually.have.property( 'form' ).and.not.to.match( /or-constraint-msg [^>]+>msg to be ignored/ );
                 } );
+
             } );
 
         } );
