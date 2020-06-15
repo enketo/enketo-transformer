@@ -34,6 +34,7 @@ router
             .then( xform => transformer.transform( {
                 xform,
                 theme: req.query.theme,
+                openclinica: req.query.openclinica === 'true',
                 markdown: req.query.markdown !== 'false'
             } ) )
             .then( result => {
@@ -50,6 +51,7 @@ router
                 xform: req.body.xform,
                 theme: req.body.theme,
                 media: req.body.media,
+                openclinica: req.body.openclinica === 'true',
                 markdown: req.body.markdown !== 'false'
             } )
             .then( result => {
@@ -70,6 +72,7 @@ router
             .then( xform => transformer.transform( {
                 xform,
                 theme: req.query.theme,
+                openclinica: req.query.openclinica === 'true',
                 markdown: req.query.markdown !== 'false'
             } ) )
             .then( result => {

@@ -1,11 +1,9 @@
-'use strict';
+const express = require( 'express' );
+const app = express();
+const bodyParser = require( 'body-parser' );
+const config = require( './config/config.json' );
 
-var express = require( 'express' );
-var app = express();
-var bodyParser = require( 'body-parser' );
-var config = require( './config/config.json' );
-
-for ( var item in config ) {
+for ( const item in config ) {
     app.set( item, config[ item ] );
 }
 
@@ -16,6 +14,6 @@ app.use( bodyParser.urlencoded( {
 
 require( './src/api' )( app );
 
-app.listen( app.get( 'port' ), function() {
-    console.log( 'enketo-transformer running on port ' + app.get( 'port' ) + '!' );
+app.listen( app.get( 'port' ), () => {
+    console.log( `enketo-transformer running on port ${app.get( 'port' )}!` );
 } );
