@@ -47,9 +47,11 @@ function markdownToHtml( text ) {
         // headers
         .replace( /^\s*(#{1,6})\s?([^#][^\n]*)(\n|$)/gm, _createHeader )
         // unordered lists
-        .replace( /(\n(\*|\+|-) (.*))+$/gm, _createUnorderedList )
+        .replace( /^((\*|\+|-) (.*)(\n|$))+/gm, _createUnorderedList )
         // ordered lists
-        .replace( /(\n([0-9]+\.) (.*))+$/gm, _createOrderedList )
+        .replace( /^(([0-9]+\.) (.*)(\n|$))+/gm, _createOrderedList )
+        // newline characters followed by block tag <ul>, <ol>
+        .replace( /\n(<(ul|ol)( start="[0-9]+")?>)/gm, '$1')
         // reverting escape of special characters
         .replace( /&35;/gm, '#' )
         .replace( /&95;/gm, '_' )
@@ -80,7 +82,7 @@ function _createHeader( match, hashtags, content ) {
  * @return {string} HTML string.
  */
 function _createUnorderedList( match ) {
-    const items = match.replace( /\n?(\*|\+|-)(.*)/gm, _createItem );
+    const items = match.replace( /(\*|\+|-)(.*)\n?/gm, _createItem );
     return `<ul>${items}</ul>`;
 }
 
@@ -89,17 +91,20 @@ function _createUnorderedList( match ) {
  * @return {string} HTML string.
  */
 function _createOrderedList( match ) {
-    const items = match.replace( /\n?([0-9]+\.)(.*)/gm, _createItem );
-    return `<ol>${items}</ol>`;
+    const startMatches = match.match(/^(?<start>[0-9]+)\./);
+    const start = startMatches && startMatches.groups && startMatches.groups.start !== '1' ? ` start="${startMatches.groups.start}"` : '';
+    const items = match.replace( /([0-9]+\.)(.*)\n?/gm, _createItem );
+    return `<ol${start}>${items}</ol>`;
 }
 
 /**
  * @param {string} match - The matched substring.
  * @param {*} bullet
  * @param {string} content - Item text.
+ * @param offset
  * @return {string} HTML string.
  */
-function _createItem( match, bullet, content ) {
+function _createItem( match, bullet, content) {
     return `<li>${content.trim()}</li>`;
 }
 

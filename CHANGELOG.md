@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+----------------------
+##### Changed
+- Markdown lists no longer require preceding newline.
+- Markdown ordered lists detect non-1 numbering start.
+
 [1.40.1] - 2020-04-24
 ---------------------
 ##### Fixed
@@ -17,7 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ---------------------
 ##### Removed
 - Node 8 compatibility.
-  
+
 ##### Changed
 - Node 12 now required.
 
@@ -316,7 +322,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ----------------------
 ##### Added
 - Proper support for namespaces. **Warning: requires enketo-core 4.7.0+!**
-- Support for comment feature. 
+- Support for comment feature.
 
 ##### Fixed
 - Markdown headers not followed by newline are not converted.
@@ -355,7 +361,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 [1.7.0] - 2016-01-11
 ----------------------
-##### Added 
+##### Added
 - Support for big-image.
 - Support for jr:requiredMsg.
 - Support for rows input attribute (alias of multiline appearance).
@@ -395,7 +401,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [1.6.0] - 2015-10-09
 ------------------------
 ##### Added
-- Full-featured POST /transform API endpoint 
+- Full-featured POST /transform API endpoint
 
 ##### Changed
 ------------------------
@@ -412,7 +418,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ##### Fixed
 - Markdown lists not formed correctly.
 
-[1.5.3] - 2015-09-23 
+[1.5.3] - 2015-09-23
 -----------------------
 ##### Fixed
 - Markdown lists require newline character to start (too strict).
@@ -434,7 +440,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ##### Fixed
 - node 0.12 compatibility
 
-[1.5.0] - 2015-09-08 
+[1.5.0] - 2015-09-08
 -----------------------
 ##### Added
 - Moved markdown support from enketo-core, added additional support, and expanded to all labels and hints (**Warning:** use only with enketo-core 4.2.0+ ).
@@ -462,11 +468,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ##### Fixed
 - Directionality not detected when forms contain no itext.
 
-[1.3.0] - 2015-07-24 
+[1.3.0] - 2015-07-24
 ------------------------
 ##### Changed
 - Prefer first hint when determining directionality of language.
-- Preferred language name syntax in XForms is now "Name Of Language (tag)". 
+- Preferred language name syntax in XForms is now "Name Of Language (tag)".
 
 [1.2.4] - 2015-07-23
 ------------------------
@@ -489,7 +495,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ##### Fixed
 - Directionality of language tag with region (e.g. ar-IR) not determined correctly.
 
-[1.2.0] - 2015-07-10 
+[1.2.0] - 2015-07-10
 ------------------------
 ##### Added
 - Post-process lang attributes to create valid HTML.
