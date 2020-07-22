@@ -81,19 +81,21 @@ describe( 'markdown', () => {
             [ '\n* a\n* 2.\n', '<ul><li>a</li><li>2.</li></ul><br>' ],
             [ 'list:\n* a\n* b \n+ c   \n+ d', 'list:<ul><li>a</li><li>b</li><li>c</li><li>d</li></ul>' ],
             [ 'list:\n\n* a\n* b \n+ c   \n+ d', 'list:<br><ul><li>a</li><li>b</li><li>c</li><li>d</li></ul>' ],
-            // incorrect unordered lists            
+            [ '- 1\n- 2\n- 3\n This', '<ul><li>1</li><li>2</li><li>3</li></ul><p> This</p>' ],
+            [ '* a', '<ul><li>a</li></ul>' ],
+            // incorrect unordered lists
             [ '-', '-' ],
             [ '*', '*' ],
             [ '+', '+' ],
             [ '* ', '* ' ],
-            [ '* a', '* a' ],
             // correct ordered lists
             [ '\n1. a\n2. b', '<ol><li>a</li><li>b</li></ol>' ], // note: pyxform trims labels starting with \n
             [ '\n3. ', '<ol><li></li></ol>' ],
             [ '\n1. 2.\n2. b', '<ol><li>2.</li><li>b</li></ol>' ],
             [ 'list:\n1. a\n2. b \n501. c   \n6. d', 'list:<ol><li>a</li><li>b</li><li>c</li><li>d</li></ol>' ],
             [ 'list:\n\n1. a\n2. b \n501. c   \n6. d', 'list:<br><ol><li>a</li><li>b</li><li>c</li><li>d</li></ol>' ],
-            // incorrect ordered lists            
+            [ '1.\n2.\n2. b', '<ol><li></li><li></li><li>b</li></ol>' ],
+            // incorrect ordered lists
             [ '3.', '3.' ],
             [ '3. ', '3. ' ],
             [ '3. a', '3. a' ],
