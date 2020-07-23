@@ -9,6 +9,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Markdown ordered lists detect non-1 numbering start.
 - Add rel="noopener" to markdown links.
 
+##### Fixed
+- Textarea contains unnecessary space character.
+
 [1.40.1] - 2020-04-24
 ---------------------
 ##### Fixed
