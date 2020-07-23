@@ -49,7 +49,7 @@ describe( 'markdown', () => {
             [ 'this is number #1 and this is #2.' ],
             [ '####### A\nB', '####### A<br>B' ],
             // correct links
-            [ '[link](http://example.org)', '<a href="http://example.org" target="_blank">link</a>' ],
+            [ '[link](http://example.org)', '<a href="http://example.org" rel="noopener" target="_blank">link</a>' ],
             // incorrect links
             [ '[link(http://example.org)', '[link(http://example.org)' ],
             [ '[link(http://example.org)]', '[link(http://example.org)]' ],
@@ -112,8 +112,8 @@ describe( 'markdown', () => {
             ],
             [ '_<span style="color:red;">dbl</span>_', '<em><span style="color:red;">dbl</span></em>' ],
             [ '<span style="color:red;">_dbl_</span>', '<span style="color:red;"><em>dbl</em></span>' ],
-            [ 'list:\n* __a__\n* _b_ \n+ [c](c)', 'list:<ul><li><strong>a</strong></li><li><em>b</em></li><li><a href="c" target="_blank">c</a></li></ul>' ],
-            [ '<span style="color:blue">[link](http://enketo.org)</span>', '<span style="color:blue"><a href="http://enketo.org" target="_blank">link</a></span>' ],
+            [ 'list:\n* __a__\n* _b_ \n+ [c](c)', 'list:<ul><li><strong>a</strong></li><li><em>b</em></li><li><a href="c" rel="noopener" target="_blank">c</a></li></ul>' ],
+            [ '<span style="color:blue">[link](http://enketo.org)</span>', '<span style="color:blue"><a href="http://enketo.org" rel="noopener" target="_blank">link</a></span>' ],
             [ '# heading\nline1\nline2', '<h1>heading</h1>line1<br>line2' ],
             [ '####### heading7\nline1\nline2', '####### heading7<br>line1<br>line2' ],
             // escaping special characters with backslash

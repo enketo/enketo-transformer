@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ##### Changed
 - Markdown lists no longer require preceding newline.
 - Markdown ordered lists detect non-1 numbering start.
+- Add rel="noopener" to markdown links.
 
 [1.40.1] - 2020-04-24
 ---------------------
