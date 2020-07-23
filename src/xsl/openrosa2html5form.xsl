@@ -130,7 +130,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                     <xsl:text>&#10;</xsl:text>
                     <xsl:comment>This form was created by transforming a OpenRosa-flavored (X)Form using an XSL stylesheet created by Enketo LLC.</xsl:comment>
                     <section class="form-logo">
-                        <xsl:text> </xsl:text>
+                        <xsl:text></xsl:text>
                     </section>
                     <h3 dir="auto" id="form-title">
                         <xsl:choose>
