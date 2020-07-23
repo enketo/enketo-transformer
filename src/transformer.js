@@ -15,7 +15,7 @@ const xslModel = fs.readFileSync( path.join( __dirname, './xsl/openrosa2xmlmodel
 /**
  * @constant
  * @static
- * @type object
+ * @type {object}
  * @default
  */
 const NAMESPACES = {
@@ -26,7 +26,7 @@ const NAMESPACES = {
 /**
  * @constant
  * @static
- * @type string
+ * @type {string}
  */
 const version = _getVersion();
 
@@ -48,6 +48,7 @@ function transform( survey ) {
             if ( typeof survey.preprocess === 'function' ) {
                 doc = survey.preprocess.call( libxmljs, doc );
             }
+
             return doc;
         } )
         .then( _processBinaryDefaults )
@@ -80,6 +81,7 @@ function transform( survey ) {
             delete survey.preprocess;
             delete survey.markdown;
             delete survey.includeRelevantMsg;
+
             return survey;
         } );
 }
@@ -87,13 +89,14 @@ function transform( survey ) {
 /**
  * Performs a generic XSLT transformation.
  *
- * @param {string} xslStr
+ * @param {string} xslStr - XSL stylesheet content as string
  * @param {object} xmlDoc - libxmljs object of XML document
  * @param {object} xsltParams - Params object.
  * @return {Promise<Error|object>} libxmljs result document object.
  */
 function _transform( xslStr, xmlDoc, xsltParams ) {
     const params = xsltParams || {};
+
     return new Promise( ( resolve, reject ) => {
         libxslt.parse( xslStr, ( error, stylesheet ) => {
             if ( error ) {
@@ -117,7 +120,7 @@ function _processBinaryDefaults( doc ) {
             const nodeset = bind.attr( 'nodeset' );
 
             if ( nodeset && nodeset.value() ) {
-                const path = `/h:html/h:head/xmlns:model/xmlns:instance${nodeset.value().replace(/\//g, '/xmlns:')}`;
+                const path = `/h:html/h:head/xmlns:model/xmlns:instance${nodeset.value().replace( /\//g, '/xmlns:' )}`;
                 const dataNode = doc.get( path, NAMESPACES );
                 if ( dataNode ) {
                     const value = dataNode.text();
@@ -136,10 +139,13 @@ function _processBinaryDefaults( doc ) {
 /**
  * Correct some <setvalue> issues in the XSL stylesheets.
  * This is much easier to correct in javascript than in XSLT
+ *
+ * @param {object} doc - libxmljs object
+ * @return {object} doc - libxmljs object
  */
 function _correctSetValue( doc ) {
 
-    /* 
+    /*
      * See setvalue.xml (/data/person/age_changed). A <setvalue> inside a form control results
      * in one label.question with a nested label.setvalue which is weird syntax (and possibly invalid HTML).
      */
@@ -149,11 +155,11 @@ function _correctSetValue( doc ) {
         setValueEl.parent().remove();
     } );
 
-    /* 
+    /*
      * See setvalue.xml (/data/person/age). A <setvalue> inside a repeat to set a default value that also has a question with the same name, results
      * in one .question and .setvalue with the same name, which will leads to all kinds of problems in enketo-core
      * as name is presumed to be unique.
-     * 
+     *
      * Note that a label.setvalue is always to set a default value (with odk-new-repeat, odk-instance-first-load), never
      * a value change directive (with xforms-value-changed)
      */
@@ -219,7 +225,7 @@ function _replaceTheme( doc, theme ) {
  * Replaces xformManifest urls with URLs according to an internal Enketo Express url format.
  *
  * @param {object} xmlDoc - libxmljs object.
- * @param {Array<*>} mediaMap
+ * @param {object} mediaMap - map of media filenames and their URLs
  * @return {object} libxmljs object
  */
 function _replaceMediaSources( xmlDoc, mediaMap ) {
@@ -270,6 +276,7 @@ function _replaceLanguageTags( doc, survey ) {
     // List of parsed language objects
     const languages = languageElements.map( el => {
         const lang = el.text();
+
         return language.parse( lang, _getLanguageSampleText( doc, lang ) );
     } );
 
@@ -311,13 +318,16 @@ function _replaceLanguageTags( doc, survey ) {
                 langSelectorElement.attr( {
                     'data-default-lang': lang.tag
                 } );
+
                 return true;
             }
+
             return false;
         } );
     }
 
     survey.languageMap = map;
+
     return doc;
 }
 
@@ -446,6 +456,7 @@ function _getVersion() {
 function _md5( message ) {
     const hash = crypto.createHash( 'md5' );
     hash.update( message );
+
     return hash.digest( 'hex' );
 }
 

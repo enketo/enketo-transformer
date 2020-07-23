@@ -63,6 +63,7 @@ function parse( lang, sample ) {
  */
 function _getLangWithDesc( desc ) {
     const results = ( desc ) ? tags.search( desc ).filter( _languagesOnly ) : [];
+
     return results[ 0 ] || '';
 }
 
@@ -97,6 +98,7 @@ function _getDirectionality( sample ) {
     if ( direction !== 'ltr' ) {
         return 'rtl';
     }
+
     return direction;
 }
 

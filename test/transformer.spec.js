@@ -15,11 +15,13 @@ function parseHtmlForm( transformationResult ) {
 function findElementByName( htmlDoc, tagName, nameAttributeValue ) {
     const elements = Array.prototype.slice.call( htmlDoc.getElementsByTagName( tagName ) );
     const target = elements.find( el => el.getAttribute( 'name' ) === nameAttributeValue );
+
     return target || null;
 }
 
 function findElementsByName( htmlDoc, tagName, nameAttributeValue ) {
     const elements = Array.prototype.slice.call( htmlDoc.getElementsByTagName( tagName ) );
+
     return elements.filter( el => el.getAttribute( 'name' ) === nameAttributeValue );
 }
 
@@ -50,6 +52,7 @@ describe( 'transformer', () => {
                 const result = transformer.transform( {
                     xform
                 } );
+
                 return expect( result ).to.eventually.be.rejectedWith( Error );
             } );
         } );
@@ -59,6 +62,7 @@ describe( 'transformer', () => {
         it( 'copies the odk:xforms-version attribute', () => {
             const xform = fs.readFileSync( './test/forms/autocomplete.xml', 'utf8' );
             const result = transformer.transform( { xform } );
+
             return expect( result ).to.eventually.have.property( 'model' ).and.to.contain( 'odk:xforms-version="1.0.0"' );
         } );
     } );
@@ -71,6 +75,7 @@ describe( 'transformer', () => {
                 xform,
                 theme: 'mytheme'
             } );
+
             return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'theme-mytheme' );
         } );
 
@@ -147,9 +152,9 @@ describe( 'transformer', () => {
 
             return Promise.all( [
                 expect( result ).to.eventually.have.property( 'form' )
-                .and.to.not.contain( '&lt;span style="color:pink;"&gt;Intro&lt;/span&gt;' ),
+                    .and.to.not.contain( '&lt;span style="color:pink;"&gt;Intro&lt;/span&gt;' ),
                 expect( result ).to.eventually.have.property( 'form' )
-                .and.to.contain( '<span style="color:pink;">Intro</span>' )
+                    .and.to.contain( '<span style="color:pink;">Intro</span>' )
             ] );
         } );
 
@@ -270,9 +275,9 @@ describe( 'transformer', () => {
 
             return Promise.all( [
                 expect( result ).to.eventually.have.property( 'model' )
-                .and.to.contain( '<ann src="https://feelings/unhappy.jpg">jr://images/unhappy.jpg</ann>' ),
+                    .and.to.contain( '<ann src="https://feelings/unhappy.jpg">jr://images/unhappy.jpg</ann>' ),
                 expect( result ).to.eventually.have.property( 'model' )
-                .and.to.contain( '<dra src="https://feelings/indifferent.png">jr://images/indifferent.png</dra>' )
+                    .and.to.contain( '<dra src="https://feelings/indifferent.png">jr://images/indifferent.png</dra>' )
             ] );
         } );
 
@@ -301,6 +306,7 @@ describe( 'transformer', () => {
         it( 'and adds the correct number of constraint-msg elements', () => {
             const count = result => {
                 const matches = result.form.match( /class="or-constraint-msg/g );
+
                 return matches ? matches.length : 0;
             };
             const xform1 = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );
@@ -440,7 +446,8 @@ describe( 'transformer', () => {
 
         it( 'and outputs <datalist> elements', () => {
             const xform = fs.readFileSync( './test/forms/autocomplete.xml' );
-            const transform = transformer.transform( { xform } ).then( parseHtmlForm )
+            const transform = transformer.transform( { xform } ).then( parseHtmlForm );
+
             return transform.then( doc => {
                 return Promise.all( [
                     expect( doc ).to.be.an( 'object' ),
@@ -516,6 +523,7 @@ describe( 'transformer', () => {
                 xform,
                 includeRelevantMsg: 1
             } );
+
             return expect( result ).to.eventually.have.property( 'form' ).and.to.satisfy( form => form.match( /or-relevant-msg/g ).length === 4 );
         } );
 
@@ -523,6 +531,7 @@ describe( 'transformer', () => {
             const result = transformer.transform( {
                 xform
             } );
+
             return expect( result ).to.eventually.have.property( 'form' ).and.not.to.contain( 'or-relevant-msg' );
         } );
 
@@ -535,6 +544,7 @@ describe( 'transformer', () => {
 
         it( 'works for itemset nodesets using a simple randomize()', () => {
             const result = transformer.transform( { xform } );
+
             return expect( result ).to.eventually.have.property( 'form' ).and.to.match( MATCH );
         } );
 
@@ -542,6 +552,7 @@ describe( 'transformer', () => {
             const result = transformer.transform( {
                 xform: xform.replace( REPLACE, 'randomize(instance(\'holiday\')/root/item, 34)' )
             } );
+
             return expect( result ).to.eventually.have.property( 'form' ).and.to.match( MATCH );
         } );
 
@@ -549,6 +560,7 @@ describe( 'transformer', () => {
             const result = transformer.transform( {
                 xform: xform.replace( REPLACE, 'randomize(instance(\'holiday\')/root/item[value=concat("a", "b")]/name)' )
             } );
+
             return expect( result ).to.eventually.have.property( 'form' ).and.to.match( MATCH );
         } );
 
@@ -556,6 +568,7 @@ describe( 'transformer', () => {
             const result = transformer.transform( {
                 xform: xform.replace( REPLACE, 'randomize(instance(\'holiday\')/root/item[value=concat("a", "b")]/name, 34)' )
             } );
+
             return expect( result ).to.eventually.have.property( 'form' ).and.to.match( MATCH );
         } );
     } );

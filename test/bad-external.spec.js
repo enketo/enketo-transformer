@@ -34,7 +34,7 @@ describe( 'for incompatible forms that require preprocessing', () => {
              * Preprocess Model
              * - add instances
              */
-            const match = query.match( /^instance\('([^\)]+)'\)/ );
+            const match = query.match( /^instance\('([^)]+)'\)/ );
             const id = match && match.length ? match[ 1 ] : null;
 
             if ( id && !model.get( `//xmlns:instance[@id="${id}"]`, NAMESPACES ) ) {
@@ -91,17 +91,18 @@ describe( 'for incompatible forms that require preprocessing', () => {
                 .node( 'value' )
                 .namespace( NAMESPACES.xmlns )
                 .attr( {
-                    ref: "name"
+                    ref: 'name'
                 } );
             itemset
                 .node( 'label' )
                 .namespace( NAMESPACES.xmlns )
                 .attr( {
-                    ref: "translate(label)"
+                    ref: 'translate(label)'
                 } );
 
             input.replace( select1 );
         } );
+
         //console.log( doc.toString( true ) );
         return doc;
     };
@@ -110,8 +111,10 @@ describe( 'for incompatible forms that require preprocessing', () => {
         const result = transformer.transform( {
             xform
         } );
+
         return result.then( res => {
             const doc = parser.parseFromString( res.model, 'text/xml' );
+
             return Promise.all( [
                 expect( doc ).to.be.an( 'object' ),
                 expect( doc.getElementsByTagName( 'instance' ) ).to.have.length( 2 ),
@@ -128,8 +131,10 @@ describe( 'for incompatible forms that require preprocessing', () => {
             xform,
             preprocess
         } );
+
         return result.then( res => {
             const doc = parser.parseFromString( res.model, 'text/xml' );
+
             return Promise.all( [
                 expect( doc ).to.be.an( 'object' ),
                 expect( doc.getElementsByTagName( 'instance' ) ).to.have.length( 4 ),
@@ -148,15 +153,17 @@ describe( 'for incompatible forms that require preprocessing', () => {
             xform,
             preprocess
         } );
+
         return result.then( res => {
             const doc = parser.parseFromString( res.form, 'text/xml' );
             const selects = doc.getElementsByTagName( 'select' );
+
             return Promise.all( [
                 expect( selects ).to.have.length( 2 ), // language selector and the one with appearance=minimal
                 expect( selects[ 1 ].getAttribute( 'name' ) ).to.equal( '/select_one_external/city2' ),
                 expect( selects[ 1 ].getAttribute( 'data-type-xml' ) ).to.equal( 'select1' ),
                 expect( selects[ 1 ].getElementsByTagName( 'option' )[ 0 ].getAttribute( 'class' ) ).to.equal( 'itemset-template' ),
-                expect( selects[ 1 ].getElementsByTagName( 'option' )[ 0 ].getAttribute( 'data-items-path' ) ).to.equal( "instance('cities')/root/item[state= /select_one_external/state  and county= /select_one_external/county ]" ),
+                expect( selects[ 1 ].getElementsByTagName( 'option' )[ 0 ].getAttribute( 'data-items-path' ) ).to.equal( 'instance(\'cities\')/root/item[state= /select_one_external/state  and county= /select_one_external/county ]' ),
                 expect( selects[ 1 ].nextSibling.nextSibling.getAttribute( 'class' ) ).to.equal( 'itemset-labels' ),
                 expect( selects[ 1 ].nextSibling.nextSibling.getAttribute( 'data-label-ref' ) ).to.equal( 'translate(label)' ),
                 expect( selects[ 1 ].nextSibling.nextSibling.getAttribute( 'data-value-ref' ) ).to.equal( 'name' ),
@@ -169,8 +176,10 @@ describe( 'for incompatible forms that require preprocessing', () => {
             xform: fs.readFileSync( './test/forms/widgets.xml' ),
             preprocess
         } );
+
         return result.then( res => {
             const doc = parser.parseFromString( res.model, 'text/xml' );
+
             return Promise.all( [
                 expect( doc ).to.be.an( 'object' ),
                 expect( doc.getElementById( 'counties' ) ).to.be.null

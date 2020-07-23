@@ -51,7 +51,7 @@ function markdownToHtml( text ) {
         // ordered lists
         .replace( /^(([0-9]+\.) (.*)(\n|$))+/gm, _createOrderedList )
         // newline characters followed by block tag <ul>, <ol>
-        .replace( /\n(<(ul|ol)( start="[0-9]+")?>)/gm, '$1')
+        .replace( /\n(<(ul|ol)( start="[0-9]+")?>)/gm, '$1' )
         // reverting escape of special characters
         .replace( /&35;/gm, '#' )
         .replace( /&95;/gm, '_' )
@@ -74,6 +74,7 @@ function markdownToHtml( text ) {
  */
 function _createHeader( match, hashtags, content ) {
     const level = hashtags.length;
+
     return `<h${level}>${content.replace( /#+$/, '' )}</h${level}>`;
 }
 
@@ -83,6 +84,7 @@ function _createHeader( match, hashtags, content ) {
  */
 function _createUnorderedList( match ) {
     const items = match.replace( /(\*|\+|-)(.*)\n?/gm, _createItem );
+
     return `<ul>${items}</ul>`;
 }
 
@@ -91,26 +93,26 @@ function _createUnorderedList( match ) {
  * @return {string} HTML string.
  */
 function _createOrderedList( match ) {
-    const startMatches = match.match(/^(?<start>[0-9]+)\./);
+    const startMatches = match.match( /^(?<start>[0-9]+)\./ );
     const start = startMatches && startMatches.groups && startMatches.groups.start !== '1' ? ` start="${startMatches.groups.start}"` : '';
     const items = match.replace( /([0-9]+\.)(.*)\n?/gm, _createItem );
+
     return `<ol${start}>${items}</ol>`;
 }
 
 /**
  * @param {string} match - The matched substring.
- * @param {*} bullet
+ * @param {string} bullet - The list item bullet/number.
  * @param {string} content - Item text.
- * @param offset
  * @return {string} HTML string.
  */
-function _createItem( match, bullet, content) {
+function _createItem( match, bullet, content ) {
     return `<li>${content.trim()}</li>`;
 }
 
 /**
  * @param {string} match - The matched substring.
- * @param {string} line
+ * @param {string} line - The line.
  * @return {string} HTML string.
  */
 function _createParagraph( match, line ) {
@@ -118,6 +120,7 @@ function _createParagraph( match, line ) {
     if ( /^<\/?(ul|ol|li|h|p|bl)/i.test( trimmed ) ) {
         return line;
     }
+
     return `<p>${trimmed}</p>`;
 }
 
@@ -129,12 +132,13 @@ function _createParagraph( match, line ) {
  */
 function _createSpan( match, attributes, content ) {
     const sanitizedAttributes = _sanitizeAttributes( attributes );
+
     return `<span${sanitizedAttributes}>${content}</span>`;
 }
 
 /**
  * @param {string} match - The matched substring.
- * @param {string} attributes
+ * @param {string} attributes - The attributes.
  * @param {string} content - Sup text.
  * @return {string} HTML string.
  */
@@ -145,7 +149,7 @@ function _createSup( match, attributes, content ) {
 
 /**
  * @param {string} match - The matched substring.
- * @param {string} attributes
+ * @param {string} attributes - The attributes.
  * @param {string} content - Sub text.
  * @return {string} HTML string.
  */
@@ -155,12 +159,13 @@ function _createSub( match, attributes, content ) {
 }
 
 /**
- * @param {string} attributes
+ * @param {string} attributes - The attributes.
  * @return {string} style
  */
 function _sanitizeAttributes( attributes ) {
     const styleMatches = attributes.match( /( style=(["'])[^"']*\2)/ );
     const style = ( styleMatches && styleMatches.length ) ? styleMatches[ 0 ] : '';
+
     return style;
 }
 

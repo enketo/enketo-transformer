@@ -16,7 +16,9 @@
     "contributors": [],
     "scripts": {
         "start": "node app.js",
-        "test": "nyc mocha test/*.spec.js && node update-readme-with-shield-badge.js",
+        "eslint-check": "eslint app.js src/**/*.js test/**/*.js",
+        "eslint-fix": "eslint app.js src/**/*.js test/**/*.js --fix",
+        "test": "nyc mocha test/*.spec.js && npm run eslint-check && node update-readme-with-shield-badge.js",
         "build-docs": "rimraf docs && ./node_modules/.bin/jsdoc -c jsdoc.config.js",
         "develop": "DEBUG=api,transformer,markdown,language node app.js & http-server test/forms -p 8081"
     },

@@ -102,7 +102,7 @@ describe( 'markdown', () => {
             // correct superscript and subscript
             [ 'm<sup>2</sup>' ],
             [ 'H<sub>2</sub>O' ],
-            [ 'H<sub onclick="alert(\"gotcha!\")">2</sub>O', 'H<sub>2</sub>O' ],
+            [ 'H<sub onclick="alert("gotcha!")">2</sub>O', 'H<sub>2</sub>O' ],
             // correct combos
             [ 'format __s__ and _e_\nformat **s** and *e*',
                 'format <strong>s</strong> and <em>e</em><br>format <strong>s</strong> and <em>e</em>'

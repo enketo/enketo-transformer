@@ -28,9 +28,9 @@ router
     } )
     .get( '/', ( req, res ) => {
         _request( {
-                method: 'get',
-                url: req.query.xform
-            } )
+            method: 'get',
+            url: req.query.xform
+        } )
             .then( xform => transformer.transform( {
                 xform,
                 theme: req.query.theme,
@@ -47,11 +47,11 @@ router
     } )
     .post( '/', ( req, res ) => {
         transformer.transform( {
-                xform: req.body.xform,
-                theme: req.body.theme,
-                media: req.body.media,
-                markdown: req.body.markdown !== 'false'
-            } )
+            xform: req.body.xform,
+            theme: req.body.theme,
+            media: req.body.media,
+            markdown: req.body.markdown !== 'false'
+        } )
             .then( result => {
                 res.json( result );
             } )
@@ -64,9 +64,9 @@ router
     // for development purposes, to return HTML that can be easily inspected in the developer console
     .get( '/htmlform', ( req, res ) => {
         _request( {
-                method: 'get',
-                url: req.query.xform
-            } )
+            method: 'get',
+            url: req.query.xform
+        } )
             .then( xform => transformer.transform( {
                 xform,
                 theme: req.query.theme,
@@ -98,7 +98,7 @@ function _request( options ) {
     return new Promise( ( resolve, reject ) => {
         request[ method ]( options, ( error, response, body ) => {
             if ( error ) {
-                console.log( `Error occurred when requesting ${options.url}`, error );
+                console.error( `Error occurred when requesting ${options.url}`, error );
                 reject( error );
             } else if ( response.statusCode === 401 ) {
                 const error = new Error( 'Forbidden. Authorization Required.' );
@@ -109,7 +109,7 @@ function _request( options ) {
                 error.status = response.statusCode;
                 reject( error );
             } else {
-                console.log( `response of request to ${options.url} has status code: `, response.statusCode );
+                //console.log( `response of request to ${options.url} has status code: `, response.statusCode );
                 resolve( body );
             }
         } );
