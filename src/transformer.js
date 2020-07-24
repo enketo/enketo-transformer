@@ -52,6 +52,7 @@ function transform( survey ) {
 
             return doc;
         } )
+        .then( _addMissingRelevantNodes )
         .then( _processBinaryDefaults )
         .then( doc => {
             xformDoc = doc;
@@ -137,13 +138,8 @@ function _nodeInChildren(parent, nodeName){
     return false;
 }
 
-// function _addMissingRelevantNodes( doc ){
-//     console.log( doc );
-//     return doc;
-// }
 
-function _processBinaryDefaults( doc ) {
-    // add missing relevant nodes
+function _addMissingRelevantNodes( doc ){
     doc.find( '/h:html/h:head/xmlns:model/xmlns:bind[@relevant]', NAMESPACES )
         .forEach( bind => {
             // nodeset is the non-namespaced path to the relevant node
@@ -172,12 +168,15 @@ function _processBinaryDefaults( doc ) {
                         var prevSibling = doc.find(parent.path()+'/xmlns:'+previousSiblingName, NAMESPACES)[0];
                         prevSibling.addNextSibling(relevantNodeClone);
                         doc = libxmljs.parseXml( doc.toString() );
-                        // if something like this would works :-)
                     }
                 }
             }
 
         });
+    return doc;
+}
+
+function _processBinaryDefaults( doc ) {
     doc.find( '/h:html/h:head/xmlns:model/xmlns:bind[@type="binary"]', NAMESPACES )
         .forEach( bind => {
             const nodeset = bind.attr( 'nodeset' );
