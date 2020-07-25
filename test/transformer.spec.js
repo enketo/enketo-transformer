@@ -259,7 +259,7 @@ describe( 'transformer', () => {
             ] );
         } );
 
-        it( `in the model for binary questions that contain a default value by copying to a 
+        it( `in the model for binary questions that contain a default value by copying to a
             src attribute and resolving the URL according to a provided map`, () => {
             const xform = fs.readFileSync( './test/forms/image-default.xml', 'utf8' );
             const media = {
@@ -654,7 +654,7 @@ describe( 'transformer', () => {
                     expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
                     expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '"Age changed!"' );
                     expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'string' );
-                    // Check location as sibling of /data/person/age 
+                    // Check location as sibling of /data/person/age
                     const sibling = target.parentNode.getElementsByTagName( 'input' )[ 0 ];
                     expect( sibling.getAttribute( 'name' ) ).to.equal( '/data/person/age' );
                 } );
@@ -728,7 +728,7 @@ describe( 'transformer', () => {
                     expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
                     expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '"Age changed!"' );
                     expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'string' );
-                    // Check location as sibling of /data/person/age 
+                    // Check location as sibling of /data/person/age
                     const sibling = target.parentNode.getElementsByTagName( 'input' )[ 0 ];
                     expect( sibling.getAttribute( 'name' ) ).to.equal( '/data/person/age' );
                 } );
@@ -809,6 +809,18 @@ describe( 'transformer', () => {
                 } );
         } );
 
+        describe( 'adds missing relevant nodes', () => {
+            const xform = fs.readFileSync( './test/forms/missing-relevants.xml', 'utf8' );
+            const result = transformer.transform( {
+                xform
+            } ).then( form => {
+                return parser.parseFromString( form.model, 'text/xml' );
+            } );
+
+            return result.then( form => {
+                expect( form.getElementsByTagName( 'school_roomtype' ).length ).to.equal( 7 );
+            } );
+        } );
     } );
 
 } );
