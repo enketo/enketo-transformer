@@ -116,25 +116,27 @@ function _transform( xslStr, xmlDoc, xsltParams ) {
     } );
 }
 
-function _addNameSpace(nodeString){
-    var nodeStringArray = nodeString.split('/');
-    function reducer(accumulator, currentValue){
-        if(currentValue.length > 0 && accumulator){
+function _addNameSpace( nodeString ){
+    var nodeStringArray = nodeString.split( '/' );
+    function reducer( accumulator, currentValue ){
+        if( currentValue.length > 0 && accumulator ){
             return accumulator + '/xmlns:' + currentValue;
-        }else if(currentValue.length > 0){
+        }else if( currentValue.length > 0 ){
             return '/xmlns:' + currentValue;
         }
     }
     var startStr = '/h:html/h:head/xmlns:model/xmlns:instance';
-    return startStr + nodeStringArray.reduce(reducer, '');
+
+    return startStr + nodeStringArray.reduce( reducer, '' );
 }
 
-function _nodeInChildren(parent, nodeName){
+function _nodeInChildren( parent, nodeName ){
     var childNodes = parent.childNodes();
     for( var childNode of childNodes ){
         if( childNode.name() == nodeName )
             return true;
     }
+
     return false;
 }
 
@@ -146,33 +148,36 @@ function _addMissingRelevantNodes( doc ){
             const nodeset = bind.attr( 'nodeset' );
             var nodesetString = nodeset.value();
             var index = nodesetString.lastIndexOf( '/' );
-            var repeatName = nodesetString.substr(0, index);
-            var relevantNodeName = nodesetString.substr(index + 1);
-            var namespacedRepeatName = _addNameSpace(repeatName);
-            var relevantParents = doc.find(namespacedRepeatName, NAMESPACES);
-            var relevantParentTemplate = doc.find(namespacedRepeatName+'[@jr:template]', NAMESPACES);
+            var repeatName = nodesetString.substr( 0, index );
+            var relevantNodeName = nodesetString.substr( index + 1 );
+            var namespacedRepeatName = _addNameSpace( repeatName );
+            var relevantParents = doc.find( namespacedRepeatName, NAMESPACES );
+            var relevantParentTemplate = doc.find( namespacedRepeatName + '[@jr:template]', NAMESPACES );
 
-            if(relevantParentTemplate.length){
+            if( relevantParentTemplate.length ){
                 var relevantNodeTemplateXPath = namespacedRepeatName + '[@jr:template]/xmlns:' + relevantNodeName;
-                var relevantNodeTemplate = doc.find(relevantNodeTemplateXPath, NAMESPACES)[0];
+                var relevantNodeTemplate = doc.find( relevantNodeTemplateXPath, NAMESPACES )[0];
                 var relevantNodeClone = relevantNodeTemplate.clone();
                 var previousSibling = relevantNodeTemplate.prevSibling();
-                while(previousSibling.name() == 'text'){
-                    previousSibling = previousSibling.prevSibling();
+                if( prevSibling ){
+                    while( previousSibling.name() == 'text' ){
+                        previousSibling = previousSibling.prevSibling();
+                    }
                 }
                 var previousSiblingName = previousSibling.name();
-                for(var parent of relevantParents){
+                for( var parent of relevantParents ){
                     //check if one of the parents children is relevant node
-                    if(!_nodeInChildren(parent, relevantNodeName)){
+                    if( !_nodeInChildren( parent, relevantNodeName ) ){
                         // insert the relevant node after the previousSibling element
-                        var prevSibling = doc.find(parent.path()+'/xmlns:'+previousSiblingName, NAMESPACES)[0];
-                        prevSibling.addNextSibling(relevantNodeClone);
+                        var prevSibling = doc.find( parent.path() + '/xmlns:' + previousSiblingName, NAMESPACES )[0];
+                        prevSibling.addNextSibling( relevantNodeClone );
                         doc = libxmljs.parseXml( doc.toString() );
                     }
                 }
             }
 
-        });
+        } );
+
     return doc;
 }
 
