@@ -1,0 +1,466 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:jr="http://openrosa.org/javarosa"
+    xmlns:odk="http://www.opendatakit.org/xforms"
+    xmlns:orx="http://openrosa.org/xforms"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <h:head>
+        <h:title>School Survey Testing Form</h:title>
+        <model odk:xforms-version="1.0.0">
+            <itext>
+                <translation lang="Arabic">
+                    <text id="/data/group1/repeat1/building/bulding_type_list5:label">
+                        <value>مبنى مخصص للرياضة</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/position_repeat11:label">
+                        <value>-</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list1:label">
+                        <value>مكتبة</value>
+                    </text>
+                    <text id="/data/group1:label">
+                        <value>-</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list6:label">
+                        <value>مختبر الحاسوب</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111:label">
+                        <value>-</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list2:label">
+                        <value>غرفة معلم</value>
+                    </text>
+                    <text id="/data/group1/repeat1/building/bulding_type_list7:label">
+                        <value>أخرى</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype:hint">
+                        <value>اختيار من القائمة</value>
+                    </text>
+                    <text id="/data/group1/repeat1:label">
+                        <value>-</value>
+                    </text>
+                    <text id="/data/group1/repeat1/building:label">
+                        <value>-</value>
+                    </text>
+                    <text id="/data/group1/repeat1/numb_buid99:label">
+                        <value>عدد المباني</value>
+                    </text>
+                    <text id="/data/group1/repeat1/position_repeat1:label">
+                        <value>-</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/room_open_stat/no:label">
+                        <value>لا</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list5:label">
+                        <value>غرفة صفية</value>
+                    </text>
+                    <text id="/data/group1/repeat1/building/bulding_type_list4:label">
+                        <value>مشاغل هندسية</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/total_numb_corridors:label">
+                        <value>-</value>
+                    </text>
+                    <text id="/data/group1/repeat1/building/bulding_type_list3:label">
+                        <value>رياض أطفال</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/position_repeat111:label">
+                        <value>-</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list7:label">
+                        <value>مختبر العلوم</value>
+                    </text>
+                    <text id="/data/total_numb_b:label">
+                        <value>عدد اجمالي المباني</value>
+                    </text>
+                    <text id="/data/group1/repeat1/total_number_cord:label">
+                        <value>عدد اجمالي الطوابق</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list8:label">
+                        <value>أخرى</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list4:label">
+                        <value>غرفة مُخصصة</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11:label">
+                        <value>-</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list3:label">
+                        <value>مكتب اداري</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/room_open_stat:label">
+                        <value>-</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/total_numb_rooms:label">
+                        <value>-</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/total_number_room:label">
+                        <value>عدد اجمالي الغرف في الطابق</value>
+                    </text>
+                    <text id="/data/group1/repeat1/building/bulding_type_list8:label">
+                        <value>غرفة حارس</value>
+                    </text>
+                    <text id="/data/group1/repeat1/building/bulding_type_list1:label">
+                        <value>مبني المدرسة الرئيسي</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype:label">
+                        <value>121- نوع الغرفة</value>
+                    </text>
+                    <text id="/data/group1/repeat1/building/bulding_type_list6:label">
+                        <value>مسارح</value>
+                    </text>
+                    <text id="/data/group1/repeat1/building/bulding_type_list2:label">
+                        <value>مرافق صحية</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/room_open_stat/yes:label">
+                        <value>نعم</value>
+                    </text>
+                </translation>
+                <translation default="true()" lang="English">
+                    <text id="/data/group1/repeat1/building/bulding_type_list5:label">
+                        <value>Sports building</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/position_repeat11:label">
+                        <value>position</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list1:label">
+                        <value>Library</value>
+                    </text>
+                    <text id="/data/group1:label">
+                        <value>Group 1</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list6:label">
+                        <value>Computer lab</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111:label">
+                        <value>Repeat 111 - Rooms</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list2:label">
+                        <value>Teacher room</value>
+                    </text>
+                    <text id="/data/group1/repeat1/building/bulding_type_list7:label">
+                        <value>Other</value>
+                    </text>
+                    <text id="/data/group1/repeat1/building/bulding_type_list1:label">
+                        <value>Main school Building</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype:hint">
+                        <value>Please choose from the list below</value>
+                    </text>
+                    <text id="/data/group1/repeat1:label">
+                        <value>Repeat 1 - Building</value>
+                    </text>
+                    <text id="/data/group1/repeat1/building:label">
+                        <value>Building Type</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/room_open_stat/no:label">
+                        <value>No</value>
+                    </text>
+                    <text id="/data/group1/repeat1/position_repeat1:label">
+                        <value>position</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list5:label">
+                        <value>Classroom</value>
+                    </text>
+                    <text id="/data/group1/repeat1/building/bulding_type_list4:label">
+                        <value>Engineering workshops</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/total_numb_corridors:label">
+                        <value>Calculate the number of corridors</value>
+                    </text>
+                    <text id="/data/group1/repeat1/building/bulding_type_list3:label">
+                        <value>KG</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/position_repeat111:label">
+                        <value>position</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list7:label">
+                        <value>Science Lab</value>
+                    </text>
+                    <text id="/data/total_numb_b:label">
+                        <value>Total # of Buildings =</value>
+                    </text>
+                    <text id="/data/group1/repeat1/total_number_cord:label">
+                        <value>Total # of Floors =</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list8:label">
+                        <value>Other</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list4:label">
+                        <value>Specialty room</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11:label">
+                        <value>Repeat 11 - Corridor</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list3:label">
+                        <value>Adminstrative Office</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/room_open_stat:label">
+                        <value>Is the room open or able to open it?</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/total_numb_rooms:label">
+                        <value>Calculate the number of rooms</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/total_number_room:label">
+                        <value>Total # of Rooms =</value>
+                    </text>
+                    <text id="/data/group1/repeat1/building/bulding_type_list8:label">
+                        <value>Room Guard</value>
+                    </text>
+                    <text id="/data/group1/repeat1/numb_buid99:label">
+                        <value>Number of Buildings =</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/school_roomtype:label">
+                        <value>121. Room Type</value>
+                    </text>
+                    <text id="/data/group1/repeat1/building/bulding_type_list6:label">
+                        <value>Theater</value>
+                    </text>
+                    <text id="/data/group1/repeat1/building/bulding_type_list2:label">
+                        <value>Bathroom Toilets</value>
+                    </text>
+                    <text id="/data/group1/repeat1/repeat11/repeat111/room_open_stat/yes:label">
+                        <value>Yes</value>
+                    </text>
+                </translation>
+            </itext>
+            <instance>
+                <data id="test_school_form">
+                    <start_time/>
+                    <end_time/>
+                    <device_id/>
+                    <group1>
+                        <repeat1 jr:template="">
+                            <position_repeat1/>
+                            <numb_buid99/>
+                            <building/>
+                            <repeat11 jr:template="">
+                                <position_repeat11/>
+                                <total_numb_corridors/>
+                                <repeat111 jr:template="">
+                                    <position_repeat111/>
+                                    <total_numb_rooms/>
+                                    <room_open_stat/>
+                                    <school_roomtype/>
+                                </repeat111>
+                                <total_number_room/>
+                            </repeat11>
+                            <total_number_cord/>
+                        </repeat1>
+                        <repeat1>
+                            <position_repeat1>1</position_repeat1>
+                            <numb_buid99>1</numb_buid99>
+                            <building>bulding_type_list7</building>
+                            <repeat11>
+                                <position_repeat11>1</position_repeat11>
+                                <total_numb_corridors>1</total_numb_corridors>
+                                <repeat111>
+                                    <position_repeat111>1</position_repeat111>
+                                    <total_numb_rooms>1</total_numb_rooms>
+                                    <room_open_stat>no</room_open_stat>
+                                </repeat111>
+                                <repeat111>
+                                    <position_repeat111>2</position_repeat111>
+                                    <total_numb_rooms>1</total_numb_rooms>
+                                    <room_open_stat>no</room_open_stat>
+                                </repeat111>
+                                <total_number_room>1</total_number_room>
+                            </repeat11>
+                            <repeat11>
+                                <position_repeat11>2</position_repeat11>
+                                <total_numb_corridors>1</total_numb_corridors>
+                                <repeat111>
+                                    <position_repeat111>1</position_repeat111>
+                                    <total_numb_rooms>1</total_numb_rooms>
+                                    <room_open_stat>no</room_open_stat>
+                                </repeat111>
+                                <total_number_room>6</total_number_room>
+                            </repeat11>
+                            <total_number_cord>1</total_number_cord>
+                        </repeat1>
+                        <repeat1>
+                            <position_repeat1>2</position_repeat1>
+                            <numb_buid99>1</numb_buid99>
+                            <building>bulding_type_list4</building>
+                            <repeat11>
+                                <position_repeat11>1</position_repeat11>
+                                <total_numb_corridors>1</total_numb_corridors>
+                                <repeat111>
+                                    <position_repeat111>1</position_repeat111>
+                                    <total_numb_rooms>1</total_numb_rooms>
+                                    <room_open_stat>no</room_open_stat>
+                                </repeat111>
+                                <total_number_room>2</total_number_room>
+                            </repeat11>
+                            <total_number_cord>2</total_number_cord>
+                        </repeat1>
+                        <repeat1>
+                            <position_repeat1>3</position_repeat1>
+                            <numb_buid99>1</numb_buid99>
+                            <building>bulding_type_list7</building>
+                            <repeat11>
+                                <position_repeat11>1</position_repeat11>
+                                <total_numb_corridors>1</total_numb_corridors>
+                                <repeat111>
+                                    <position_repeat111>1</position_repeat111>
+                                    <total_numb_rooms>1</total_numb_rooms>
+                                    <room_open_stat>no</room_open_stat>
+                                </repeat111>
+                                <total_number_room>3</total_number_room>
+                            </repeat11>
+                            <total_number_cord>3</total_number_cord>
+                        </repeat1>
+                        <repeat1>
+                            <position_repeat1>4</position_repeat1>
+                            <numb_buid99>1</numb_buid99>
+                            <building>bulding_type_list4</building>
+                            <repeat11>
+                                <position_repeat11>1</position_repeat11>
+                                <total_numb_corridors>1</total_numb_corridors>
+                                <repeat111>
+                                    <position_repeat111>1</position_repeat111>
+                                    <total_numb_rooms>1</total_numb_rooms>
+                                    <room_open_stat>no</room_open_stat>
+                                </repeat111>
+                                <total_number_room>4</total_number_room>
+                            </repeat11>
+                            <total_number_cord>4</total_number_cord>
+                        </repeat1>
+                    </group1>
+                    <total_numb_b/>
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                </data>
+            </instance>
+            <bind calculate="format-date-time(once(now()),'%Y-%m-%d %H:%M:%S')" jr:preload="timestamp" jr:preloadParams="start" nodeset="/data/start_time" type="dateTime"/>
+            <bind calculate="format-date-time(once(now()),'%Y-%m-%d %H:%M:%S')" jr:preload="timestamp" jr:preloadParams="end" nodeset="/data/end_time" type="dateTime"/>
+            <bind jr:preload="property" jr:preloadParams="deviceid" nodeset="/data/device_id" type="string"/>
+            <bind calculate="position(..)" nodeset="/data/group1/repeat1/position_repeat1" type="string"/>
+            <bind calculate="1" nodeset="/data/group1/repeat1/numb_buid99" type="string"/>
+            <bind nodeset="/data/group1/repeat1/building" type="string"/>
+            <bind calculate="position(..)" nodeset="/data/group1/repeat1/repeat11/position_repeat11" type="string"/>
+            <bind calculate="1" nodeset="/data/group1/repeat1/repeat11/total_numb_corridors" type="string"/>
+            <bind calculate="position(..)" nodeset="/data/group1/repeat1/repeat11/repeat111/position_repeat111" type="string"/>
+            <bind calculate="1" nodeset="/data/group1/repeat1/repeat11/repeat111/total_numb_rooms" type="string"/>
+            <bind nodeset="/data/group1/repeat1/repeat11/repeat111/room_open_stat" type="string"/>
+            <bind nodeset="/data/group1/repeat1/repeat11/repeat111/school_roomtype" relevant="selected( ../room_open_stat ,'yes')" type="string"/>
+            <bind calculate="sum( /data/group1/repeat1/repeat11/repeat111/total_numb_rooms )" nodeset="/data/group1/repeat1/repeat11/total_number_room" readonly="true()" type="string"/>
+            <bind calculate="sum( /data/group1/repeat1/repeat11/total_numb_corridors )" nodeset="/data/group1/repeat1/total_number_cord" readonly="true()" type="string"/>
+            <bind calculate="sum( /data/group1/repeat1/numb_buid99 )" nodeset="/data/total_numb_b" readonly="true()" type="string"/>
+            <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+        </model>
+    </h:head>
+    <h:body>
+        <group ref="/data/group1">
+            <label ref="jr:itext('/data/group1:label')"/>
+            <group ref="/data/group1/repeat1">
+                <label ref="jr:itext('/data/group1/repeat1:label')"/>
+                <repeat nodeset="/data/group1/repeat1">
+                    <select ref="/data/group1/repeat1/building">
+                        <label ref="jr:itext('/data/group1/repeat1/building:label')"/>
+                        <item>
+                            <label ref="jr:itext('/data/group1/repeat1/building/bulding_type_list1:label')"/>
+                            <value>bulding_type_list1</value>
+                        </item>
+                        <item>
+                            <label ref="jr:itext('/data/group1/repeat1/building/bulding_type_list2:label')"/>
+                            <value>bulding_type_list2</value>
+                        </item>
+                        <item>
+                            <label ref="jr:itext('/data/group1/repeat1/building/bulding_type_list3:label')"/>
+                            <value>bulding_type_list3</value>
+                        </item>
+                        <item>
+                            <label ref="jr:itext('/data/group1/repeat1/building/bulding_type_list4:label')"/>
+                            <value>bulding_type_list4</value>
+                        </item>
+                        <item>
+                            <label ref="jr:itext('/data/group1/repeat1/building/bulding_type_list5:label')"/>
+                            <value>bulding_type_list5</value>
+                        </item>
+                        <item>
+                            <label ref="jr:itext('/data/group1/repeat1/building/bulding_type_list6:label')"/>
+                            <value>bulding_type_list6</value>
+                        </item>
+                        <item>
+                            <label ref="jr:itext('/data/group1/repeat1/building/bulding_type_list7:label')"/>
+                            <value>bulding_type_list7</value>
+                        </item>
+                        <item>
+                            <label ref="jr:itext('/data/group1/repeat1/building/bulding_type_list8:label')"/>
+                            <value>bulding_type_list8</value>
+                        </item>
+                    </select>
+                    <group ref="/data/group1/repeat1/repeat11">
+                        <label ref="jr:itext('/data/group1/repeat1/repeat11:label')"/>
+                        <repeat nodeset="/data/group1/repeat1/repeat11">
+                            <group ref="/data/group1/repeat1/repeat11/repeat111">
+                                <label ref="jr:itext('/data/group1/repeat1/repeat11/repeat111:label')"/>
+                                <repeat nodeset="/data/group1/repeat1/repeat11/repeat111">
+                                    <select1 ref="/data/group1/repeat1/repeat11/repeat111/room_open_stat">
+                                        <label ref="jr:itext('/data/group1/repeat1/repeat11/repeat111/room_open_stat:label')"/>
+                                        <item>
+                                            <label ref="jr:itext('/data/group1/repeat1/repeat11/repeat111/room_open_stat/yes:label')"/>
+                                            <value>yes</value>
+                                        </item>
+                                        <item>
+                                            <label ref="jr:itext('/data/group1/repeat1/repeat11/repeat111/room_open_stat/no:label')"/>
+                                            <value>no</value>
+                                        </item>
+                                    </select1>
+                                    <select1 ref="/data/group1/repeat1/repeat11/repeat111/school_roomtype">
+                                        <label ref="jr:itext('/data/group1/repeat1/repeat11/repeat111/school_roomtype:label')"/>
+                                        <hint ref="jr:itext('/data/group1/repeat1/repeat11/repeat111/school_roomtype:hint')"/>
+                                        <item>
+                                            <label ref="jr:itext('/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list1:label')"/>
+                                            <value>roomtype_list1</value>
+                                        </item>
+                                        <item>
+                                            <label ref="jr:itext('/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list2:label')"/>
+                                            <value>roomtype_list2</value>
+                                        </item>
+                                        <item>
+                                            <label ref="jr:itext('/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list3:label')"/>
+                                            <value>roomtype_list3</value>
+                                        </item>
+                                        <item>
+                                            <label ref="jr:itext('/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list4:label')"/>
+                                            <value>roomtype_list4</value>
+                                        </item>
+                                        <item>
+                                            <label ref="jr:itext('/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list5:label')"/>
+                                            <value>roomtype_list5</value>
+                                        </item>
+                                        <item>
+                                            <label ref="jr:itext('/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list6:label')"/>
+                                            <value>roomtype_list6</value>
+                                        </item>
+                                        <item>
+                                            <label ref="jr:itext('/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list7:label')"/>
+                                            <value>roomtype_list7</value>
+                                        </item>
+                                        <item>
+                                            <label ref="jr:itext('/data/group1/repeat1/repeat11/repeat111/school_roomtype/roomtype_list8:label')"/>
+                                            <value>roomtype_list8</value>
+                                        </item>
+                                    </select1>
+                                </repeat>
+                            </group>
+                            <input ref="/data/group1/repeat1/repeat11/total_number_room">
+                                <label ref="jr:itext('/data/group1/repeat1/repeat11/total_number_room:label')"/>
+                            </input>
+                        </repeat>
+                    </group>
+                    <input ref="/data/group1/repeat1/total_number_cord">
+                        <label ref="jr:itext('/data/group1/repeat1/total_number_cord:label')"/>
+                    </input>
+                </repeat>
+            </group>
+        </group>
+        <input ref="/data/total_numb_b">
+            <label ref="jr:itext('/data/total_numb_b:label')"/>
+        </input>
+    </h:body>
+</h:html>
