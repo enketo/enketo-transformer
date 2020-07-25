@@ -159,19 +159,22 @@ function _addMissingRelevantNodes( doc ){
                 var relevantNodeTemplate = doc.find( relevantNodeTemplateXPath, NAMESPACES )[0];
                 var relevantNodeClone = relevantNodeTemplate.clone();
                 var previousSibling = relevantNodeTemplate.prevSibling();
-                if( prevSibling ){
-                    while( previousSibling.name() == 'text' ){
+                var previousSiblingName = '';
+                if( previousSibling ){
+                    while( previousSibling && previousSibling.name() == 'text' ){
                         previousSibling = previousSibling.prevSibling();
                     }
                 }
-                var previousSiblingName = previousSibling.name();
-                for( var parent of relevantParents ){
-                    //check if one of the parents children is relevant node
-                    if( !_nodeInChildren( parent, relevantNodeName ) ){
-                        // insert the relevant node after the previousSibling element
-                        var prevSibling = doc.find( parent.path() + '/xmlns:' + previousSiblingName, NAMESPACES )[0];
-                        prevSibling.addNextSibling( relevantNodeClone );
-                        doc = libxmljs.parseXml( doc.toString() );
+                if( previousSibling ){
+                    previousSiblingName = previousSibling.name();
+                    for( var parent of relevantParents ){
+                        //check if one of the parents children is relevant node
+                        if( !_nodeInChildren( parent, relevantNodeName ) ){
+                            // insert the relevant node after the previousSibling element
+                            var prevSibling = doc.find( parent.path() + '/xmlns:' + previousSiblingName, NAMESPACES )[0];
+                            prevSibling.addNextSibling( relevantNodeClone );
+                            doc = libxmljs.parseXml( doc.toString() );
+                        }
                     }
                 }
             }
