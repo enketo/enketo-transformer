@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+-----------------------
+##### Fixed
+- When a `setvalue` element has no `value` attribute and no textContent, the output for `data-setvalue` is incorrect.
+
 [1.40.2] - 2020-07-23
 ----------------------
 ##### Changed

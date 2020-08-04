@@ -1002,9 +1002,9 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                 <xsl:when test="./@value">
                     <xsl:value-of select="./@value" />
                 </xsl:when>
-                <xsl:otherwise>
+                <xsl:when test="string-length(.) > 0">
                     <xsl:value-of select="concat('&quot;', ./text(), '&quot;')" />
-                </xsl:otherwise>
+                </xsl:when>
             </xsl:choose>
         </xsl:attribute>
         <xsl:attribute name="data-event">
