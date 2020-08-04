@@ -259,7 +259,7 @@ describe( 'transformer', () => {
             ] );
         } );
 
-        it( `in the model for binary questions that contain a default value by copying to a 
+        it( `in the model for binary questions that contain a default value by copying to a
             src attribute and resolving the URL according to a provided map`, () => {
             const xform = fs.readFileSync( './test/forms/image-default.xml', 'utf8' );
             const media = {
@@ -654,7 +654,7 @@ describe( 'transformer', () => {
                     expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
                     expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '"Age changed!"' );
                     expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'string' );
-                    // Check location as sibling of /data/person/age 
+                    // Check location as sibling of /data/person/age
                     const sibling = target.parentNode.getElementsByTagName( 'input' )[ 0 ];
                     expect( sibling.getAttribute( 'name' ) ).to.equal( '/data/person/age' );
                 } );
@@ -728,7 +728,7 @@ describe( 'transformer', () => {
                     expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
                     expect( target.getAttribute( 'data-setvalue' ) ).to.equal( '"Age changed!"' );
                     expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'string' );
-                    // Check location as sibling of /data/person/age 
+                    // Check location as sibling of /data/person/age
                     const sibling = target.parentNode.getElementsByTagName( 'input' )[ 0 ];
                     expect( sibling.getAttribute( 'name' ) ).to.equal( '/data/person/age' );
                 } );
@@ -806,6 +806,27 @@ describe( 'transformer', () => {
                     expect( d[ 0 ].getAttribute( 'name' ) ).to.equal( '/data/d' );
                     expect( d[ 0 ].hasAttribute( 'data-event' ) ).to.equal( false );
                     expect( d[ 0 ].hasAttribute( 'data-setvalue' ) ).to.equal( false );
+                } );
+        } );
+
+        it( 'with different ways of specify a "value" for setvalue', () => {
+            const xform2 = fs.readFileSync( './test/forms/setvalue-values.xml', 'utf8' );
+            const transform = transformer.transform( { xform: xform2 } ).then( parseHtmlForm );
+
+            return transform
+                .then( form => {
+                    const a = findElementByName( form, 'input', '/data/a' );
+                    expect( a.getAttribute( 'data-setvalue' ) ).to.equal( '"ab"' );
+                    const b = findElementByName( form, 'input', '/data/b' );
+                    expect( b.getAttribute( 'data-setvalue' ) ).to.equal( '"not ignored"' );
+                    const c = findElementByName( form, 'input', '/data/c' );
+                    expect( c.getAttribute( 'data-setvalue' ) ).to.equal( 'string-length(\'two\')' );
+                    const f = findElementByName( form, 'input', '/data/f' );
+                    expect( f.getAttribute( 'data-setvalue' ) ).to.equal( '' );
+                    const hs = findElementsByName( form, 'input', '/data/h' );
+                    const h = hs.filter( el => el.getAttribute( 'data-event' ) )[0];
+                    expect( h.getAttribute( 'data-setvalue' ) ).to.equal( '' );
+
                 } );
         } );
 
