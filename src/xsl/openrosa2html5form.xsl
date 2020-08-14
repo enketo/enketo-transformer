@@ -25,7 +25,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
     extension-element-prefixes="exsl str dyn"
     version="1.0"
     >
-    <xsl:param name="include-relevant-msg"/>
+    <xsl:param name="openclinica"/>
     <xsl:output method="html" omit-xml-declaration="yes" encoding="UTF-8" indent="yes"/><!-- for xml: version="1.0" -->
 
     <xsl:variable name="upper-case" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
@@ -128,7 +128,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                         </xsl:attribute>
                     </xsl:if>
                     <xsl:text>&#10;</xsl:text>
-                    <xsl:comment>This form was created by transforming a OpenRosa-flavored (X)Form using an XSL stylesheet created by Enketo LLC.</xsl:comment>
+                    <xsl:comment>This form was created by transforming an ODK/OpenRosa-flavored (X)Form using an XSL stylesheet created by Enketo LLC.</xsl:comment>
                     <section class="form-logo">
                         <xsl:text></xsl:text>
                     </section>
@@ -1095,20 +1095,12 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                 <xsl:value-of select="normalize-space($binding/@enk:for)" />
             </xsl:attribute>
         </xsl:if>
-        <xsl:if test="$binding/@oc:external">
-            <xsl:attribute name="oc-external">
-                <xsl:value-of select="normalize-space($binding/@oc:external)" />
-            </xsl:attribute>
-        </xsl:if>
-        <xsl:if test="$binding/@oc:constraint-type">
-            <xsl:attribute name="oc-constraint-type">
-                <xsl:value-of select="normalize-space($binding/@oc:constraint-type)" />
-            </xsl:attribute>
-        </xsl:if>
-        <xsl:if test="$binding/@oc:required-type">
-            <xsl:attribute name="oc-required-type">
-                <xsl:value-of select="normalize-space($binding/@oc:required-type)" />
-            </xsl:attribute>
+        <xsl:if test="$openclinica = 1">
+            <xsl:for-each select="$binding/@*[starts-with(name(), 'oc:') and not(substring-before(name(), 'Msg'))]" >
+                <xsl:attribute name="{concat('data-oc-', local-name(.))}">
+                    <xsl:value-of select="normalize-space(.)" />
+                </xsl:attribute>
+            </xsl:for-each>
         </xsl:if>
         <xsl:if test="$binding/@orx:max-pixels">
             <xsl:attribute name="data-max-pixels">
@@ -1202,26 +1194,31 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="xf:label | xf:hint | xf:bind/@jr:constraintMsg | xf:bind/@jr:requiredMsg | xf:bind/@oc:relevantMsg">
+    <xsl:template match="xf:label | xf:hint | xf:bind/@jr:constraintMsg | xf:bind/@jr:requiredMsg | xf:bind/@*[starts-with(name(), 'oc:')]">
         <xsl:variable name="class">
-            <xsl:if test="local-name() = 'constraintMsg'">
-                <xsl:value-of select="'or-constraint-msg'" />
-            </xsl:if>
-            <xsl:if test="local-name() = 'requiredMsg'">
-                <xsl:value-of select="'or-required-msg'" />
-            </xsl:if>
-            <xsl:if test="local-name() = 'relevantMsg'">
-                <xsl:value-of select="'or-relevant-msg'" />
-            </xsl:if>
-            <xsl:if test="local-name() = 'hint'">
-                <xsl:value-of select="'or-hint'" />
-            </xsl:if>
-            <xsl:if test="local-name() = 'label' and local-name(..) != 'item' ">
-                <xsl:value-of select="'question-label'"/>
-            </xsl:if>
-             <xsl:if test="local-name() = 'label' and local-name(..) = 'item' ">
-                <xsl:value-of select="'option-label'"/>
-            </xsl:if>
+            <xsl:choose>
+                <xsl:when test="name() = 'jr:constraintMsg'">
+                    <xsl:value-of select="'or-constraint-msg'" />
+                </xsl:when>
+                <xsl:when test="local-name() = 'requiredMsg'">
+                    <xsl:value-of select="'or-required-msg'" />
+                </xsl:when>
+                <xsl:when test="local-name() = 'relevantMsg'">
+                    <xsl:value-of select="'or-relevant-msg'" />
+                </xsl:when>
+                <xsl:when test="local-name() = 'hint'">
+                    <xsl:value-of select="'or-hint'" />
+                </xsl:when>
+                <xsl:when test="local-name() = 'label' and local-name(..) != 'item' ">
+                    <xsl:value-of select="'question-label'"/>
+                </xsl:when>
+                <xsl:when test="local-name() = 'label' and local-name(..) = 'item' ">
+                    <xsl:value-of select="'option-label'"/>
+                </xsl:when>
+                <xsl:when test="$openclinica = 1 and starts-with(name(), 'oc:constraint') and string-length(local-name()) > 13 and substring(name(), string-length(name()) - string-length('Msg') +1) = 'Msg' " >
+                    <xsl:value-of select="concat('or-', substring-before(local-name(.), 'Msg'), '-msg')"/>
+                </xsl:when>
+            </xsl:choose>
         </xsl:variable>
         <xsl:choose>
             <xsl:when test="not(string(./@ref)) and ( string(.) or string(./xf:output/@value) ) and not(contains(.,'itext('))">
@@ -1278,19 +1275,24 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                     <xsl:apply-templates select="$binding/@jr:requiredMsg" />
                 </xsl:when>
                 <xsl:otherwise>
-                        <xsl:call-template name="default-required-msg"/>
+                    <xsl:call-template name="default-required-msg"/>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:if>
-        <xsl:if test="$include-relevant-msg = 1 and (string-length($binding/@relevant) &gt; 0) and not($binding/@relevant = 'true()')">
-            <xsl:choose>
-                <xsl:when test="$binding/@oc:relevantMsg">
-                    <xsl:apply-templates select="$binding/@oc:relevantMsg" />
-                </xsl:when>
-                <xsl:otherwise>
+        <xsl:if test="$openclinica = 1">
+            <xsl:if test="(string-length($binding/@relevant) &gt; 0) and not($binding/@relevant = 'true()')">
+                <xsl:choose>
+                    <xsl:when test="$binding/@oc:relevantMsg">
+                        <xsl:apply-templates select="$binding/@oc:relevantMsg" />
+                    </xsl:when>
+                    <xsl:otherwise>
                         <xsl:call-template name="default-relevant-msg"/>
-                </xsl:otherwise>
-            </xsl:choose>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:if>
+            <xsl:for-each select="$binding/@*[starts-with(name(), 'oc:constraint') and substring(name(), string-length(name()) - string-length('Msg') +1) = 'Msg' ]" >
+                <xsl:apply-templates select="." />
+            </xsl:for-each>
         </xsl:if>
     </xsl:template>
 

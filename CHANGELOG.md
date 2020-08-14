@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+-----------------------
+##### Added
+- An openclinica transformation mode that passes all custom bind attributes in the OpenClinica namespace including custom 'Msg' attributes in the right place.
+
 [1.40.3] - 2020-08-06
 -----------------------
 ##### Fixed
