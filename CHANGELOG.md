@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased]
+[1.41.1] - 2020-08-25
 -----------------------
 ##### Changed
 - Ordered markdown lists should always be preceded by a newline character (partially reverted change in 1.40.2) because it's very common to number labels in forms.
