@@ -48,10 +48,10 @@ function markdownToHtml( text ) {
         .replace( /^\s*(#{1,6})\s?([^#][^\n]*)(\n|$)/gm, _createHeader )
         // unordered lists
         .replace( /^((\*|\+|-) (.*)(\n|$))+/gm, _createUnorderedList )
-        // ordered lists
-        .replace( /^(([0-9]+\.) (.*)(\n|$))+/gm, _createOrderedList )
-        // newline characters followed by block tag <ul>, <ol>
-        .replace( /\n(<(ul|ol)( start="[0-9]+")?>)/gm, '$1' )
+        // ordered lists, which have to be preceded by a newline since numbered labels are common
+        .replace( /(\n([0-9]+\.) (.*))+$/gm, _createOrderedList )
+        // newline characters followed by <ul> tag
+        .replace( /\n(<ul>)/gm, '$1' )
         // reverting escape of special characters
         .replace( /&35;/gm, '#' )
         .replace( /&95;/gm, '_' )
@@ -93,9 +93,9 @@ function _createUnorderedList( match ) {
  * @return {string} HTML string.
  */
 function _createOrderedList( match ) {
-    const startMatches = match.match( /^(?<start>[0-9]+)\./ );
+    const startMatches = match.match( /^\n?(?<start>[0-9]+)\./ );
     const start = startMatches && startMatches.groups && startMatches.groups.start !== '1' ? ` start="${startMatches.groups.start}"` : '';
-    const items = match.replace( /([0-9]+\.)(.*)\n?/gm, _createItem );
+    const items = match.replace( /\n?([0-9]+\.)(.*)/gm, _createItem );
 
     return `<ol${start}>${items}</ol>`;
 }

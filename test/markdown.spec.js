@@ -94,11 +94,11 @@ describe( 'markdown', () => {
             [ '\n1. 2.\n2. b', '<ol><li>2.</li><li>b</li></ol>' ],
             [ 'list:\n1. a\n2. b \n501. c   \n6. d', 'list:<ol><li>a</li><li>b</li><li>c</li><li>d</li></ol>' ],
             [ 'list:\n\n1. a\n2. b \n501. c   \n6. d', 'list:<br><ol><li>a</li><li>b</li><li>c</li><li>d</li></ol>' ],
-            [ '1. \n2. \n2. b', '<ol><li></li><li></li><li>b</li></ol>' ],
-            [ '3. ', '<ol start="3"><li></li></ol>' ],
-            [ '3. a', '<ol start="3"><li>a</li></ol>' ],
             // incorrect ordered lists
+            [ '1. \n2. \n2. b', '1. <ol start="2"><li></li><li>b</li></ol>' ],
             [ '3.', '3.' ],
+            [ '3. ', '3. ' ],
+            [ '3. a', '3. a' ],
             // correct superscript and subscript
             [ 'm<sup>2</sup>' ],
             [ 'H<sub>2</sub>O' ],
