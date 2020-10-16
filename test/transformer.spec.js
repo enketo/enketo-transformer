@@ -792,6 +792,19 @@ describe( 'custom stuff', () => {
         ] ) );
     } );
 
+    describe( 'supports the oc:external attribute if openclinica=1', () => {
+        const xform = fs.readFileSync( './test/forms/oc-external.xml' );
+        const result = transformer.transform( {
+            xform,
+            openclinica: 1
+        } );
+
+        it( 'by turning it into the data-oc-external attribute', () => Promise.all( [
+            expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-oc-external="clinicaldata"' ),
+        ] ) );
+    } );
+
+
     describe( 'oc:relevantMsg binding attributes', () => {
         const xform = fs.readFileSync( './test/forms/relevant_constraint_required.xml' );
 
