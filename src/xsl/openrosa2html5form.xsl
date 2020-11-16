@@ -1520,8 +1520,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                 <xsl:value-of select="/h:html/h:head/xf:model/xf:bind[@id=$id]/@nodeset"/>
             </xsl:when>
             <xsl:when test="$input-node/@ref or $input-node/@nodeset">
-                <xsl:variable name="path" select="$input-node/@ref | $input-node/@nodeset" />
-                <xsl:variable name="inputname" select="local-name()"/>
+                <xsl:variable name="path" select="normalize-space($input-node/@ref | $input-node/@nodeset)" />
                 <xsl:if test="not(substring($path, 1, 1) = '/') and not(parent::h:body)" >
                     <!-- path is relative, so we need context -->
                     <!--<xsl:choose>-->
