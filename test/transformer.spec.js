@@ -14,7 +14,7 @@ function parseHtmlForm( transformationResult ) {
 
 function findElementByName( htmlDoc, tagName, nameAttributeValue ) {
     const elements = Array.prototype.slice.call( htmlDoc.getElementsByTagName( tagName ) );
-    const target = elements.find( el => el.getAttribute( 'name' ) === nameAttributeValue );
+    const target = elements.find( el =>  el.getAttribute( 'name' ) === nameAttributeValue );
 
     return target || null;
 }
@@ -776,6 +776,26 @@ describe( 'transformer', () => {
                 } );
 
         } );
+
+        it( 'with a dynamic default repeat question, that also gets its value set by a trigger', () => {
+            const xform = fs.readFileSync( './test/forms/setvalue-repeat-tricky.xml', 'utf8' );
+            const transform = transformer.transform( { xform } ).then( parseHtmlForm );
+
+            return transform
+                .then( form => {
+                    const ages = findElementsByName( form, 'input', '/data/person/group/age' );
+                    expect( ages.length ).to.equal( 2 );
+
+                    const agePrimary = ages[1]; // actual form control shown in form
+                    const ageHidden = ages[0]; // hidden setvalue/xforms-value-changed directive
+                    expect( agePrimary.getAttribute( 'data-event' ) ).to.equal( 'odk-new-repeat odk-instance-first-load' );
+                    expect( agePrimary.getAttribute( 'data-setvalue' ) ).to.equal( '100' );
+
+                    expect( ageHidden.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( ageHidden.getAttribute( 'data-setvalue' ) ).to.equal( '15' );
+                } );
+        } );
+
     } );
 } );
 
