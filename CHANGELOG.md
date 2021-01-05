@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+------------------------
+##### Fixed
+- setvalue/odk-instance-first-load and setvalue/odk-new-repeat actions are not properly added for radiobutton and checkbox questions.
+
 [1.41.3] - 2020-12-21
 ------------------------
 ##### Fixed
