@@ -777,6 +777,21 @@ describe( 'transformer', () => {
 
         } );
 
+        it( 'with a dynamic default set on a radiobutton question', () =>{
+            const xform = fs.readFileSync( './test/forms/setvalue-radiobuttons-default.xml', 'utf8' );
+            const transform = transformer.transform( { xform } ).then( parseHtmlForm );
+
+            return transform
+                .then( form => {
+                    const sel1 = findElementsByName( form, 'input', '/data/sel1' );
+                    expect( sel1.length ).to.equal( 2 );
+                    expect( sel1[0].getAttribute( 'data-event' ) ).to.equal( 'odk-instance-first-load' );
+                    // It probably wouldn't be an issue if the events and setvalue attributes were added to all radiobuttons (or checkboxes)
+                    // but this test is to show it is deliberately/lazily only added to the first.
+                    expect( sel1[1].getAttribute( 'data-event' ) ).to.equal( '' );
+                } );
+        } );
+
         it( 'with a dynamic default repeat question, that also gets its value set by a trigger', () => {
             const xform = fs.readFileSync( './test/forms/setvalue-repeat-tricky.xml', 'utf8' );
             const transform = transformer.transform( { xform } ).then( parseHtmlForm );

@@ -167,6 +167,7 @@ function _correctSetValue( doc ) {
         const name = setValueEl.attr( 'name' ).value();
         const questionSameName = doc.get( `//*[@name="${name}" and ( contains(../@class, 'question') or contains(../../@class, 'option-wrapper')) and not(@type='hidden')]` );
         if ( questionSameName ) {
+            // Note that if the question has radiobuttons or checkboxes only the first of those gets the setvalue attributes.
             [ 'data-setvalue', 'data-event' ].forEach( att => questionSameName.attr( att, setValueEl.attr( att ).value() ) );
             setValueEl.parent().remove();
         }
