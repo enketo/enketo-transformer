@@ -1429,7 +1429,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                                     </xsl:call-template>
                                 </a>
                             </xsl:when>
-                            <xsl:otherwise test="not(../xf:value[@form = 'big-image'])" >
+                            <xsl:otherwise>
                                 <xsl:call-template name="image">
                                     <xsl:with-param name="active" select="$active"/>
                                     <xsl:with-param name="notext" select="$notext"/>
