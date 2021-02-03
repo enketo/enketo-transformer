@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+------------------------
+##### Fixed
+- setvalue/odk-instance-first-load actions do not copy custom OpenClinica attributes.
+
 [1.41.4] - 2021-01-05
 ------------------------
 ##### Fixed

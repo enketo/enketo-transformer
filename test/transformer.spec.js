@@ -828,15 +828,27 @@ describe( 'custom stuff', () => {
     } );
 
     describe( 'supports the oc:external attribute if openclinica=1', () => {
-        const xform = fs.readFileSync( './test/forms/oc-external.xml' );
-        const result = transformer.transform( {
-            xform,
-            openclinica: 1
+
+
+        it( 'by turning it into the data-oc-external attribute', () => {
+            const xform = fs.readFileSync( './test/forms/oc-external.xml' );
+            const result = transformer.transform( {
+                xform,
+                openclinica: 1
+            } );
+
+            return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-oc-external="clinicaldata"' );
         } );
 
-        it( 'by turning it into the data-oc-external attribute', () => Promise.all( [
-            expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-oc-external="clinicaldata"' ),
-        ] ) );
+        it( 'for setvalue/odk-instance-first-load actions by turning it into the data-oc-external attribute', () => {
+            const xform = fs.readFileSync( './test/forms/oc-438-setvalue.xml' );
+            const result = transformer.transform( {
+                xform,
+                openclinica: 1
+            } );
+
+            return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-oc-external="clinicaldata"' );
+        } );
     } );
 
 
