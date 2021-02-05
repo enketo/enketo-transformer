@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
-[Unreleased]
+[1.41.6] - 2021-02-05
 ------------------------
 ##### Fixed
 - Setvalue/xforms-value-changed inside a select multiple question is not working.
