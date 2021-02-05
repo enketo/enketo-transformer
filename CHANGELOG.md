@@ -2,15 +2,21 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+
+[Unreleased]
+------------------------
+##### Fixed
+- Setvalue/xforms-value-changed inside a select multiple question is not working.
+
 [1.41.5] - 2021-02-03
 ------------------------
 ##### Fixed
-- setvalue/odk-instance-first-load actions do not copy custom OpenClinica attributes.
+- Setvalue/odk-instance-first-load actions do not copy custom OpenClinica attributes.
 
 [1.41.4] - 2021-01-05
 ------------------------
 ##### Fixed
-- setvalue/odk-instance-first-load and setvalue/odk-new-repeat actions are not properly added for radiobutton and checkbox questions.
+- Setvalue/odk-instance-first-load and setvalue/odk-new-repeat actions are not properly added for radiobutton and checkbox questions.
 
 [1.41.3] - 2020-12-21
 ------------------------

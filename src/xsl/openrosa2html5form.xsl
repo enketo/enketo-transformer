@@ -1677,7 +1677,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             <xsl:otherwise>
                 <xsl:variable name="intermediate">
                     <xsl:choose>
-                        <xsl:when test="not(local-name() = 'setvalue') and local-name(..) = 'select1' or local-name(..) = 'select'">
+                        <xsl:when test="not(local-name() = 'setvalue') and ( local-name(..) = 'select1' or local-name(..) = 'select' )">
                             <xsl:call-template name="node-path-helper">
                                 <xsl:with-param name="input-node" select=".." />
                             </xsl:call-template>

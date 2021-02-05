@@ -643,7 +643,7 @@ describe( 'transformer', () => {
                 } );
         } );
 
-        it( 'with xforms-value-changed included inside a select1 form control', () => {
+        it( 'with xforms-value-changed included inside a select form control', () => {
             const xform2 = xform.replace( 'appearance="minimal"', '' );
             const transform = transformer.transform( { xform: xform2 } ).then( parseHtmlForm );
 
@@ -701,7 +701,7 @@ describe( 'transformer', () => {
                 } );
         } );
 
-        it( 'with xforms-value-changed included inside a select1 form control with an itemset', () => {
+        it( 'with xforms-value-changed included inside a select form control with an itemset', () => {
             const xform2 = fs.readFileSync( './test/forms/itemset.xml', 'utf8' );
             const transform = transformer.transform( { xform: xform2 } ).then( parseHtmlForm );
 
