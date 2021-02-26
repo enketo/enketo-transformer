@@ -3,6 +3,8 @@
 # exit if an error occurs
 set -e
 
+export DEBIAN_FRONTEND=noninteractive
+
 # installing prerequisites
 echo 'installing prerequisites...'
 apt-get update
@@ -19,6 +21,16 @@ if [ -d "/vagrant/node_modules" ]; then
 fi
 npm install
 npm install -g mocha
+
+if [ "$MINIMAL" = "true" ]
+then
+    apt-get remove -y build-essential
+    apt-get autoremove -y
+fi
+if [ "$QUIET" = "true" ]
+then
+    exit 0
+fi
 
 echo "*************************************************************************************"
 echo "***                           Development VM created!                             ***"
