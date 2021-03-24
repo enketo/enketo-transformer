@@ -44,8 +44,21 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                 <xsl:value-of select="h:html/h:head/xf:model/xf:itext/xf:translation[@default]/@lang" />
             </xsl:when>
             <xsl:otherwise>
-                <!-- first language or empty if itext was not used -->
-                <xsl:value-of select="h:html/h:head/xf:model/xf:itext/xf:translation[1]/@lang" />
+                <xsl:value-of select="''" />
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="first-lang">
+        <!-- first language or empty if itext was not used -->
+        <xsl:value-of select="h:html/h:head/xf:model/xf:itext/xf:translation[1]/@lang" />
+    </xsl:variable>
+    <xsl:variable name="current-lang">
+        <xsl:choose>
+            <xsl:when test="$default-lang">
+                <xsl:value-of select="$default-lang" />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$first-lang" />
             </xsl:otherwise>
         </xsl:choose>
     </xsl:variable>
@@ -607,8 +620,8 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             <!-- better to use default language if defined and otherwise span[1] -->
             <xsl:choose>
                 <!-- TODO: IT WOULD BE MORE EFFICIENT TO EXTRACT THIS FROM exsl:node-set($label_translations) -->
-                <xsl:when test="exsl:node-set($label_translations)/span[@lang=$default-lang]">
-                    <xsl:value-of select="exsl:node-set($label_translations)/span[@lang=$default-lang] " />
+                <xsl:when test="exsl:node-set($label_translations)/span[@lang=$current-lang]">
+                    <xsl:value-of select="exsl:node-set($label_translations)/span[@lang=$current-lang] " />
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:value-of select="exsl:node-set($label_translations)/span[1] " />
@@ -1370,7 +1383,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
         <xsl:for-each select="/h:html/h:head/xf:model/xf:itext/xf:translation/xf:text[@id=$id]">
             <xsl:variable name="lang" select="ancestor::xf:translation/@lang"/>
             <xsl:variable name="active">
-                <xsl:if test="string($lang) = string($default-lang)">active</xsl:if>
+                <xsl:if test="string($lang) = string($current-lang)">active</xsl:if>
             </xsl:variable>
             <xsl:variable name="notext">
                 <xsl:value-of select="string-length(./xf:value[@form='long' or @form='short' or not(@form)]) = 0" />
