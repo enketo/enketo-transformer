@@ -54,7 +54,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
     </xsl:variable>
     <xsl:variable name="current-lang">
         <xsl:choose>
-            <xsl:when test="$default-lang">
+            <xsl:when test="string-length($default-lang) > 0">
                 <xsl:value-of select="$default-lang" />
             </xsl:when>
             <xsl:otherwise>
