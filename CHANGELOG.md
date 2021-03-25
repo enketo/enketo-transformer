@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+------------------------
+##### Changed
+- Output explicitly set default languages differently than the first-defined language.
 
 [1.41.6] - 2021-02-05
 ------------------------
