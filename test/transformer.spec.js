@@ -1076,6 +1076,16 @@ describe( 'custom stuff', () => {
 
             return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-oc-external="clinicaldata"' );
         } );
+
+        it( 'for setgeopoint/odk-instance-first-load actions by turning it into the data-oc-external attribute', () => {
+            const xform = fs.readFileSync( './test/forms/oc-438-setgeopoint.xml' );
+            const result = transformer.transform( {
+                xform,
+                openclinica: 1
+            } );
+
+            return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-oc-external="clinicaldata"' );
+        } );
     } );
 
 
