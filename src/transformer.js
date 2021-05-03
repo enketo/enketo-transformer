@@ -58,7 +58,8 @@ function transform( survey ) {
             return _transform( xslForm, xformDoc, xsltParams );
         } )
         .then( htmlDoc => {
-            htmlDoc = _correctSetValue( htmlDoc );
+            htmlDoc = _correctSetValue( htmlDoc, 'setgeopoint' );
+            htmlDoc = _correctSetValue( htmlDoc, 'setvalue' );
             htmlDoc = _replaceTheme( htmlDoc, survey.theme );
             htmlDoc = _replaceMediaSources( htmlDoc, survey.media );
             htmlDoc = _replaceLanguageTags( htmlDoc, survey );
@@ -141,34 +142,34 @@ function _processBinaryDefaults( doc ) {
  * This is much easier to correct in javascript than in XSLT
  *
  * @param {object} doc - libxmljs object
+ * @param {string} localName - local XML tag name
  * @return {object} doc - libxmljs object
  */
-function _correctSetValue( doc ) {
-
+function _correctSetValue( doc, localName ) {
     /*
-     * See setvalue.xml (/data/person/age_changed). A <setvalue> inside a form control results
-     * in one label.question with a nested label.setvalue which is weird syntax (and possibly invalid HTML).
-     */
-    doc.find( '//*[contains(@class, "question")]//label/input[@data-setvalue]' ).forEach( setValueEl => {
+        * See setvalue.xml (/data/person/age_changed). A <setvalue> inside a form control results
+        * in one label.question with a nested label.setvalue which is weird syntax (and possibly invalid HTML).
+        */
+    doc.find( `//*[contains(@class, "question")]//label/input[@data-${localName}]` ).forEach( setValueEl => {
         const clone = setValueEl.clone();
         setValueEl.parent().addNextSibling( clone );
         setValueEl.parent().remove();
     } );
 
     /*
-     * See setvalue.xml (/data/person/age). A <setvalue> inside a repeat to set a default value that also has a question with the same name, results
-     * in one .question and .setvalue with the same name, which will leads to all kinds of problems in enketo-core
-     * as name is presumed to be unique.
-     *
-     * Note that a label.setvalue is always to set a default value (with odk-new-repeat, odk-instance-first-load), never
-     * a value change directive (with xforms-value-changed)
-     */
-    doc.find( '//label[contains(@class, "setvalue")]/input[@data-setvalue]' ).forEach( setValueEl => {
+        * See setvalue.xml (/data/person/age). A <setvalue> inside a repeat to set a default value that also has a question with the same name, results
+        * in one .question and .setvalue with the same name, which will leads to all kinds of problems in enketo-core
+        * as name is presumed to be unique.
+        *
+        * Note that a label.setvalue is always to set a default value (with odk-new-repeat, odk-instance-first-load), never
+        * a value change directive (with xforms-value-changed)
+        */
+    doc.find( `//label[contains(@class, "${localName}")]/input[@data-${localName}]` ).forEach( setValueEl => {
         const name = setValueEl.attr( 'name' ).value();
         const questionSameName = doc.get( `//*[@name="${name}" and ( contains(../@class, 'question') or contains(../../@class, 'option-wrapper')) and not(@type='hidden')]` );
         if ( questionSameName ) {
             // Note that if the question has radiobuttons or checkboxes only the first of those gets the setvalue attributes.
-            [ 'data-setvalue', 'data-event' ].forEach( att => questionSameName.attr( att, setValueEl.attr( att ).value() ) );
+            [ `data-${localName}`, 'data-event' ].forEach( att => questionSameName.attr( att, setValueEl.attr( att ).value() ) );
             setValueEl.parent().remove();
         }
     } );
