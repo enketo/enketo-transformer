@@ -531,7 +531,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                         </xsl:if>
 
                         <xsl:if test="not(local-name() = 'item' or local-name() = 'bind' or local-name() = 'setvalue' or local-name() = 'setgeopoint')">
-                            <!-- the only use case at the moment is a <setvalue> child with xforms-value-changed event-->
+                            <!-- the only use case at the moment is a <setvalue> and <odk:setgeopoint> child with xforms-value-changed event-->
                             <xsl:if test="./xf:setvalue[@event] or ./odk:setgeopoint[@event]">
                                 <xsl:apply-templates select="./xf:setvalue[@event] | ./odk:setgeopoint[@event]" />
                             </xsl:if>
