@@ -512,7 +512,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                                     <xsl:call-template name="rank-item-attributes"/>
                                 </xsl:when>
                                 <xsl:when test="local-name() = 'setvalue' or local-name() = 'setgeopoint'">
-                                    <xsl:call-template name="setvalue-setgeopoint-attributes">
+                                    <xsl:call-template name="action-attributes">
                                         <xsl:with-param name="binding" select="$binding"/>
                                         <xsl:with-param name="nodeset" select="$nodeset"/>
                                     </xsl:call-template>
@@ -1007,7 +1007,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
     <!--
         Don't add any logic or names to setvalue or setgeopoint items
     -->
-    <xsl:template name="setvalue-setgeopoint-attributes">
+    <xsl:template name="action-attributes">
         <xsl:param name="binding"/>
         <xsl:param name="nodeset"/>
         <xsl:attribute name="name">
@@ -1020,11 +1020,6 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
         </xsl:attribute>
         <xsl:attribute name="data-event">
             <xsl:value-of select="./@event"/>
-        </xsl:attribute>
-        <xsl:attribute name="data-attrs">
-            <xsl:for-each select="names/name/@*">
-                <xsl:value-of select="concat( ., ' ')"/>
-            </xsl:for-each>
         </xsl:attribute>
         <xsl:choose>
             <xsl:when test="local-name() = 'setvalue'">
