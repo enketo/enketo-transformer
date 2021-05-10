@@ -58,8 +58,8 @@ function transform( survey ) {
             return _transform( xslForm, xformDoc, xsltParams );
         } )
         .then( htmlDoc => {
-            htmlDoc = _correctSetValue( htmlDoc, 'setgeopoint' );
-            htmlDoc = _correctSetValue( htmlDoc, 'setvalue' );
+            htmlDoc = _correctAction( htmlDoc, 'setgeopoint' );
+            htmlDoc = _correctAction( htmlDoc, 'setvalue' );
             htmlDoc = _replaceTheme( htmlDoc, survey.theme );
             htmlDoc = _replaceMediaSources( htmlDoc, survey.media );
             htmlDoc = _replaceLanguageTags( htmlDoc, survey );
@@ -138,14 +138,14 @@ function _processBinaryDefaults( doc ) {
 }
 
 /**
- * Correct some <setvalue> issues in the XSL stylesheets.
+ * Correct some <setvalue>/<odk:setgeopoint> issues in the XSL stylesheets.
  * This is much easier to correct in javascript than in XSLT
  *
  * @param {object} doc - libxmljs object
- * @param {string} localName - local XML tag name
+ * @param {'setvalue' | 'setgeopoint'} localName - local XML tag name
  * @return {object} doc - libxmljs object
  */
-function _correctSetValue( doc, localName ) {
+function _correctAction( doc, localName = 'setvalue' ) {
     /*
         * See setvalue.xml (/data/person/age_changed). A <setvalue> inside a form control results
         * in one label.question with a nested label.setvalue which is weird syntax (and possibly invalid HTML).
