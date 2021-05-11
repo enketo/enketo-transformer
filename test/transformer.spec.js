@@ -58,6 +58,30 @@ describe( 'transformer', () => {
         } );
     } );
 
+    describe( 'puts attributes on root', () => {
+        it( 'copies the formId', () => {
+            const xform = fs.readFileSync( './test/forms/widgets.xml', 'utf8' );
+            const result = transformer.transform( { xform } );
+
+            return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-form-id="widgets"' );
+        } );
+
+        it( 'copies the formId with accents', () => {
+            const xform = fs.readFileSync( './test/forms/form-id-with-accent.xml', 'utf8' );
+            const result = transformer.transform( { xform } );
+
+            return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-form-id="Éphémère"' );
+        } );
+
+        // https://github.com/enketo/enketo-transformer/issues/100
+        it( 'copies the formId with spaces', () => {
+            const xform = fs.readFileSync( './test/forms/form-id-with-space.xml', 'utf8' );
+            const result = transformer.transform( { xform } );
+
+            return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-form-id="FormId with spaces"' );
+        } );
+    } );
+
     describe( 'copies attributes on the `<model>`', () => {
         it( 'copies the odk:xforms-version attribute', () => {
             const xform = fs.readFileSync( './test/forms/autocomplete.xml', 'utf8' );

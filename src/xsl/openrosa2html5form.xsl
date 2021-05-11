@@ -105,13 +105,13 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                             <xsl:value-of select="concat(' ', /h:html/h:body/@class)" />
                         </xsl:if>
                     </xsl:attribute>
-                    <xsl:attribute name="id">
+                    <xsl:attribute name="data-form-id">
                         <xsl:choose>
                             <xsl:when test="/h:html/h:head/xf:model/xf:instance[1]/child::node()/@id">
-                                <xsl:value-of select="translate(/h:html/h:head/xf:model/xf:instance/child::node()/@id, ' ', '_' )" /><!-- not smart! -->
+                                <xsl:value-of select="/h:html/h:head/xf:model/xf:instance/child::node()/@id" />
                             </xsl:when>
                             <xsl:when test="/h:html/h:head/xf:model/xf:instance/child::node()/@xmlns">
-                                <xsl:value-of select="translate(/h:html/h:head/xf:model/xf:instance/child::node()/@xmlns, ' ', '_')" />
+                                <xsl:value-of select="/h:html/h:head/xf:model/xf:instance/child::node()/@xmlns" />
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:text>_</xsl:text>
