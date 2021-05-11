@@ -6,6 +6,7 @@
       <instance>
         <data id="data_simplified">
           <state/>
+          <location_changed/>
           <meta>
             <instanceID/>
           </meta>
@@ -23,6 +24,7 @@
           </item>
         </root>
       </instance>
+      <bind nodeset="/data/location_changed" type="geopoint"/>
       <bind nodeset="/data/state" type="select1"/>
       <bind calculate="concat('uuid:', uuid())" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
     </model>
@@ -35,6 +37,7 @@
         <label ref="label"/>
       </itemset>
       <setvalue event="xforms-value-changed" ref="/data/state_changed" value="3+3"/>/>
+      <odk:setgeopoint event="xforms-value-changed" ref="/data/location_changed"/>
     </select1>
   </h:body>
 </h:html>

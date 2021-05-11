@@ -836,6 +836,233 @@ describe( 'transformer', () => {
         } );
 
     } );
+
+    describe( 'setgeopoint actions', () => {
+        const xform = fs.readFileSync( './test/forms/setgeopoint.xml', 'utf8' );
+        const transform = transformer.transform( { xform } ).then( parseHtmlForm );
+
+        it( 'included in XForm body', () => {
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/visible_first_load' );
+                    expect( target ).to.not.equal( null );
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'odk-instance-first-load' );
+                    expect( target.hasAttribute( 'data-setgeopoint' ) ).to.equal( true );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'geopoint' );
+                } );
+        } );
+
+        it( 'included as XForm <bind> sibling ', () => {
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/hidden_first_load' );
+                    expect( target ).to.not.equal( null );
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'odk-instance-first-load' );
+                    expect( target.hasAttribute( 'data-setgeopoint' ) ).to.equal( true );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'geopoint' );
+                } );
+        } );
+
+        it( 'with odk-new-repeat included inside a repeat ', () => {
+            return transform
+                .then( form => {
+                    const targets = findElementsByName( form, 'input', '/data/repeats/first_load' );
+                    // Duplicates added by xsl sheet are merged.
+                    expect( targets.length ).to.equal( 1 );
+                    // The empty .setgeopoint label is removed.
+                    expect( form.getElementsByTagName( 'label' ).length ).to.equal( 5 );
+                    const target = targets[ 0 ];
+                    expect( target ).to.not.equal( null );
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'odk-new-repeat odk-instance-first-load' );
+                    expect( target.hasAttribute( 'data-setgeopoint' ) ).to.equal( true );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'geopoint' );
+                } );
+        } );
+
+        it( 'with xforms-value-changed included inside an input form control', () => {
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/repeats/changed_location' );
+                    expect( target ).to.not.equal( null );
+                    // The nested labels are removed
+                    expect( form.getElementsByTagName( 'label' ).length ).to.equal( 5 );
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( target.hasAttribute( 'data-setgeopoint' ) ).to.equal( true );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'geopoint' );
+                    // Check location as sibling of /data/repeats/changed_location
+                    const sibling = target.parentNode.getElementsByTagName( 'input' )[ 0 ];
+                    expect( sibling.getAttribute( 'name' ) ).to.equal( '/data/repeats/changes' );
+                } );
+        } );
+
+        it( 'with xforms-value-changed included inside a select1 form control with minimal appearance', () => {
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/changed_location' );
+                    expect( target ).to.not.equal( null );
+                    // The nested labels are removed
+                    expect( form.getElementsByTagName( 'label' ).length ).to.equal( 5 );
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( target.hasAttribute( 'data-setgeopoint' ) ).to.equal( true );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'geopoint' );
+                    // check location of target as sibling <select>
+                    const sibling = target.parentNode.getElementsByTagName( 'select' )[ 0 ];
+                    expect( sibling.getAttribute( 'name' ) ).to.equal( '/data/changes' );
+                } );
+        } );
+
+        it( 'with xforms-value-changed included inside a select form control', () => {
+            const xform2 = xform.replace( 'appearance="minimal"', '' );
+            const transform = transformer.transform( { xform: xform2 } ).then( parseHtmlForm );
+
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/changed_location' );
+                    expect( target ).to.not.equal( null );
+                    // The nested labels are removed
+                    expect( form.getElementsByTagName( 'label' ).length ).to.equal( 6 );
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( target.hasAttribute( 'data-setgeopoint' ) ).to.equal( true );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'geopoint' );
+                    // check location of target inside same label as input[name="/data/my_age"]
+                    const radio = target.parentNode.getElementsByTagName( 'input' )[ 0 ];
+                    expect( radio.getAttribute( 'name' ) ).to.equal( '/data/changes' );
+                } );
+        } );
+
+        it( 'with xforms-value-changed included inside a rank form control', () => {
+            const xform2 = xform.replace( 'appearance="minimal"', '' ).replace( /select1/g, 'odk:rank' );
+            const transform = transformer.transform( { xform: xform2 } ).then( parseHtmlForm );
+
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/changed_location' );
+                    expect( target ).to.not.equal( null );
+                    // The nested labels are removed
+                    expect( form.getElementsByTagName( 'label' ).length ).to.equal( 6 );
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( target.hasAttribute( 'data-setgeopoint' ) ).to.equal( true );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'geopoint' );
+                    // check location of target inside same label as input[name="/data/my_age"]
+                    const radio = target.parentNode.getElementsByTagName( 'input' )[ 0 ];
+                    expect( radio.getAttribute( 'name' ) ).to.equal( '/data/changes' );
+
+                } );
+        } );
+
+        it( 'with xforms-value-changed included inside a range form control', () => {
+            const xform2 = xform.replace( /<input ref="\/data\/person\/age">(.*)<\/input>/gm, '<range ref="/data/repeats/changes">$1</range>' );
+            const transform = transformer.transform( { xform: xform2 } ).then( parseHtmlForm );
+
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/repeats/changed_location' );
+                    expect( target ).to.not.equal( null );
+                    // The nested labels are removed
+                    expect( form.getElementsByTagName( 'label' ).length ).to.equal( 5 );
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( target.hasAttribute( 'data-setgeopoint' ) ).to.equal( true );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'geopoint' );
+                    // Check location as sibling of /data/person/age
+                    const sibling = target.parentNode.getElementsByTagName( 'input' )[ 0 ];
+                    expect( sibling.getAttribute( 'name' ) ).to.equal( '/data/repeats/changes' );
+                } );
+        } );
+
+        it( 'with xforms-value-changed included inside a select form control with an itemset', () => {
+            const xform2 = fs.readFileSync( './test/forms/itemset.xml', 'utf8' );
+            const transform = transformer.transform( { xform: xform2 } ).then( parseHtmlForm );
+
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/location_changed' );
+                    expect( target ).to.not.equal( null );
+                    // The nested labels are removed
+                    expect( target.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( target.hasAttribute( 'data-setgeopoint' ) ).to.equal( true );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'geopoint' );
+                    // check location of target inside same label as input[name="/data/state"]
+                    const parent = target.parentNode;
+                    expect( parent.nodeName ).to.equal( 'fieldset' );
+                    expect( parent.getElementsByTagName( 'input' )[ 0 ].getAttribute( 'name' ) ).to.equal( '/data/state' );
+                } );
+        } );
+
+        it( 'with multiple xforms-value-changed inside a single text input', () => {
+            const xform2 = fs.readFileSync( './test/forms/setgeopoint-value-changed-multiple.xml', 'utf8' );
+            const transform = transformer.transform( { xform: xform2 } ).then( parseHtmlForm );
+
+            return transform
+                .then( form => {
+                    const target = findElementByName( form, 'input', '/data/a' );
+                    expect( target ).to.not.equal( null );
+                    expect( target.hasAttribute( 'data-event' ) ).to.equal( false );
+                    expect( target.hasAttribute( 'data-setgeopoint' ) ).to.equal( false );
+                    expect( target.getAttribute( 'data-type-xml' ) ).to.equal( 'string' );
+                    // check for 4 setgeopoint siblings
+                    const parent = target.parentNode;
+                    const sibs = Array.prototype.slice.call( parent.getElementsByTagName( 'input' ) ).slice( 1 );
+                    // data/b
+                    expect( sibs[ 0 ].getAttribute( 'name' ) ).to.equal( '/data/b' );
+                    expect( sibs[ 0 ].hasAttribute( 'data-setgeopoint' ) ).to.equal( true );
+                    expect( sibs[ 0 ].getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( sibs[ 0 ].getAttribute( 'type' ) ).to.equal( 'hidden' );
+                    // data/c
+                    expect( sibs[ 1 ].getAttribute( 'name' ) ).to.equal( '/data/c' );
+                    expect( sibs[ 1 ].hasAttribute( 'data-setgeopoint' ) ).to.equal( true );
+                    expect( sibs[ 1 ].getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( sibs[ 1 ].getAttribute( 'type' ) ).to.equal( 'hidden' );
+                    // data/d
+                    expect( sibs[ 2 ].getAttribute( 'name' ) ).to.equal( '/data/d' );
+                    expect( sibs[ 2 ].hasAttribute( 'data-setgeopoint' ) ).to.equal( true );
+                    expect( sibs[ 2 ].getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( sibs[ 2 ].getAttribute( 'type' ) ).to.equal( 'hidden' );
+                    // data/e
+                    expect( sibs[ 3 ].getAttribute( 'name' ) ).to.equal( '/data/e' );
+                    expect( sibs[ 3 ].hasAttribute( 'data-setgeopoint' ) ).to.equal( true );
+                    expect( sibs[ 3 ].getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( sibs[ 3 ].getAttribute( 'type' ) ).to.equal( 'hidden' );
+
+                    // other form controls
+                    const questions = Array.prototype.slice.call( form.getElementsByTagName( 'label' ) )
+                        .filter( question => question.getAttribute( 'class' ).includes( 'question' ) );
+                    expect( questions.length ).to.equal( 3 );
+
+                    const c = questions[ 1 ].getElementsByTagName( 'input' );
+                    expect( c.length ).to.equal( 1 );
+                    expect( c[ 0 ].getAttribute( 'name' ) ).to.equal( '/data/c' );
+                    expect( c[ 0 ].hasAttribute( 'data-event' ) ).to.equal( false );
+                    expect( c[ 0 ].hasAttribute( 'data-setgeopoint' ) ).to.equal( false );
+
+                    const d = questions[ 2 ].getElementsByTagName( 'input' );
+                    expect( d.length ).to.equal( 1 );
+                    expect( d[ 0 ].getAttribute( 'name' ) ).to.equal( '/data/d' );
+                    expect( d[ 0 ].hasAttribute( 'data-event' ) ).to.equal( false );
+                    expect( d[ 0 ].hasAttribute( 'data-setgeopoint' ) ).to.equal( false );
+                } );
+
+        } );
+
+        it( 'with a dynamic default repeat question, that also gets its value set by a trigger', () => {
+            const xform = fs.readFileSync( './test/forms/setgeopoint-repeat-tricky.xml', 'utf8' );
+            const transform = transformer.transform( { xform } ).then( parseHtmlForm );
+
+            return transform
+                .then( form => {
+                    const ages = findElementsByName( form, 'input', '/data/person/group/age' );
+                    expect( ages.length ).to.equal( 2 );
+
+                    const agePrimary = ages[1]; // actual form control shown in form
+                    const ageHidden = ages[0]; // hidden setgeopoint/xforms-value-changed directive
+                    expect( agePrimary.getAttribute( 'data-event' ) ).to.equal( 'odk-new-repeat odk-instance-first-load' );
+                    expect( agePrimary.hasAttribute( 'data-setgeopoint' ) ).to.equal( true );
+
+                    expect( ageHidden.getAttribute( 'data-event' ) ).to.equal( 'xforms-value-changed' );
+                    expect( ageHidden.hasAttribute( 'data-setgeopoint' ) ).to.equal( true );
+                } );
+        } );
+
+    } );
 } );
 
 describe( 'custom stuff', () => {
@@ -866,6 +1093,16 @@ describe( 'custom stuff', () => {
 
         it( 'for setvalue/odk-instance-first-load actions by turning it into the data-oc-external attribute', () => {
             const xform = fs.readFileSync( './test/forms/oc-438-setvalue.xml' );
+            const result = transformer.transform( {
+                xform,
+                openclinica: 1
+            } );
+
+            return expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'data-oc-external="clinicaldata"' );
+        } );
+
+        it( 'for setgeopoint/odk-instance-first-load actions by turning it into the data-oc-external attribute', () => {
+            const xform = fs.readFileSync( './test/forms/oc-438-setgeopoint.xml' );
             const result = transformer.transform( {
                 xform,
                 openclinica: 1

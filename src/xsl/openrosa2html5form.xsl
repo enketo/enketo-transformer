@@ -208,6 +208,11 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                             <xsl:apply-templates select="/h:html/h:head/xf:model/xf:setvalue[@event]" />
                         </fieldset>
                     </xsl:if>
+                    <xsl:if test="/h:html/h:head/xf:model/odk:setgeopoint[@event]">
+                        <fieldset id="or-setgeopoint-items" style="display:none;">
+                            <xsl:apply-templates select="/h:html/h:head/xf:model/odk:setgeopoint[@event]" />
+                        </fieldset>
+                    </xsl:if>
                     <!--
                     <xsl:if test="/h:html/h:body//xf:output">
                         <xsl:message>WARNING: Output element(s) added but note that only /absolute/path/to/node is properly supported as "value" attribute of outputs. Please test to make sure they do what you want.</xsl:message>
@@ -403,7 +408,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
     </xsl:template>
 
 
-    <xsl:template match="xf:input | xf:upload | xf:range | xf:item | xf:bind[@jr:preload] | xf:bind[@calculate] | xf:setvalue[@event]">
+    <xsl:template match="xf:input | xf:upload | xf:range | xf:item | xf:bind[@jr:preload] | xf:bind[@calculate] | xf:setvalue[@event] | odk:setgeopoint[@event]">
     <!-- NOTE: TO IMPROVE PERFORMANCE, SUPPORT FOR RELATIVE NODESET BINDINGS HAS BEEN SWITCHED OFF
             To turn this back on:
             - uncomment the variable nodeset_used
@@ -456,6 +461,9 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                             <xsl:if test="local-name() = 'setvalue'">
                                 <xsl:value-of select="'setvalue '"/>
                             </xsl:if>
+                            <xsl:if test="local-name() = 'setgeopoint'">
+                                <xsl:value-of select="'setgeopoint '"/>
+                            </xsl:if>
                             <!--<xsl:if test="local-name() = 'item'">
                                 <xsl:value-of select="'clearfix '"/>
                             </xsl:if>-->
@@ -467,7 +475,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
 
                         <xsl:apply-templates select="./@kb:image-customization"/>
 
-                        <xsl:if test="not(local-name() = 'item' or local-name() = 'bind' or local-name='setvalue')">
+                        <xsl:if test="not(local-name() = 'item' or local-name() = 'bind' or local-name() = 'setvalue' or local-name() = 'setgeopoint')">
                             <xsl:apply-templates select="xf:label" />
                             <xsl:if test="not($binding/@readonly = 'true()')">
                                 <xsl:apply-templates select="$binding/@required"/>
@@ -500,11 +508,11 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                         </xsl:variable>
                         <xsl:element name="{$element}">
                             <xsl:choose>
-                                <xsl:when test="not(local-name() = 'setvalue') and ancestor::odk:rank">
+                                <xsl:when test="not(local-name() = 'setvalue' or local-name() = 'setgeopoint') and ancestor::odk:rank">
                                     <xsl:call-template name="rank-item-attributes"/>
                                 </xsl:when>
-                                <xsl:when test="local-name() = 'setvalue'">
-                                    <xsl:call-template name="setvalue-attributes">
+                                <xsl:when test="local-name() = 'setvalue' or local-name() = 'setgeopoint'">
+                                    <xsl:call-template name="action-attributes">
                                         <xsl:with-param name="binding" select="$binding"/>
                                         <xsl:with-param name="nodeset" select="$nodeset"/>
                                     </xsl:call-template>
@@ -522,10 +530,10 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                             <xsl:apply-templates select="xf:label" />
                         </xsl:if>
 
-                        <xsl:if test="not(local-name() = 'item' or local-name() = 'bind' or local-name = 'setvalue')">
-                            <!-- the only use case at the moment is a <setvalue> child with odk-xforms-changed event-->
-                            <xsl:if test="./xf:setvalue[@event]">
-                                <xsl:apply-templates select="./xf:setvalue[@event]" />
+                        <xsl:if test="not(local-name() = 'item' or local-name() = 'bind' or local-name() = 'setvalue' or local-name() = 'setgeopoint')">
+                            <!-- the only use case at the moment is a <setvalue> and <odk:setgeopoint> child with xforms-value-changed event-->
+                            <xsl:if test="./xf:setvalue[@event] or ./odk:setgeopoint[@event]">
+                                <xsl:apply-templates select="./xf:setvalue[@event] | ./odk:setgeopoint[@event]" />
                             </xsl:if>
                             <xsl:call-template name="constraint-and-required-msg" >
                                  <xsl:with-param name="binding" select="$binding"/>
@@ -887,8 +895,8 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             <xsl:if test="./xf:itemset">
                 <xsl:apply-templates select="xf:itemset" mode="labels"/>
             </xsl:if>
-            <xsl:if test="./xf:setvalue[@event]">
-                <xsl:apply-templates select="./xf:setvalue[@event]" />
+            <xsl:if test="./xf:setvalue[@event] or ./odk:setgeopoint[@event]">
+                <xsl:apply-templates select="./xf:setvalue[@event] | ./odk:setgeopoint[@event]" />
             </xsl:if>
             <xsl:call-template name="constraint-and-required-msg" >
                 <xsl:with-param name="binding" select="$binding"/>
@@ -970,9 +978,9 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                     </xsl:choose>
                 </div>
             </fieldset>
-             <!-- the only use case at the moment is a <setvalue> child with odk-xforms-changed event-->
-            <xsl:if test="./xf:setvalue[@event]">
-                <xsl:apply-templates select="./xf:setvalue[@event]" />
+             <!-- the only use case at the moment is a <setvalue> or <odk:setgeopoint> child with xforms-value-changed event-->
+            <xsl:if test="./xf:setvalue[@event] or ./odk:setgeopoint[@event]">
+                <xsl:apply-templates select="./xf:setvalue[@event] | ./odk:setgeopoint[@event]" />
             </xsl:if>
             <xsl:call-template name="constraint-and-required-msg" >
                 <xsl:with-param name="binding" select="$binding"/>
@@ -997,9 +1005,9 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
     </xsl:template>
 
     <!--
-        Don't add any logic or names to setvalue items
+        Don't add any logic or names to setvalue or setgeopoint items
     -->
-    <xsl:template name="setvalue-attributes">
+    <xsl:template name="action-attributes">
         <xsl:param name="binding"/>
         <xsl:param name="nodeset"/>
         <xsl:attribute name="name">
@@ -1010,19 +1018,28 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                 <xsl:with-param name="nodeset" select="$nodeset"/>
             </xsl:call-template>
         </xsl:attribute>
-        <xsl:attribute name="data-setvalue">
-            <xsl:choose>
-                <xsl:when test="./@value">
-                    <xsl:value-of select="./@value" />
-                </xsl:when>
-                <xsl:when test="string-length(.) > 0">
-                    <xsl:value-of select="concat('&quot;', ./text(), '&quot;')" />
-                </xsl:when>
-            </xsl:choose>
-        </xsl:attribute>
         <xsl:attribute name="data-event">
             <xsl:value-of select="./@event"/>
         </xsl:attribute>
+        <xsl:choose>
+            <xsl:when test="local-name() = 'setvalue'">
+                <xsl:attribute name="data-setvalue">
+                    <xsl:choose>
+                        <xsl:when test="./@value">
+                            <xsl:value-of select="./@value" />
+                        </xsl:when>
+                        <xsl:when test="string-length(.) > 0">
+                            <xsl:value-of select="concat('&quot;', ./text(), '&quot;')" />
+                        </xsl:when>
+                    </xsl:choose>
+                </xsl:attribute>
+            </xsl:when>
+            <xsl:when test="local-name() = 'setgeopoint'">
+                <xsl:attribute name="data-setgeopoint">
+                    <xsl:value-of select="true()" />
+                </xsl:attribute>
+            </xsl:when>
+        </xsl:choose>
         <xsl:attribute name="type">
             <xsl:value-of select="'hidden'"/>
         </xsl:attribute>
@@ -1690,7 +1707,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
             <xsl:otherwise>
                 <xsl:variable name="intermediate">
                     <xsl:choose>
-                        <xsl:when test="not(local-name() = 'setvalue') and ( local-name(..) = 'select1' or local-name(..) = 'select' )">
+                        <xsl:when test="not(local-name() = 'setvalue' or local-name() = 'setgeopoint') and ( local-name(..) = 'select1' or local-name(..) = 'select' )">
                             <xsl:call-template name="node-path-helper">
                                 <xsl:with-param name="input-node" select=".." />
                             </xsl:call-template>
