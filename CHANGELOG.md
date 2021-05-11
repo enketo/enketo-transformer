@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.43.0] - 2021-05-11
+------------------------
+##### Added
+- Support for `odk:setgeopoint`.
+
+##### Changed
+- changed form id attribute to data-form-id to support spaces.
+
 [1.42.0] - 2021-03-25
 ------------------------
 ##### Changed
