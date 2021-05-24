@@ -95,9 +95,20 @@ A vagrant configuration file and provisioning script is also included. Use DEBUG
 DEBUG=api,transformer,markdown,language node app.js
 ```
 
+### Release
+
+Releases are done each time a dependent tool needs an `enketo-transformer` change. They are published by [@Martijnr](https://github.com/MartijnR) and require the following steps:
+  - update [change log](https://github.com/enketo/enketo-transformer/blob/master/CHANGELOG.md)
+  - update version in `package.json`
+  - update dependencies (`npm update` and then check if `node-libxslt` has been updated because it has caused problems in the past).
+  - `npm audit fix`
+  - `npm run build-docs`
+  - tag the release with the version
+  - publish with `npm publish`
+
 ### License
 
-See [license document](./LICENSE). 
+See [license document](./LICENSE).
 
 In addition, any product that uses enketo-transformer or parts thereof is required to have a "Powered by Enketo" footer, according to the specifications below, on all screens in which the output of enketo-xslt, or parts thereof, are used, unless explicity exempted from this requirement by Enketo LLC in writing. Partners and sponsors of the Enketo Project, listed on [https://enketo.org/#about](https://enketo.org/#about) and on [https://github.com/enketo/enketo-core#sponsors](https://github.com/enketo/enketo-core#sponsors) are exempted from this requirements and so are contributors listed in [package.json](./package.json).
 
