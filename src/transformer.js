@@ -434,11 +434,11 @@ function _renderMarkdown( htmlDoc ) {
          */
 
         let replacement = replacements[ key ];
-        const dollarGuid = "e797765b9844931906444b2435a84a18";
-        replacement = replacement.replace(/\$/g, dollarGuid);
+        const dollarGuid = 'e797765b9844931906444b2435a84a18';
+        replacement = replacement.replace( /\$/g, dollarGuid );
 
         if ( replacement ) {
-            htmlStr = htmlStr.replace( key, replacement ).replace(new RegExp(dollarGuid, "g"), "$$");
+            htmlStr = htmlStr.replace( key, replacement ).replace( new RegExp( dollarGuid, 'g' ), '$$' );
         }
     } );
 
