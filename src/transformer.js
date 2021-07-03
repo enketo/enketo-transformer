@@ -421,9 +421,24 @@ function _renderMarkdown( htmlDoc ) {
     // Now replace the placeholders with the rendered HTML
     // in reverse order so outputs are done last
     Object.keys( replacements ).reverse().forEach( key => {
-        const replacement = replacements[ key ];
+        /**
+         * If the replacement text contains certain special regex char sequences, we could incorrectly nest 
+         * sections of the form inside it causing performance issues and an incorrect HTML form. We thus 
+         * need to replace these chars sequences with something and revert them after replacing.
+         * If we replace these directly, certain combinations could still end up polluting the replace text,
+         * depending on the order of replacements (e.g. $$$$'`'` could not be replaced once without ending 
+         * up with either $' or $`). So, we just replace the $, which should catch all sequences.
+         * 
+         * Info about special sequences:
+         * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace
+         */
+
+        let replacement = replacements[ key ];
+        const dollarGuid = "e797765b9844931906444b2435a84a18";
+        replacement = replacement.replace(/\$/g, dollarGuid);
+
         if ( replacement ) {
-            htmlStr = htmlStr.replace( key, replacement );
+            htmlStr = htmlStr.replace( key, replacement ).replace(new RegExp(dollarGuid, "g"), "$$");
         }
     } );
 
