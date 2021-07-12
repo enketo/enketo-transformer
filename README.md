@@ -80,6 +80,22 @@ curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.
 ### Test
 
 * run tests with `npm test`
+* run tests in watch mode with `npm run test:watch`
+* Tests can be run in watch mode for [TDD](https://en.wikipedia.org/wiki/Test-driven_development) workflows with `npm run test-watch`, and support for debugging in [VSCode](https://code.visualstudio.com/) is provided. For instructions see [./#debugging-test-watch-mode-in-vscode](Debugging test watch mode in VSCode) below
+
+#### Debugging test watch mode in VSCode
+
+Basic usage:
+
+1. Go to VSCode's "Run and Debug" panel
+2. Select "Test (watch + debug)"
+3. Click the play button
+
+Optionally, you can add a keyboard shortcut to select launch tasks:
+
+1. Open the keyboard shortcuts settings (cmd+k cmd+s on Mac, ctrl+k ctrl+s on other OSes)
+2. Search for `workbench.action.debug.selectandstart`
+3. Click the + button to add your preferred keybinding keybinding
 
 ### Develop
 
