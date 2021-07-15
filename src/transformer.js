@@ -31,11 +31,37 @@ const NAMESPACES = {
 const version = _getVersion();
 
 /**
+ * @typedef {import('libxmljs').Document} XMLJSDocument
+ */
+
+/**
+ * @typedef {Function} TransformPreprocess
+ * @this {typeof libxmljs}
+ * @param {XMLJSDocument} doc
+ */
+
+/**
+ * @typedef Survey
+ * @property {string} xform
+ * @property {string} theme
+ * @property {boolean} [markdown]
+ * @property {Record<string, string>} [media]
+ * @property {boolean} [openclinica]
+ */
+
+/**
+ * @typedef TransformedSurvey
+ * @property {string} form
+ * @property {string} model
+ * @property {string} transformerVersion
+ */
+
+/**
  * Performs XSLT transformation on XForm and process the result.
  *
  * @static
- * @param {{xform: string, theme: string}} survey - Survey object with at least an xform property.
- * @return {Promise} promise
+ * @param {Survey} survey - Survey object with at least an xform property.
+ * @return {Promise<TransformedSurvey>} promise
  */
 function transform( survey ) {
     let xformDoc;
@@ -115,6 +141,28 @@ function _transform( xslStr, xmlDoc, xsltParams ) {
     } );
 }
 
+/**
+ * @param {string} src
+ * @return {string}
+ */
+function _escapeSrcAttribute( src ) {
+    const isFullyQualified = ( /^[a-z]+:/i ).test( src );
+    const urlString = isFullyQualified ? src : `file:///${src}`;
+    const url = new URL( urlString );
+
+    if ( isFullyQualified ) {
+        return url.href;
+    }
+
+    const { pathname } = url;
+
+    if ( src.startsWith( '/' ) ) {
+        return pathname;
+    }
+
+    return pathname.replace( /^\//, '' );
+}
+
 function _processBinaryDefaults( doc ) {
     doc.find( '/h:html/h:head/xmlns:model/xmlns:bind[@type="binary"]', NAMESPACES )
         .forEach( bind => {
@@ -125,10 +173,11 @@ function _processBinaryDefaults( doc ) {
                 const dataNode = doc.get( path, NAMESPACES );
                 if ( dataNode ) {
                     const value = dataNode.text();
+                    const escaped = _escapeSrcAttribute( value );
                     // Very crude URL checker which is fine for now,
                     // because at this point we don't expect anything other than jr://
                     if ( /^[a-zA-Z]+:\/\//.test( value ) ) {
-                        dataNode.attr( { 'src': value } );
+                        dataNode.attr( { 'src': escaped } ).text( escaped );
                     }
                 }
             }
@@ -181,7 +230,7 @@ function _correctAction( doc, localName = 'setvalue' ) {
  * Parses and XML string into a libxmljs object.
  *
  * @param  {string} xmlStr - XML string.
- * @return {Promise<Error|object>} libxmljs result document object.
+ * @return {Promise<XMLJSDocument>} libxmljs result document object.
  */
 function _parseXml( xmlStr ) {
     let doc;
@@ -238,11 +287,13 @@ function _replaceMediaSources( xmlDoc, mediaMap ) {
     xmlDoc.find( '//*[@src] | //a[@href]' ).forEach( mediaEl => {
         const attribute = ( mediaEl.name().toLowerCase() === 'a' ) ? 'href' : 'src';
         const src = mediaEl.attr( attribute ).value();
-        const matches = src ? src.match( /jr:\/\/[\w-]+\/(.+)/ ) : null;
+        const matches = src ? src.match( /jr:\/\/[\s\w-]+\/(.+)/ ) : null;
         const filename = matches && matches.length ? matches[ 1 ] : null;
         const replacement = filename ? mediaMap[ filename ] : null;
         if ( replacement ) {
-            mediaEl.attr( attribute, replacement );
+            const escaped = _escapeSrcAttribute( replacement );
+
+            mediaEl.attr( attribute, escaped );
         }
     } );
 
