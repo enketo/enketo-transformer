@@ -31,11 +31,37 @@ const NAMESPACES = {
 const version = _getVersion();
 
 /**
+ * @typedef {import('libxmljs').Document} XMLJSDocument
+ */
+
+/**
+ * @typedef {Function} TransformPreprocess
+ * @this {typeof libxmljs}
+ * @param {XMLJSDocument} doc
+ */
+
+/**
+ * @typedef Survey
+ * @property {string} xform
+ * @property {string} theme
+ * @property {boolean} [markdown]
+ * @property {Record<string, string>} [media]
+ * @property {boolean} [openclinica]
+ */
+
+/**
+ * @typedef TransformedSurvey
+ * @property {string} form
+ * @property {string} model
+ * @property {string} transformerVersion
+ */
+
+/**
  * Performs XSLT transformation on XForm and process the result.
  *
  * @static
- * @param {{xform: string, theme: string}} survey - Survey object with at least an xform property.
- * @return {Promise} promise
+ * @param {Survey} survey - Survey object with at least an xform property.
+ * @return {Promise<TransformedSurvey>} promise
  */
 function transform( survey ) {
     let xformDoc;
@@ -51,7 +77,7 @@ function transform( survey ) {
 
             return doc;
         } )
-        .then( _processBinaryDefaults )
+        .then( doc => _processBinaryDefaults( doc, survey.media ) )
         .then( doc => {
             xformDoc = doc;
 
@@ -115,7 +141,52 @@ function _transform( xslStr, xmlDoc, xsltParams ) {
     } );
 }
 
-function _processBinaryDefaults( doc ) {
+/**
+ * @param {string} value - a fully qualified URL, or a relative path
+ * @return {string}
+ */
+function _escapeURLPath( value ) {
+    const isFullyQualified = ( /^[a-z]+:/i ).test( value );
+    const urlString = isFullyQualified ? value : `file:///${value}`;
+    const url = new URL( urlString );
+
+    if ( isFullyQualified ) {
+        return url.href;
+    }
+
+    const { pathname } = url;
+
+    if ( value.startsWith( '/' ) ) {
+        return pathname;
+    }
+
+    return pathname.replace( /^\//, '' );
+}
+
+/**
+ * @param {Record<string, string>} mediaMap
+ * @param {string} mediaURL
+ */
+ function _getMediaPath( mediaMap, mediaURL ) {
+    const mediaPath = mediaURL.match( /jr:\/\/[\w-]+\/(.+)/ );
+
+    if ( mediaPath != null ) {
+        const value = mediaMap[ mediaPath[1] ];
+
+        if ( value ) {
+            return _escapeURLPath( value );
+        }
+    }
+
+    return _escapeURLPath( mediaURL );
+}
+
+/**
+ * @param {XMLJSDocument} doc - libxmljs object.
+ * @param {Record<string, string>} [mediaMap] - map of media filenames and their URLs
+ * @return {XMLJSDocument} libxmljs object
+ */
+function _processBinaryDefaults( doc, mediaMap ) {
     doc.find( '/h:html/h:head/xmlns:model/xmlns:bind[@type="binary"]', NAMESPACES )
         .forEach( bind => {
             const nodeset = bind.attr( 'nodeset' );
@@ -123,12 +194,17 @@ function _processBinaryDefaults( doc ) {
             if ( nodeset && nodeset.value() ) {
                 const path = `/h:html/h:head/xmlns:model/xmlns:instance${nodeset.value().replace( /\//g, '/xmlns:' )}`;
                 const dataNode = doc.get( path, NAMESPACES );
+
                 if ( dataNode ) {
-                    const value = dataNode.text();
+                    const text = dataNode.text();
+
                     // Very crude URL checker which is fine for now,
                     // because at this point we don't expect anything other than jr://
-                    if ( /^[a-zA-Z]+:\/\//.test( value ) ) {
-                        dataNode.attr( { 'src': value } );
+                    if ( /^[a-zA-Z]+:\/\//.test( text ) ) {
+                        const value = _getMediaPath( mediaMap, text );
+                        const escapedText = _escapeURLPath( text );
+
+                        dataNode.attr( { 'src': value } ).text( escapedText );
                     }
                 }
             }
@@ -181,7 +257,7 @@ function _correctAction( doc, localName = 'setvalue' ) {
  * Parses and XML string into a libxmljs object.
  *
  * @param  {string} xmlStr - XML string.
- * @return {Promise<Error|object>} libxmljs result document object.
+ * @return {Promise<XMLJSDocument>} libxmljs result document object.
  */
 function _parseXml( xmlStr ) {
     let doc;
@@ -225,9 +301,9 @@ function _replaceTheme( doc, theme ) {
 /**
  * Replaces xformManifest urls with URLs according to an internal Enketo Express url format.
  *
- * @param {object} xmlDoc - libxmljs object.
- * @param {object} mediaMap - map of media filenames and their URLs
- * @return {object} libxmljs object
+ * @param {XMLJSDocument} xmlDoc - libxmljs object.
+ * @param {Record<string, string>} [mediaMap] - map of media filenames and their URLs
+ * @return {XMLJSDocument} libxmljs object
  */
 function _replaceMediaSources( xmlDoc, mediaMap ) {
     if ( !mediaMap ) {
@@ -238,9 +314,8 @@ function _replaceMediaSources( xmlDoc, mediaMap ) {
     xmlDoc.find( '//*[@src] | //a[@href]' ).forEach( mediaEl => {
         const attribute = ( mediaEl.name().toLowerCase() === 'a' ) ? 'href' : 'src';
         const src = mediaEl.attr( attribute ).value();
-        const matches = src ? src.match( /jr:\/\/[\w-]+\/(.+)/ ) : null;
-        const filename = matches && matches.length ? matches[ 1 ] : null;
-        const replacement = filename ? mediaMap[ filename ] : null;
+        const replacement = _getMediaPath( mediaMap, src );
+
         if ( replacement ) {
             mediaEl.attr( attribute, replacement );
         }

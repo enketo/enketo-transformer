@@ -324,6 +324,31 @@ describe( 'transformer', () => {
             ] );
         } );
 
+        it( 'escapes spaces in URLs', () => {
+            const xform = fs.readFileSync( './test/forms/jr-url-space.xml', 'utf8' );
+            const media = {
+                'first image.jpg': 'hallo spaceboy/spiders from mars.jpg',
+                'a song.mp3': 'hallo spaceboy/space oddity.mp3',
+                'some video.mp4': 'hallo spaceboy/a small plot of land.mp4',
+                'another image.png': 'hallo spaceboy/under pressure.png',
+            };
+            const result = transformer.transform( {
+                xform,
+                media
+            } );
+
+            return Promise.all( [
+                expect( result ).to.eventually.have.property( 'form' ).and.to.not.contain( 'jr://images/first image.jpg' ),
+                expect( result ).to.eventually.have.property( 'form' ).and.to.not.contain( 'jr://audio/a song.mp3' ),
+                expect( result ).to.eventually.have.property( 'form' ).and.to.not.contain( 'jr://video/some video.mp4' ),
+                expect( result ).to.eventually.have.property( 'model' ).and.to.not.contain( 'jr://images/another image.png' ),
+
+                expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'hallo%20spaceboy/spiders%20from%20mars.jpg' ),
+                expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'hallo%20spaceboy/space%20oddity.mp3' ),
+                expect( result ).to.eventually.have.property( 'form' ).and.to.contain( 'hallo%20spaceboy/a%20small%20plot%20of%20land.mp4' ),
+                expect( result ).to.eventually.have.property( 'model' ).and.to.contain( 'hallo%20spaceboy/under%20pressure.png' ),
+            ] );
+        } );
     } );
 
     describe( 'processes questions with constraints', () => {
