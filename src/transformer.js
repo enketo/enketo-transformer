@@ -77,7 +77,7 @@ function transform( survey ) {
 
             return doc;
         } )
-        .then( _processBinaryDefaults )
+        .then( doc => _processBinaryDefaults( doc, survey.media ) )
         .then( doc => {
             xformDoc = doc;
 
@@ -142,12 +142,12 @@ function _transform( xslStr, xmlDoc, xsltParams ) {
 }
 
 /**
- * @param {string} src
+ * @param {string} value - a fully qualified URL, or a relative path
  * @return {string}
  */
-function _escapeSrcAttribute( src ) {
-    const isFullyQualified = ( /^[a-z]+:/i ).test( src );
-    const urlString = isFullyQualified ? src : `file:///${src}`;
+function _escapeURLPath( value ) {
+    const isFullyQualified = ( /^[a-z]+:/i ).test( value );
+    const urlString = isFullyQualified ? value : `file:///${value}`;
     const url = new URL( urlString );
 
     if ( isFullyQualified ) {
@@ -156,14 +156,37 @@ function _escapeSrcAttribute( src ) {
 
     const { pathname } = url;
 
-    if ( src.startsWith( '/' ) ) {
+    if ( value.startsWith( '/' ) ) {
         return pathname;
     }
 
     return pathname.replace( /^\//, '' );
 }
 
-function _processBinaryDefaults( doc ) {
+/**
+ * @param {Record<string, string>} mediaMap
+ * @param {string} mediaURL
+ */
+ function _getMediaPath( mediaMap, mediaURL ) {
+    const mediaPath = mediaURL.match( /jr:\/\/[\w-]+\/(.+)/ );
+
+    if ( mediaPath != null ) {
+        const value = mediaMap[ mediaPath[1] ];
+
+        if ( value ) {
+            return _escapeURLPath( value );
+        }
+    }
+
+    return _escapeURLPath( mediaURL );
+}
+
+/**
+ * @param {XMLJSDocument} doc - libxmljs object.
+ * @param {Record<string, string>} [mediaMap] - map of media filenames and their URLs
+ * @return {XMLJSDocument} libxmljs object
+ */
+function _processBinaryDefaults( doc, mediaMap ) {
     doc.find( '/h:html/h:head/xmlns:model/xmlns:bind[@type="binary"]', NAMESPACES )
         .forEach( bind => {
             const nodeset = bind.attr( 'nodeset' );
@@ -171,13 +194,17 @@ function _processBinaryDefaults( doc ) {
             if ( nodeset && nodeset.value() ) {
                 const path = `/h:html/h:head/xmlns:model/xmlns:instance${nodeset.value().replace( /\//g, '/xmlns:' )}`;
                 const dataNode = doc.get( path, NAMESPACES );
+
                 if ( dataNode ) {
-                    const value = dataNode.text();
-                    const escaped = _escapeSrcAttribute( value );
+                    const text = dataNode.text();
+
                     // Very crude URL checker which is fine for now,
                     // because at this point we don't expect anything other than jr://
-                    if ( /^[a-zA-Z]+:\/\//.test( value ) ) {
-                        dataNode.attr( { 'src': escaped } ).text( escaped );
+                    if ( /^[a-zA-Z]+:\/\//.test( text ) ) {
+                        const value = _getMediaPath( mediaMap, text );
+                        const escapedText = _escapeURLPath( text );
+
+                        dataNode.attr( { 'src': value } ).text( escapedText );
                     }
                 }
             }
@@ -274,9 +301,9 @@ function _replaceTheme( doc, theme ) {
 /**
  * Replaces xformManifest urls with URLs according to an internal Enketo Express url format.
  *
- * @param {object} xmlDoc - libxmljs object.
- * @param {object} mediaMap - map of media filenames and their URLs
- * @return {object} libxmljs object
+ * @param {XMLJSDocument} xmlDoc - libxmljs object.
+ * @param {Record<string, string>} [mediaMap] - map of media filenames and their URLs
+ * @return {XMLJSDocument} libxmljs object
  */
 function _replaceMediaSources( xmlDoc, mediaMap ) {
     if ( !mediaMap ) {
@@ -287,13 +314,10 @@ function _replaceMediaSources( xmlDoc, mediaMap ) {
     xmlDoc.find( '//*[@src] | //a[@href]' ).forEach( mediaEl => {
         const attribute = ( mediaEl.name().toLowerCase() === 'a' ) ? 'href' : 'src';
         const src = mediaEl.attr( attribute ).value();
-        const matches = src ? src.match( /jr:\/\/[\s\w-]+\/(.+)/ ) : null;
-        const filename = matches && matches.length ? matches[ 1 ] : null;
-        const replacement = filename ? mediaMap[ filename ] : null;
-        if ( replacement ) {
-            const escaped = _escapeSrcAttribute( replacement );
+        const replacement = _getMediaPath( mediaMap, src );
 
-            mediaEl.attr( attribute, escaped );
+        if ( replacement ) {
+            mediaEl.attr( attribute, replacement );
         }
     } );
 

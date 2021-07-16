@@ -12,13 +12,13 @@
             <itext>
                 <translation default="true()" lang="English">
                     <text id="/outside/l1:label">
-                        <value form="image">jr://images/hallo spaceboy/spiders from mars.jpg</value>
+                        <value form="image">jr://images/first image.jpg</value>
                     </text>
                     <text id="/outside/l2:label">
-                        <value form="audio">jr://audio/hallo spaceboy/space oddity.mp3</value>
+                        <value form="audio">jr://audio/a song.mp3</value>
                     </text>
                     <text id="/outside/l3:label">
-                        <value form="video">jr://video/hallo spaceboy/a small plot of land.mp4</value>
+                        <value form="video">jr://video/some video.mp4</value>
                     </text>
                 </translation>
             </itext>
@@ -26,7 +26,7 @@
                 <outside>
                     <a/>
                     <b/>
-                    <c>jr://images/hallo spaceboy/under pressure.png</c>
+                    <c>jr://images/another image.png</c>
                     <l1/>
                     <l2/>
                     <l2/>
