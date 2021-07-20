@@ -90,7 +90,7 @@ function transform( survey ) {
             htmlDoc = _replaceMediaSources( htmlDoc, survey.media );
             htmlDoc = _replaceLanguageTags( htmlDoc, survey );
             if ( survey.markdown !== false ) {
-                survey.form = _renderMarkdown( htmlDoc );
+                survey.form = _renderMarkdown( htmlDoc, survey.media );
             } else {
                 survey.form = _docToString( htmlDoc );
             }
@@ -145,7 +145,7 @@ function _transform( xslStr, xmlDoc, xsltParams ) {
  * @param {string} value - a fully qualified URL, or a relative path
  * @return {string}
  */
-function _escapeURLPath( value ) {
+function escapeURLPath( value ) {
     const isFullyQualified = ( /^[a-z]+:/i ).test( value );
     const urlString = isFullyQualified ? value : `file:///${value}`;
     const url = new URL( urlString );
@@ -174,11 +174,11 @@ function _escapeURLPath( value ) {
         const value = mediaMap[ mediaPath[1] ];
 
         if ( value ) {
-            return _escapeURLPath( value );
+            return escapeURLPath( value );
         }
     }
 
-    return _escapeURLPath( mediaURL );
+    return escapeURLPath( mediaURL );
 }
 
 /**
@@ -202,7 +202,7 @@ function _processBinaryDefaults( doc, mediaMap ) {
                     // because at this point we don't expect anything other than jr://
                     if ( /^[a-zA-Z]+:\/\//.test( text ) ) {
                         const value = _getMediaPath( mediaMap, text );
-                        const escapedText = _escapeURLPath( text );
+                        const escapedText = escapeURLPath( text );
 
                         dataNode.attr( { 'src': value } ).text( escapedText );
                     }
@@ -456,9 +456,10 @@ function _addInstanceIdNodeIfMissing( doc ) {
  * Converts a subset of Markdown in all textnode children of labels and hints into HTML
  *
  * @param  {object} htmlDoc - libxmljs object.
+ * @param {Record<string, string>} [mediaMap] - map of media filenames and their URLs
  * @return {string} html string.
  */
-function _renderMarkdown( htmlDoc ) {
+function _renderMarkdown( htmlDoc, mediaMap ) {
     const replacements = {};
 
     // First turn all outputs into text so *<span class="or-output></span>* can be detected
@@ -482,8 +483,15 @@ function _renderMarkdown( htmlDoc ) {
          * Note that text() will convert &gt; to >
          */
         const original = el.text().replace( '<', '&lt;' ).replace( '>', '&gt;' );
-        const rendered = markdown.toHtml( original );
+        let rendered = markdown.toHtml( original );
+
         if ( original !== rendered ) {
+            if ( mediaMap != null ) {
+                const fragment = libxmljs.parseHtmlFragment( rendered );
+
+                rendered = _replaceMediaSources( fragment, mediaMap ).toString( false );
+            }
+
             key = `$$$${index}`;
             replacements[ key ] = rendered;
             el.text( key );
@@ -543,5 +551,6 @@ module.exports = {
     sheets: {
         xslForm,
         xslModel
-    }
+    },
+    escapeURLPath,
 };

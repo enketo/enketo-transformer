@@ -27,6 +27,7 @@
                     <a/>
                     <b/>
                     <c>jr://images/another image.png</c>
+                    <d/>
                     <l1/>
                     <l2/>
                     <l2/>
@@ -35,9 +36,13 @@
                     </meta>
                 </outside>
             </instance>
+            <instance id="file" src="jr://file/an instance.xml" />
+            <instance id="file-csv" src="jr://file-csv/a spreadsheet.csv" />
             <bind nodeset="/outside/a" type="string"/>
             <bind nodeset="/outside/b" type="string"/>
             <bind nodeset="/outside/c" type="binary"/>
+            <bind nodeset="/outside/d" type="string"/>
+
         </model>
     </h:head>
     <h:body>
@@ -50,5 +55,10 @@
         <upload appearance="annotate" mediatype="image/*" ref="/outside/c">
             <label ref="jr:itext('/outside/l3:label')"/>
         </upload>
+        <input> ref="/d">
+            <label>
+                [markdown](jr://file/a link.xml)
+            </label>
+        </input>
     </h:body>
 </h:html>
