@@ -4,6 +4,7 @@ dist: trusty
 node_js:
   - "14"
   - "16"
+before_install:
+  - npm install -g npm@^6
 after_script:
-  - if [[ `npm -v` != 6.* ]]; then npm i -g npm@^6; fi
   - npm install enketo-transformer
