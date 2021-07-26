@@ -57,6 +57,28 @@ const version = _getVersion();
  */
 
 /**
+ * @param {string} value - a fully qualified URL, or a relative path
+ * @return {string}
+ */
+function escapeURLPath( value ) {
+    const isFullyQualified = ( /^[a-z]+:/i ).test( value );
+    const urlString = isFullyQualified ? value : `file:///${value}`;
+    const url = new URL( urlString );
+
+    if ( isFullyQualified ) {
+        return url.href;
+    }
+
+    const { pathname } = url;
+
+    if ( value.startsWith( '/' ) ) {
+        return pathname;
+    }
+
+    return pathname.replace( /^\//, '' );
+}
+
+/**
  * Performs XSLT transformation on XForm and process the result.
  *
  * @static
@@ -69,6 +91,12 @@ function transform( survey ) {
         'openclinica': 1
     } : {};
 
+    const mediaMap = Object.fromEntries(
+        Object.entries( survey.media || {} ).map( ( entry ) => (
+            entry.map( escapeURLPath )
+        ) )
+    );
+
     return _parseXml( survey.xform )
         .then( doc => {
             if ( typeof survey.preprocess === 'function' ) {
@@ -77,7 +105,7 @@ function transform( survey ) {
 
             return doc;
         } )
-        .then( doc => _processBinaryDefaults( doc, survey.media ) )
+        .then( doc => _processBinaryDefaults( doc, mediaMap ) )
         .then( doc => {
             xformDoc = doc;
 
@@ -87,10 +115,10 @@ function transform( survey ) {
             htmlDoc = _correctAction( htmlDoc, 'setgeopoint' );
             htmlDoc = _correctAction( htmlDoc, 'setvalue' );
             htmlDoc = _replaceTheme( htmlDoc, survey.theme );
-            htmlDoc = _replaceMediaSources( htmlDoc, survey.media );
+            htmlDoc = _replaceMediaSources( htmlDoc, mediaMap );
             htmlDoc = _replaceLanguageTags( htmlDoc, survey );
             if ( survey.markdown !== false ) {
-                survey.form = _renderMarkdown( htmlDoc, survey.media );
+                survey.form = _renderMarkdown( htmlDoc, mediaMap );
             } else {
                 survey.form = _docToString( htmlDoc );
             }
@@ -98,7 +126,7 @@ function transform( survey ) {
             return _transform( xslModel, xformDoc );
         } )
         .then( xmlDoc => {
-            xmlDoc = _replaceMediaSources( xmlDoc, survey.media );
+            xmlDoc = _replaceMediaSources( xmlDoc, mediaMap );
             xmlDoc = _addInstanceIdNodeIfMissing( xmlDoc );
             survey.model = xmlDoc.root().get( '*' ).toString( false );
             survey.transformerVersion = pkg.version;
@@ -142,39 +170,18 @@ function _transform( xslStr, xmlDoc, xsltParams ) {
 }
 
 /**
- * @param {string} value - a fully qualified URL, or a relative path
- * @return {string}
- */
-function escapeURLPath( value ) {
-    const isFullyQualified = ( /^[a-z]+:/i ).test( value );
-    const urlString = isFullyQualified ? value : `file:///${value}`;
-    const url = new URL( urlString );
-
-    if ( isFullyQualified ) {
-        return url.href;
-    }
-
-    const { pathname } = url;
-
-    if ( value.startsWith( '/' ) ) {
-        return pathname;
-    }
-
-    return pathname.replace( /^\//, '' );
-}
-
-/**
  * @param {Record<string, string>} mediaMap
  * @param {string} mediaURL
  */
- function _getMediaPath( mediaMap, mediaURL ) {
+function _getMediaPath( mediaMap, mediaURL ) {
     const mediaPath = mediaURL.match( /jr:\/\/[\w-]+\/(.+)/ );
 
     if ( mediaPath != null ) {
-        const value = mediaMap[ mediaPath[1] ];
+        const path = escapeURLPath( mediaPath[1] );
+        const value = mediaMap[ path ];
 
         if ( value ) {
-            return escapeURLPath( value );
+            return value;
         }
     }
 
