@@ -2,7 +2,7 @@ const chai = require( 'chai' );
 const chaiAsPromised = require( 'chai-as-promised' );
 const expect = chai.expect;
 const fs = require( 'fs' );
-const DOMParser = require( 'xmldom' ).DOMParser;
+const DOMParser = require( '@xmldom/xmldom' ).DOMParser;
 const parser = new DOMParser();
 const transformer = require( '../src/transformer' );
 
