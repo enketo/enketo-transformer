@@ -1,7 +1,10 @@
 language: node_js
 sudo: true
-dist: trusty
+dist: focal
 node_js:
-  - "12"
+  - "14"
+  - "16"
+before_install:
+  - npm install -g npm@^6
 after_script:
   - npm install enketo-transformer
