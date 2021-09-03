@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[1.44.0] - 2021-09-02
+[2.0.0] - 2021-09-02
 ------------------------
 ##### Changed
 - Upgraded node, npm, and other dependencies
