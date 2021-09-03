@@ -116,7 +116,7 @@ DEBUG=api,transformer,markdown,language node app.js
 
 Releases are done each time a dependent tool needs an `enketo-transformer` change. They are published by [@Martijnr](https://github.com/MartijnR) and require the following steps:
   - update [change log](https://github.com/enketo/enketo-transformer/blob/master/CHANGELOG.md)
-  - update version in `package.json`
+  - update version in `package.json`. Bump to major version if downstream has to make changes.
   - check [Dependabot alerts](https://github.com/enketo/enketo-transformer/security/dependabot) for vulnerabilities
   - update dependencies (`npm update` and then check if `node-libxslt` has been updated because it has caused problems in the past).
   - `npm audit fix`
