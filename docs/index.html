@@ -69,6 +69,7 @@
 <p><a href="https://enketo.github.io/enketo-transformer/">Technical Documentation</a></p>
 <h3 id="prerequisites">Prerequisites</h3>
 <ol>
+<li>Volta (optional, but recommended)</li>
 <li>Node.js 16 and npm 6 (Node.js 14 is also supported)</li>
 </ol>
 <h3 id="install-as-module">Install as module</h3>
@@ -154,7 +155,8 @@ http://localhost:8085/transform/htmlform?xform=http://localhost:8081/autocomplet
 <p>Releases are done each time a dependent tool needs an <code>enketo-transformer</code> change. They are published by <a href="https://github.com/MartijnR">@Martijnr</a> and require the following steps:</p>
 <ul>
 <li>update <a href="https://github.com/enketo/enketo-transformer/blob/master/CHANGELOG.md">change log</a></li>
-<li>update version in <code>package.json</code></li>
+<li>update version in <code>package.json</code>. Bump to major version if downstream has to make changes.</li>
+<li>check <a href="https://github.com/enketo/enketo-transformer/security/dependabot">Dependabot alerts</a> for vulnerabilities</li>
 <li>update dependencies (<code>npm update</code> and then check if <code>node-libxslt</code> has been updated because it has caused problems in the past).</li>
 <li><code>npm audit fix</code></li>
 <li><code>npm run build-docs</code></li>
