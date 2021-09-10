@@ -62,7 +62,7 @@ const version = _getVersion();
  */
 function escapeURLPath( value ) {
     const isFullyQualified = ( /^[a-z]+:/i ).test( value );
-    const urlString = isFullyQualified ? value : `file:///${value}`;
+    const urlString = isFullyQualified ? value : `file:///${value.replace( /^\//, '' )}`;
     const url = new URL( urlString );
 
     if ( isFullyQualified ) {
