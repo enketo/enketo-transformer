@@ -10,6 +10,8 @@ const language = require( './language' );
 const markdown = require( './markdown' );
 const fs = require( 'fs' );
 const path = require( 'path' );
+const { escapeURLPath, getMediaPath } = require( './url' );
+
 const xslForm = fs.readFileSync( path.join( __dirname, './xsl/openrosa2html5form.xsl' ), 'utf8' );
 const xslModel = fs.readFileSync( path.join( __dirname, './xsl/openrosa2xmlmodel.xsl' ), 'utf8' );
 /**
@@ -55,28 +57,6 @@ const version = _getVersion();
  * @property {string} model
  * @property {string} transformerVersion
  */
-
-/**
- * @param {string} value - a fully qualified URL, or a relative path
- * @return {string}
- */
-function escapeURLPath( value ) {
-    const isFullyQualified = ( /^[a-z]+:/i ).test( value );
-    const urlString = isFullyQualified ? value : `file:///${value.replace( /^\//, '' )}`;
-    const url = new URL( urlString );
-
-    if ( isFullyQualified ) {
-        return url.href;
-    }
-
-    const { pathname } = url;
-
-    if ( value.startsWith( '/' ) ) {
-        return pathname;
-    }
-
-    return pathname.replace( /^\//, '' );
-}
 
 /**
  * Performs XSLT transformation on XForm and process the result.
@@ -170,25 +150,6 @@ function _transform( xslStr, xmlDoc, xsltParams ) {
 }
 
 /**
- * @param {Record<string, string>} mediaMap
- * @param {string} mediaURL
- */
-function _getMediaPath( mediaMap, mediaURL ) {
-    const mediaPath = mediaURL.match( /jr:\/\/[\w-]+\/(.+)/ );
-
-    if ( mediaPath != null ) {
-        const path = escapeURLPath( mediaPath[1] );
-        const value = mediaMap[ path ];
-
-        if ( value ) {
-            return value;
-        }
-    }
-
-    return escapeURLPath( mediaURL );
-}
-
-/**
  * @param {XMLJSDocument} doc - libxmljs object.
  * @param {Record<string, string>} [mediaMap] - map of media filenames and their URLs
  * @return {XMLJSDocument} libxmljs object
@@ -208,7 +169,7 @@ function _processBinaryDefaults( doc, mediaMap ) {
                     // Very crude URL checker which is fine for now,
                     // because at this point we don't expect anything other than jr://
                     if ( /^[a-zA-Z]+:\/\//.test( text ) ) {
-                        const value = _getMediaPath( mediaMap, text );
+                        const value = getMediaPath( mediaMap, text );
                         const escapedText = escapeURLPath( text );
 
                         dataNode.attr( { 'src': value } ).text( escapedText );
@@ -321,7 +282,7 @@ function _replaceMediaSources( xmlDoc, mediaMap ) {
     xmlDoc.find( '//*[@src] | //a[@href]' ).forEach( mediaEl => {
         const attribute = ( mediaEl.name().toLowerCase() === 'a' ) ? 'href' : 'src';
         const src = mediaEl.attr( attribute ).value();
-        const replacement = _getMediaPath( mediaMap, src );
+        const replacement = getMediaPath( mediaMap, src );
 
         if ( replacement ) {
             mediaEl.attr( attribute, replacement );
