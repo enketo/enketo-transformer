@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>language.js - Enketo Transformer</title>
+    <title>Global - Enketo Transformer</title>
     
     <meta name="description" content="Library/app that transforms ODK-compliant XForms into a format that enketo-core consumes" />
     
@@ -37,126 +37,407 @@
 
 <div id="main">
     
-    <h1 class="page-title">language.js</h1>
+    <h1 class="page-title">Global</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**
- * @module language
- */
+        <h2>
+        
+        </h2>
+        
+    
+</header>
 
-const tags = require( 'language-tags' );
-const stringDirection = require( 'string-direction' );
+<article>
+    
+        <div class="container-overview">
+        
+            
 
-/**
- * @typedef LanguageObj
- * @property {string} desc
- * @property {string} tag
- * @property {string} dir
- * @property {string} src
- */
+<dl class="details">
 
-/**
- * Parses a language string into a language object. Guesses missing properties.
- *
- * @static
- * @see http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
- * @param {string} lang - Language strings as included in the XForm.
- * @param {string} sample - A text sample.
- * @return {LanguageObj} language object.
- */
-function parse( lang, sample ) {
-    // TODO: this should be refactored
-    let ianaLang;
-    const language = {
-        desc: lang.trim(),
-        tag: lang.trim(),
-        src: lang
-    };
-    const parts = lang.match( /^([^(]+)\((.*)\)\s*$/ );
+    
 
-    if ( parts &amp;&amp; parts.length > 2 ) {
-        language.desc = parts[ 1 ].trim();
-        language.tag = parts[ 2 ].trim();
-        ianaLang = _getLangWithTag( language.tag );
-    } else {
-        // First check whether lang is a known IANA subtag like 'en' or 'en-GB'
-        ianaLang = _getLangWithTag( lang.split( '-' )[ 0 ] );
-        if ( ianaLang ) {
-            language.desc = ianaLang.descriptions()[ 0 ];
-        } else {
-            // Check whether IANA language can be found with description
-            ianaLang = _getLangWithDesc( language.desc );
-            if ( ianaLang ) {
-                language.tag = ianaLang.data.subtag;
-            }
-        }
-    }
+    
 
-    language.dir = _getDirectionality( sample );
+    
 
-    return language;
-}
+    
 
-/**
- * Performs IANA search to find language object with provided description.
- *
- * @param {string} desc - Language description.
- * @return {LanguageObj} the first language object result that was found.
- */
-function _getLangWithDesc( desc ) {
-    const results = ( desc ) ? tags.search( desc ).filter( _languagesOnly ) : [];
+    
 
-    return results[ 0 ] || '';
-}
+    
 
-/**
- * Performs IANA search to find language object with provided subtag.
- *
- * @param  {string} tag - Subtag.
- * @return {LanguageObj} the first language object result that was found.
- */
-function _getLangWithTag( tag ) {
-    return ( tag ) ? tags.subtags( tag ).filter( _languagesOnly )[ 0 ] : '';
-}
+    
 
-/**
- * Filters objects with type "language" from a list of objects.
- *
- * @param  {LanguageObj} obj - Language object returned by 'language-tags' library.
- * @return {boolean} whether filter evaluated to true.
- */
-function _languagesOnly( obj ) {
-    return obj.data &amp;&amp; obj.data.type === 'language';
-}
+    
 
-/**
- * Obtains the directionality of a text sample.
- *
- * @param {string} sample - A text sample.
- * @return {string} either 'rtl' or the default 'ltr'.
- */
-function _getDirectionality( sample ) {
-    const direction = stringDirection.getDirection( sample );
-    if ( direction !== 'ltr' ) {
-        return 'rtl';
-    }
+    
 
-    return direction;
-}
+    
 
-module.exports = {
-    parse
-};
-</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+            
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="escapeURLPath"><span class="type-signature"></span>escapeURLPath<span class="signature">(value)</span><span class="type-signature"> &rarr; {string}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="url.js.html">url.js</a>, <a href="url.js.html#line5">line 5</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>a fully qualified URL, or a relative path</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getMediaPath"><span class="type-signature"></span>getMediaPath<span class="signature">(mediaMap, mediaURL)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="url.js.html">url.js</a>, <a href="url.js.html#line27">line 27</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>mediaMap</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Record.&lt;string, string></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>mediaURL</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
