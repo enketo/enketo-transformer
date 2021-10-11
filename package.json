@@ -1,6 +1,6 @@
 {
     "name": "enketo-transformer",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "description": "Library/app that transforms ODK-compliant XForms into a format that Enketo can consume",
     "license": "Apache-2.0",
     "main": "src/transformer.js",
@@ -48,6 +48,7 @@
         "string-direction": "0.1.x"
     },
     "devDependencies": {
+        "@xmldom/xmldom": "^0.7.4",
         "chai": "^4.3.4",
         "chai-as-promised": "^7.1.1",
         "docdash": "^1.2.0",
@@ -57,11 +58,11 @@
         "http-server": "^13.0.1",
         "istanbul-reporter-shield-badge": "^1.2.1",
         "jsdoc": "^3.6.7",
-        "mocha": "^9.1.1",
+        "jsdoc-plugin-typescript": "^2.0.6",
+        "mocha": "^9.1.2",
         "nodemon": "^2.0.12",
         "nyc": "^15.1.0",
-        "rimraf": "^3.0.2",
-        "@xmldom/xmldom": "^0.7.4"
+        "rimraf": "^3.0.2"
     },
     "volta": {
         "node": "16.5.0",

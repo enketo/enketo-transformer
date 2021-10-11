@@ -16,7 +16,13 @@ module.exports = {
         readme: 'README.md',
         template: 'node_modules/docdash'
     },
-    plugins: [ 'plugins/markdown' ],
+    plugins: [
+        'plugins/markdown',
+        'jsdoc-plugin-typescript'
+    ],
+    typescript: {
+        'moduleRoot': 'src'
+    },
     source: {
         include: [
             'src/',
