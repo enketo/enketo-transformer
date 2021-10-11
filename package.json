@@ -58,6 +58,7 @@
         "http-server": "^13.0.1",
         "istanbul-reporter-shield-badge": "^1.2.1",
         "jsdoc": "^3.6.7",
+        "jsdoc-plugin-typescript": "^2.0.6",
         "mocha": "^9.1.2",
         "nodemon": "^2.0.12",
         "nyc": "^15.1.0",
