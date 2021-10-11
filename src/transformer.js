@@ -10,6 +10,8 @@ const language = require( './language' );
 const markdown = require( './markdown' );
 const fs = require( 'fs' );
 const path = require( 'path' );
+const { escapeURLPath, getMediaPath } = require( './url' );
+
 const xslForm = fs.readFileSync( path.join( __dirname, './xsl/openrosa2html5form.xsl' ), 'utf8' );
 const xslModel = fs.readFileSync( path.join( __dirname, './xsl/openrosa2xmlmodel.xsl' ), 'utf8' );
 /**
@@ -31,17 +33,49 @@ const NAMESPACES = {
 const version = _getVersion();
 
 /**
+ * @typedef {import('libxmljs').Document} XMLJSDocument
+ */
+
+/**
+ * @typedef {Function} TransformPreprocess
+ * @this {typeof libxmljs}
+ * @param {XMLJSDocument} doc
+ */
+
+/**
+ * @typedef Survey
+ * @property {string} xform
+ * @property {string} theme
+ * @property {boolean} [markdown]
+ * @property {Record<string, string>} [media]
+ * @property {boolean} [openclinica]
+ */
+
+/**
+ * @typedef TransformedSurvey
+ * @property {string} form
+ * @property {string} model
+ * @property {string} transformerVersion
+ */
+
+/**
  * Performs XSLT transformation on XForm and process the result.
  *
  * @static
- * @param {{xform: string, theme: string}} survey - Survey object with at least an xform property.
- * @return {Promise} promise
+ * @param {Survey} survey - Survey object with at least an xform property.
+ * @return {Promise<TransformedSurvey>} promise
  */
 function transform( survey ) {
     let xformDoc;
     const xsltParams = survey.openclinica ? {
         'openclinica': 1
     } : {};
+
+    const mediaMap = Object.fromEntries(
+        Object.entries( survey.media || {} ).map( ( entry ) => (
+            entry.map( escapeURLPath )
+        ) )
+    );
 
     return _parseXml( survey.xform )
         .then( doc => {
@@ -51,7 +85,7 @@ function transform( survey ) {
 
             return doc;
         } )
-        .then( _processBinaryDefaults )
+        .then( doc => _processBinaryDefaults( doc, mediaMap ) )
         .then( doc => {
             xformDoc = doc;
 
@@ -61,10 +95,10 @@ function transform( survey ) {
             htmlDoc = _correctAction( htmlDoc, 'setgeopoint' );
             htmlDoc = _correctAction( htmlDoc, 'setvalue' );
             htmlDoc = _replaceTheme( htmlDoc, survey.theme );
-            htmlDoc = _replaceMediaSources( htmlDoc, survey.media );
+            htmlDoc = _replaceMediaSources( htmlDoc, mediaMap );
             htmlDoc = _replaceLanguageTags( htmlDoc, survey );
             if ( survey.markdown !== false ) {
-                survey.form = _renderMarkdown( htmlDoc );
+                survey.form = _renderMarkdown( htmlDoc, mediaMap );
             } else {
                 survey.form = _docToString( htmlDoc );
             }
@@ -72,7 +106,7 @@ function transform( survey ) {
             return _transform( xslModel, xformDoc );
         } )
         .then( xmlDoc => {
-            xmlDoc = _replaceMediaSources( xmlDoc, survey.media );
+            xmlDoc = _replaceMediaSources( xmlDoc, mediaMap );
             xmlDoc = _addInstanceIdNodeIfMissing( xmlDoc );
             survey.model = xmlDoc.root().get( '*' ).toString( false );
             survey.transformerVersion = pkg.version;
@@ -115,7 +149,12 @@ function _transform( xslStr, xmlDoc, xsltParams ) {
     } );
 }
 
-function _processBinaryDefaults( doc ) {
+/**
+ * @param {XMLJSDocument} doc - libxmljs object.
+ * @param {Record<string, string>} [mediaMap] - map of media filenames and their URLs
+ * @return {XMLJSDocument} libxmljs object
+ */
+function _processBinaryDefaults( doc, mediaMap ) {
     doc.find( '/h:html/h:head/xmlns:model/xmlns:bind[@type="binary"]', NAMESPACES )
         .forEach( bind => {
             const nodeset = bind.attr( 'nodeset' );
@@ -123,12 +162,17 @@ function _processBinaryDefaults( doc ) {
             if ( nodeset && nodeset.value() ) {
                 const path = `/h:html/h:head/xmlns:model/xmlns:instance${nodeset.value().replace( /\//g, '/xmlns:' )}`;
                 const dataNode = doc.get( path, NAMESPACES );
+
                 if ( dataNode ) {
-                    const value = dataNode.text();
+                    const text = dataNode.text();
+
                     // Very crude URL checker which is fine for now,
                     // because at this point we don't expect anything other than jr://
-                    if ( /^[a-zA-Z]+:\/\//.test( value ) ) {
-                        dataNode.attr( { 'src': value } );
+                    if ( /^[a-zA-Z]+:\/\//.test( text ) ) {
+                        const value = getMediaPath( mediaMap, text );
+                        const escapedText = escapeURLPath( text );
+
+                        dataNode.attr( { 'src': value } ).text( escapedText );
                     }
                 }
             }
@@ -181,7 +225,7 @@ function _correctAction( doc, localName = 'setvalue' ) {
  * Parses and XML string into a libxmljs object.
  *
  * @param  {string} xmlStr - XML string.
- * @return {Promise<Error|object>} libxmljs result document object.
+ * @return {Promise<XMLJSDocument>} libxmljs result document object.
  */
 function _parseXml( xmlStr ) {
     let doc;
@@ -225,9 +269,9 @@ function _replaceTheme( doc, theme ) {
 /**
  * Replaces xformManifest urls with URLs according to an internal Enketo Express url format.
  *
- * @param {object} xmlDoc - libxmljs object.
- * @param {object} mediaMap - map of media filenames and their URLs
- * @return {object} libxmljs object
+ * @param {XMLJSDocument} xmlDoc - libxmljs object.
+ * @param {Record<string, string>} [mediaMap] - map of media filenames and their URLs
+ * @return {XMLJSDocument} libxmljs object
  */
 function _replaceMediaSources( xmlDoc, mediaMap ) {
     if ( !mediaMap ) {
@@ -238,9 +282,8 @@ function _replaceMediaSources( xmlDoc, mediaMap ) {
     xmlDoc.find( '//*[@src] | //a[@href]' ).forEach( mediaEl => {
         const attribute = ( mediaEl.name().toLowerCase() === 'a' ) ? 'href' : 'src';
         const src = mediaEl.attr( attribute ).value();
-        const matches = src ? src.match( /jr:\/\/[\w-]+\/(.+)/ ) : null;
-        const filename = matches && matches.length ? matches[ 1 ] : null;
-        const replacement = filename ? mediaMap[ filename ] : null;
+        const replacement = getMediaPath( mediaMap, src );
+
         if ( replacement ) {
             mediaEl.attr( attribute, replacement );
         }
@@ -381,9 +424,10 @@ function _addInstanceIdNodeIfMissing( doc ) {
  * Converts a subset of Markdown in all textnode children of labels and hints into HTML
  *
  * @param  {object} htmlDoc - libxmljs object.
+ * @param {Record<string, string>} [mediaMap] - map of media filenames and their URLs
  * @return {string} html string.
  */
-function _renderMarkdown( htmlDoc ) {
+function _renderMarkdown( htmlDoc, mediaMap ) {
     const replacements = {};
 
     // First turn all outputs into text so *<span class="or-output></span>* can be detected
@@ -407,8 +451,15 @@ function _renderMarkdown( htmlDoc ) {
          * Note that text() will convert &gt; to >
          */
         const original = el.text().replace( '<', '&lt;' ).replace( '>', '&gt;' );
-        const rendered = markdown.toHtml( original );
+        let rendered = markdown.toHtml( original );
+
         if ( original !== rendered ) {
+            if ( mediaMap != null ) {
+                const fragment = libxmljs.parseHtmlFragment( rendered );
+
+                rendered = _replaceMediaSources( fragment, mediaMap ).toString( false );
+            }
+
             key = `$$$${index}`;
             replacements[ key ] = rendered;
             el.text( key );
@@ -468,5 +519,6 @@ module.exports = {
     sheets: {
         xslForm,
         xslModel
-    }
+    },
+    escapeURLPath,
 };
