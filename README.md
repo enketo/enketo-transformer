@@ -1,4 +1,4 @@
-![coverage-shield-badge-1](https://img.shields.io/badge/coverage-98.1%25-brightgreen.svg)
+![coverage-shield-badge-1](https://img.shields.io/badge/coverage-97.86%25-brightgreen.svg)
 [![npm version](https://badge.fury.io/js/enketo-transformer.svg)](http://badge.fury.io/js/enketo-transformer) [![Build Status](https://travis-ci.org/enketo/enketo-transformer.svg?branch=master)](https://travis-ci.org/enketo/enketo-transformer) [![Dependency Status](https://david-dm.org/enketo/enketo-transformer.svg)](https://david-dm.org/enketo/enketo-transformer)
 
 Enketo Transformer
@@ -114,15 +114,24 @@ DEBUG=api,transformer,markdown,language node app.js
 
 ### Release
 
-Releases are done each time a dependent tool needs an `enketo-transformer` change. They are published by [@Martijnr](https://github.com/MartijnR) and require the following steps:
-  - update [change log](https://github.com/enketo/enketo-transformer/blob/master/CHANGELOG.md)
-  - update version in `package.json`. Bump to major version if downstream has to make changes.
-  - check [Dependabot alerts](https://github.com/enketo/enketo-transformer/security/dependabot) for vulnerabilities
-  - update dependencies (`npm update` and then check if `node-libxslt` has been updated because it has caused problems in the past).
-  - `npm audit fix`
-  - `npm run build-docs`
-  - tag the release with the version
-  - publish with `npm publish`
+Releases are done each time a dependent tool needs an `enketo-transformer` change. 
+
+1. Create release PR
+1. Check [Dependabot](https://github.com/enketo/enketo-transformer/security/dependabot) for alerts
+1. Run `npm update`
+    -  Check if `node-libxslt` has been updated because it has caused problems in the past
+1. Run `npm audit`
+    - Run `npm audit fix --production` to apply most important fixes
+1. Run `npm ci`
+1. Run `npm test`
+1. Run `npm run build-docs`
+1. Update `CHANGELOG.md`
+1. Update version in `package.json`
+    - Bump to major version if downstream has to make changes.
+1. Merge PR with all changes
+1. Create GitHub release
+1. Tag and publish the release
+    - GitHub Action will publish it to npm
 
 ### License
 

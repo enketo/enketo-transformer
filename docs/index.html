@@ -62,7 +62,7 @@
 
 
     <section class="readme usertext">
-        <article><p><img src="https://img.shields.io/badge/coverage-98.1%25-brightgreen.svg" alt="coverage-shield-badge-1">
+        <article><p><img src="https://img.shields.io/badge/coverage-97.86%25-brightgreen.svg" alt="coverage-shield-badge-1">
 <a href="http://badge.fury.io/js/enketo-transformer"><img src="https://badge.fury.io/js/enketo-transformer.svg" alt="npm version"></a> <a href="https://travis-ci.org/enketo/enketo-transformer"><img src="https://travis-ci.org/enketo/enketo-transformer.svg?branch=master" alt="Build Status"></a> <a href="https://david-dm.org/enketo/enketo-transformer"><img src="https://david-dm.org/enketo/enketo-transformer.svg" alt="Dependency Status"></a></p>
 <h1 id="enketo-transformer">Enketo Transformer</h1>
 <p>NodeJS library that transforms OpenRosa/ODK XForms into a format the Enketo understands. It works both as a library module, as well as a standalone app.</p>
@@ -152,17 +152,35 @@ http://localhost:8085/transform/htmlform?xform=http://localhost:8081/autocomplet
 <pre class="prettyprint source lang-bash"><code>DEBUG=api,transformer,markdown,language node app.js
 </code></pre>
 <h3 id="release">Release</h3>
-<p>Releases are done each time a dependent tool needs an <code>enketo-transformer</code> change. They are published by <a href="https://github.com/MartijnR">@Martijnr</a> and require the following steps:</p>
+<p>Releases are done each time a dependent tool needs an <code>enketo-transformer</code> change.</p>
+<ol>
+<li>Create release PR</li>
+<li>Check <a href="https://github.com/enketo/enketo-transformer/security/dependabot">Dependabot</a> for alerts</li>
+<li>Run <code>npm update</code>
 <ul>
-<li>update <a href="https://github.com/enketo/enketo-transformer/blob/master/CHANGELOG.md">change log</a></li>
-<li>update version in <code>package.json</code>. Bump to major version if downstream has to make changes.</li>
-<li>check <a href="https://github.com/enketo/enketo-transformer/security/dependabot">Dependabot alerts</a> for vulnerabilities</li>
-<li>update dependencies (<code>npm update</code> and then check if <code>node-libxslt</code> has been updated because it has caused problems in the past).</li>
-<li><code>npm audit fix</code></li>
-<li><code>npm run build-docs</code></li>
-<li>tag the release with the version</li>
-<li>publish with <code>npm publish</code></li>
+<li>Check if <code>node-libxslt</code> has been updated because it has caused problems in the past</li>
 </ul>
+</li>
+<li>Run <code>npm audit</code>
+<ul>
+<li>Run <code>npm audit fix --production</code> to apply most important fixes</li>
+</ul>
+</li>
+<li>Run <code>npm run build-docs</code></li>
+<li>Update <code>CHANGELOG.md</code></li>
+<li>Update version in <code>package.json</code>
+<ul>
+<li>Bump to major version if downstream has to make changes.</li>
+</ul>
+</li>
+<li>Merge PR with all changes</li>
+<li>Create GitHub release</li>
+<li>Tag and publish the release
+<ul>
+<li>GitHub Action will publish it to npm</li>
+</ul>
+</li>
+</ol>
 <h3 id="license">License</h3>
 <p>See <a href="./LICENSE">license document</a>.</p>
 <p>In addition, any product that uses enketo-transformer or parts thereof is required to have a &quot;Powered by Enketo&quot; footer, according to the specifications below, on all screens in which the output of enketo-xslt, or parts thereof, are used, unless explicity exempted from this requirement by Enketo LLC in writing. Partners and sponsors of the Enketo Project, listed on <a href="https://enketo.org/#about">https://enketo.org/#about</a> and on <a href="https://github.com/enketo/enketo-core#sponsors">https://github.com/enketo/enketo-core#sponsors</a> are exempted from this requirements and so are contributors listed in <a href="./package.json">package.json</a>.</p>
