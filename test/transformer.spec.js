@@ -459,6 +459,31 @@ describe( 'transformer', () => {
                     } );
                 } );
             } );
+
+            it( 'preserves query parameters', async () => {
+                const media = {
+                    'first image.jpg': '/hallo spaceboy/spiders from mars.jpg?a=b',
+                    'a song.mp3': 'hallo spaceboy/space oddity.mp3?c=d%20e',
+                    'some video.mp4': '/hallo spaceboy/a small plot of land.mp4?f%20g=h',
+                    'another image.png': 'hallo spaceboy/under pressure.png?i=j&k=l',
+                    'an instance.xml': '/hallo spaceboy/golden years.xml?m',
+                    'a spreadsheet.csv': 'hallo spaceboy/little wonder.csv?n&o',
+                    'a link.xml': '/hallo spaceboy/wishful beginnings.xml?p=q&r',
+                };
+
+                const result = await transformer.transform( {
+                    xform,
+                    media,
+                } );
+
+                expect( result.form ).to.contain( '/hallo%20spaceboy/spiders%20from%20mars.jpg?a=b' );
+                expect( result.form ).to.contain( 'hallo%20spaceboy/space%20oddity.mp3?c=d%20e' );
+                expect( result.form ).to.contain( '/hallo%20spaceboy/a%20small%20plot%20of%20land.mp4?f%20g=h' );
+                expect( result.model ).to.contain( 'hallo%20spaceboy/under%20pressure.png?i=j&amp;k=l' );
+                expect( result.model ).to.contain( '/hallo%20spaceboy/golden%20years.xml?m' );
+                expect( result.model ).to.contain( 'hallo%20spaceboy/little%20wonder.csv?n&amp;o' );
+                expect( result.form ).to.contain( '/hallo%20spaceboy/wishful%20beginnings.xml?p=q&amp;r' );
+            } );
         } );
     } );
 

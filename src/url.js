@@ -2,7 +2,7 @@
  * @param {string} value - a fully qualified URL, or a relative path
  * @return {string}
  */
- function escapeURLPath( value ) {
+function escapeURLPath( value ) {
     const isFullyQualified = ( /^[a-z]+:/i ).test( value );
     const urlString = isFullyQualified ? value : `file:///${value.replace( /^\//, '' )}`;
     const url = new URL( urlString );
@@ -11,20 +11,17 @@
         return url.href;
     }
 
-    const { pathname } = url;
+    const { pathname, search } = url;
+    const path = value.startsWith( '/' ) ? pathname : pathname.replace( /^\//, '' );
 
-    if ( value.startsWith( '/' ) ) {
-        return pathname;
-    }
-
-    return pathname.replace( /^\//, '' );
+    return `${path}${search}`;
 }
 
 /**
  * @param {Record<string, string>} mediaMap
  * @param {string} mediaURL
  */
- function getMediaPath( mediaMap, mediaURL ) {
+function getMediaPath( mediaMap, mediaURL ) {
     const mediaPath = mediaURL.match( /jr:\/\/[\w-]+\/(.+)/ );
 
     if ( mediaPath == null ) {
