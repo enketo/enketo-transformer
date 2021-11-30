@@ -414,6 +414,21 @@ describe( 'transformer', () => {
 
     } );
 
+    describe( 'processes readonly questions', () => {
+
+        it( 'and outputs a disabled attribute for readonly select-minimal questions with itemsets', () => {
+            const xform = fs.readFileSync( './test/forms/select-dynamic-readonly.xml', 'utf8' );
+            const transform = transformer.transform( { xform } ).then( parseHtmlForm );
+
+            return transform.then( doc => {
+                return Promise.all( [
+                    expect(  doc.getElementsByTagName( 'option' )[0].getAttribute( 'disabled' ) ).to.equal( 'disabled' ),
+                ] );
+            } );
+        } );
+
+    } );
+
     describe( 'processes multiline questions', () => {
 
         it( 'and outputs a textarea for appearance="multiline" on text input', () => {
