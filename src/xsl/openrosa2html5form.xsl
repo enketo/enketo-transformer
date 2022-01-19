@@ -652,8 +652,9 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
     <xsl:template match="xf:itemset" mode="templates">
         <xsl:param name="nodeset" />
         <xsl:param name="binding"/>
+        <xsl:param name="type"/>
         <xsl:choose>
-            <xsl:when test="$binding">
+            <xsl:when test="not($type = 'option')">
                 <label class="itemset-template">
                     <xsl:attribute name="data-items-path">
                         <xsl:value-of select="@nodeset"/>
@@ -680,6 +681,9 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                     <xsl:attribute name="data-items-path">
                         <xsl:value-of select="@nodeset"/>
                     </xsl:attribute>
+                    <xsl:if test="$binding/@readonly = 'true()'">
+                       <xsl:attribute name="disabled"/>
+                    </xsl:if>
                     <xsl:value-of select="'...'"/>
                 </option>
             </xsl:otherwise>
@@ -878,8 +882,10 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                         </xsl:for-each>
                     </xsl:when>
                     <xsl:otherwise>
-                        <!--<xsl:attribute name="data-itemset"/>-->
-                        <xsl:apply-templates select="xf:itemset" mode="templates"/>
+                        <xsl:apply-templates select="xf:itemset" mode="templates">
+                            <xsl:with-param name="binding" select="$binding"/>
+                            <xsl:with-param name="type" select="'option'"/>
+                        </xsl:apply-templates>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:element>
