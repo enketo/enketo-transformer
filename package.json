@@ -40,7 +40,7 @@
         "Transformer"
     ],
     "dependencies": {
-        "body-parser": "1.19.x",
+        "body-parser": "^1.19.1",
         "express": "^5.0.0-alpha.8",
         "language-tags": "1.0.5",
         "libxslt": "0.10.0",
@@ -49,18 +49,18 @@
     },
     "devDependencies": {
         "@xmldom/xmldom": "^0.7.4",
-        "chai": "^4.3.4",
+        "chai": "^4.3.6",
         "chai-as-promised": "^7.1.1",
         "docdash": "^1.2.0",
         "eslint": "^7.32.0",
         "eslint-plugin-jsdoc": "^36.0.8",
         "grunt": "^1.4.1",
-        "http-server": "^13.0.1",
+        "http-server": "^13.1.0",
         "istanbul-reporter-shield-badge": "^1.2.1",
-        "jsdoc": "^3.6.7",
+        "jsdoc": "^3.6.10",
         "jsdoc-plugin-typescript": "^2.0.6",
-        "mocha": "^9.1.2",
-        "nodemon": "^2.0.12",
+        "mocha": "^9.2.0",
+        "nodemon": "^2.0.15",
         "nyc": "^15.1.0",
         "rimraf": "^3.0.2"
     },
