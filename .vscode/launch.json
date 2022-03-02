@@ -3,14 +3,9 @@
         {
             "name": "Test (watch + debug)",
             "request": "launch",
-            "runtimeArgs": [
-                "run-script",
-                "test:watch"
-            ],
+            "runtimeArgs": ["run-script", "test:watch"],
             "runtimeExecutable": "npm",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
+            "skipFiles": ["<node_internals>/**"],
             "type": "pwa-node",
             "sourceMaps": true,
             "console": "integratedTerminal"
