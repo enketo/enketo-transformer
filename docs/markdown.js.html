@@ -66,51 +66,63 @@
  * @param {string} text - Text content of a textnode.
  * @return {string} transformed text content of a textnode.
  */
-function markdownToHtml( text ) {
+function markdownToHtml(text) {
     // note: in JS $ matches end of line as well as end of string, and ^ both beginning of line and string
     const html = text
         // html encoding of &lt; because libXMLJs Element.text() converts html entities
-        .replace( /&lt;/gm, '&amp;lt;' )
+        .replace(/&lt;/gm, '&amp;lt;')
         // html encoding of &lt; because libXMLJs Element.text() converts html entities
-        .replace( />/gm, '&amp;gt;' )
+        .replace(/>/gm, '&amp;gt;')
         // span
-        .replace( /&amp;lt;\s?span([^/\n]*)&amp;gt;((?:(?!&amp;lt;\/).)+)&amp;lt;\/\s?span\s?&amp;gt;/gm, _createSpan )
+        .replace(
+            /&amp;lt;\s?span([^/\n]*)&amp;gt;((?:(?!&amp;lt;\/).)+)&amp;lt;\/\s?span\s?&amp;gt;/gm,
+            _createSpan
+        )
         // sup
-        .replace( /&amp;lt;\s?sup([^/\n]*)&amp;gt;((?:(?!&amp;lt;\/).)+)&amp;lt;\/\s?sup\s?&amp;gt;/gm, _createSup )
+        .replace(
+            /&amp;lt;\s?sup([^/\n]*)&amp;gt;((?:(?!&amp;lt;\/).)+)&amp;lt;\/\s?sup\s?&amp;gt;/gm,
+            _createSup
+        )
         // sub
-        .replace( /&amp;lt;\s?sub([^/\n]*)&amp;gt;((?:(?!&amp;lt;\/).)+)&amp;lt;\/\s?sub\s?&amp;gt;/gm, _createSub )
+        .replace(
+            /&amp;lt;\s?sub([^/\n]*)&amp;gt;((?:(?!&amp;lt;\/).)+)&amp;lt;\/\s?sub\s?&amp;gt;/gm,
+            _createSub
+        )
         // "\" will be used as escape character for *, _
-        .replace( /&amp;/gm, '&amp;amp;' )
-        .replace( /\\\\/gm, '&amp;92;' )
-        .replace( /\\\*/gm, '&amp;42;' )
-        .replace( /\\_/gm, '&amp;95;' )
-        .replace( /\\#/gm, '&amp;35;' )
+        .replace(/&amp;/gm, '&amp;amp;')
+        .replace(/\\\\/gm, '&amp;92;')
+        .replace(/\\\*/gm, '&amp;42;')
+        .replace(/\\_/gm, '&amp;95;')
+        .replace(/\\#/gm, '&amp;35;')
         // strong
-        .replace( /__(.*?)__/gm, '&lt;strong>$1&lt;/strong>' )
-        .replace( /\*\*(.*?)\*\*/gm, '&lt;strong>$1&lt;/strong>' )
+        .replace(/__(.*?)__/gm, '&lt;strong>$1&lt;/strong>')
+        .replace(/\*\*(.*?)\*\*/gm, '&lt;strong>$1&lt;/strong>')
         // emphasis
-        .replace( /_([^\s][^_\n]*)_/gm, '&lt;em>$1&lt;/em>' )
-        .replace( /\*([^\s][^*\n]*)\*/gm, '&lt;em>$1&lt;/em>' )
+        .replace(/_([^\s][^_\n]*)_/gm, '&lt;em>$1&lt;/em>')
+        .replace(/\*([^\s][^*\n]*)\*/gm, '&lt;em>$1&lt;/em>')
         // links
-        .replace( /\[([^\]]*)\]\(([^)]+)\)/gm, '&lt;a href="$2" rel="noopener" target="_blank">$1&lt;/a>' )
+        .replace(
+            /\[([^\]]*)\]\(([^)]+)\)/gm,
+            '&lt;a href="$2" rel="noopener" target="_blank">$1&lt;/a>'
+        )
         // headers
-        .replace( /^\s*(#{1,6})\s?([^#][^\n]*)(\n|$)/gm, _createHeader )
+        .replace(/^\s*(#{1,6})\s?([^#][^\n]*)(\n|$)/gm, _createHeader)
         // unordered lists
-        .replace( /^((\*|\+|-) (.*)(\n|$))+/gm, _createUnorderedList )
+        .replace(/^((\*|\+|-) (.*)(\n|$))+/gm, _createUnorderedList)
         // ordered lists, which have to be preceded by a newline since numbered labels are common
-        .replace( /(\n([0-9]+\.) (.*))+$/gm, _createOrderedList )
+        .replace(/(\n([0-9]+\.) (.*))+$/gm, _createOrderedList)
         // newline characters followed by &lt;ul> tag
-        .replace( /\n(&lt;ul>)/gm, '$1' )
+        .replace(/\n(&lt;ul>)/gm, '$1')
         // reverting escape of special characters
-        .replace( /&amp;35;/gm, '#' )
-        .replace( /&amp;95;/gm, '_' )
-        .replace( /&amp;92;/gm, '\\' )
-        .replace( /&amp;42;/gm, '*' )
-        .replace( /&amp;amp;/gm, '&amp;' )
+        .replace(/&amp;35;/gm, '#')
+        .replace(/&amp;95;/gm, '_')
+        .replace(/&amp;92;/gm, '\\')
+        .replace(/&amp;42;/gm, '*')
+        .replace(/&amp;amp;/gm, '&amp;')
         // paragraphs
-        .replace( /([^\n]+)\n{2,}/gm, _createParagraph )
+        .replace(/([^\n]+)\n{2,}/gm, _createParagraph)
         // any remaining newline characters
-        .replace( /([^\n]+)\n/gm, '$1&lt;br>' );
+        .replace(/([^\n]+)\n/gm, '$1&lt;br>');
 
     return html;
 }
@@ -121,18 +133,18 @@ function markdownToHtml( text ) {
  * @param {string} content - Header text.
  * @return {string} HTML string.
  */
-function _createHeader( match, hashtags, content ) {
+function _createHeader(match, hashtags, content) {
     const level = hashtags.length;
 
-    return `&lt;h${level}>${content.replace( /#+$/, '' )}&lt;/h${level}>`;
+    return `&lt;h${level}>${content.replace(/#+$/, '')}&lt;/h${level}>`;
 }
 
 /**
  * @param {string} match - The matched substring.
  * @return {string} HTML string.
  */
-function _createUnorderedList( match ) {
-    const items = match.replace( /(\*|\+|-)(.*)\n?/gm, _createItem );
+function _createUnorderedList(match) {
+    const items = match.replace(/(\*|\+|-)(.*)\n?/gm, _createItem);
 
     return `&lt;ul>${items}&lt;/ul>`;
 }
@@ -141,10 +153,13 @@ function _createUnorderedList( match ) {
  * @param {string} match - The matched substring.
  * @return {string} HTML string.
  */
-function _createOrderedList( match ) {
-    const startMatches = match.match( /^\n?(?&lt;start>[0-9]+)\./ );
-    const start = startMatches &amp;&amp; startMatches.groups &amp;&amp; startMatches.groups.start !== '1' ? ` start="${startMatches.groups.start}"` : '';
-    const items = match.replace( /\n?([0-9]+\.)(.*)/gm, _createItem );
+function _createOrderedList(match) {
+    const startMatches = match.match(/^\n?(?&lt;start>[0-9]+)\./);
+    const start =
+        startMatches &amp;&amp; startMatches.groups &amp;&amp; startMatches.groups.start !== '1'
+            ? ` start="${startMatches.groups.start}"`
+            : '';
+    const items = match.replace(/\n?([0-9]+\.)(.*)/gm, _createItem);
 
     return `&lt;ol${start}>${items}&lt;/ol>`;
 }
@@ -155,7 +170,7 @@ function _createOrderedList( match ) {
  * @param {string} content - Item text.
  * @return {string} HTML string.
  */
-function _createItem( match, bullet, content ) {
+function _createItem(match, bullet, content) {
     return `&lt;li>${content.trim()}&lt;/li>`;
 }
 
@@ -164,9 +179,9 @@ function _createItem( match, bullet, content ) {
  * @param {string} line - The line.
  * @return {string} HTML string.
  */
-function _createParagraph( match, line ) {
+function _createParagraph(match, line) {
     const trimmed = line.trim();
-    if ( /^&lt;\/?(ul|ol|li|h|p|bl)/i.test( trimmed ) ) {
+    if (/^&lt;\/?(ul|ol|li|h|p|bl)/i.test(trimmed)) {
         return line;
     }
 
@@ -179,8 +194,8 @@ function _createParagraph( match, line ) {
  * @param {string} content - Span text.
  * @return {string} HTML string.
  */
-function _createSpan( match, attributes, content ) {
-    const sanitizedAttributes = _sanitizeAttributes( attributes );
+function _createSpan(match, attributes, content) {
+    const sanitizedAttributes = _sanitizeAttributes(attributes);
 
     return `&lt;span${sanitizedAttributes}>${content}&lt;/span>`;
 }
@@ -191,7 +206,7 @@ function _createSpan( match, attributes, content ) {
  * @param {string} content - Sup text.
  * @return {string} HTML string.
  */
-function _createSup( match, attributes, content ) {
+function _createSup(match, attributes, content) {
     // ignore attributes completely
     return `&lt;sup>${content}&lt;/sup>`;
 }
@@ -202,7 +217,7 @@ function _createSup( match, attributes, content ) {
  * @param {string} content - Sub text.
  * @return {string} HTML string.
  */
-function _createSub( match, attributes, content ) {
+function _createSub(match, attributes, content) {
     // ignore attributes completely
     return `&lt;sub>${content}&lt;/sub>`;
 }
@@ -211,15 +226,15 @@ function _createSub( match, attributes, content ) {
  * @param {string} attributes - The attributes.
  * @return {string} style
  */
-function _sanitizeAttributes( attributes ) {
-    const styleMatches = attributes.match( /( style=(["'])[^"']*\2)/ );
-    const style = ( styleMatches &amp;&amp; styleMatches.length ) ? styleMatches[ 0 ] : '';
+function _sanitizeAttributes(attributes) {
+    const styleMatches = attributes.match(/( style=(["'])[^"']*\2)/);
+    const style = styleMatches &amp;&amp; styleMatches.length ? styleMatches[0] : '';
 
     return style;
 }
 
 module.exports = {
-    toHtml: markdownToHtml
+    toHtml: markdownToHtml,
 };
 </code></pre>
         </article>
