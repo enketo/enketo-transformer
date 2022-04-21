@@ -51,18 +51,25 @@
  * @module transformer
  */
 
-const pkg = require( '../package' );
-const crypto = require( 'crypto' );
-const libxslt = require( 'libxslt' );
-const libxmljs = libxslt.libxmljs;
-const language = require( './language' );
-const markdown = require( './markdown' );
-const fs = require( 'fs' );
-const path = require( 'path' );
-const { escapeURLPath, getMediaPath } = require( './url' );
+const pkg = require('../package');
+const crypto = require('crypto');
+const libxslt = require('libxslt');
 
-const xslForm = fs.readFileSync( path.join( __dirname, './xsl/openrosa2html5form.xsl' ), 'utf8' );
-const xslModel = fs.readFileSync( path.join( __dirname, './xsl/openrosa2xmlmodel.xsl' ), 'utf8' );
+const { libxmljs } = libxslt;
+const fs = require('fs');
+const path = require('path');
+const markdown = require('./markdown');
+const language = require('./language');
+const { escapeURLPath, getMediaPath } = require('./url');
+
+const xslForm = fs.readFileSync(
+    path.join(__dirname, './xsl/openrosa2html5form.xsl'),
+    'utf8'
+);
+const xslModel = fs.readFileSync(
+    path.join(__dirname, './xsl/openrosa2xmlmodel.xsl'),
+    'utf8'
+);
 /**
  * @constant
  * @static
@@ -72,7 +79,7 @@ const xslModel = fs.readFileSync( path.join( __dirname, './xsl/openrosa2xmlmodel
 const NAMESPACES = {
     xmlns: 'http://www.w3.org/2002/xforms',
     orx: 'http://openrosa.org/xforms',
-    h: 'http://www.w3.org/1999/xhtml'
+    h: 'http://www.w3.org/1999/xhtml',
 };
 /**
  * @constant
@@ -114,50 +121,52 @@ const version = _getVersion();
  * @param {Survey} survey - Survey object with at least an xform property.
  * @return {Promise&lt;TransformedSurvey>} promise
  */
-function transform( survey ) {
+function transform(survey) {
     let xformDoc;
-    const xsltParams = survey.openclinica ? {
-        'openclinica': 1
-    } : {};
+    const xsltParams = survey.openclinica
+        ? {
+              openclinica: 1,
+          }
+        : {};
 
     const mediaMap = Object.fromEntries(
-        Object.entries( survey.media || {} ).map( ( entry ) => (
-            entry.map( escapeURLPath )
-        ) )
+        Object.entries(survey.media || {}).map((entry) =>
+            entry.map(escapeURLPath)
+        )
     );
 
-    return _parseXml( survey.xform )
-        .then( doc => {
-            if ( typeof survey.preprocess === 'function' ) {
-                doc = survey.preprocess.call( libxmljs, doc );
+    return _parseXml(survey.xform)
+        .then((doc) => {
+            if (typeof survey.preprocess === 'function') {
+                doc = survey.preprocess.call(libxmljs, doc);
             }
 
             return doc;
-        } )
-        .then( doc => _processBinaryDefaults( doc, mediaMap ) )
-        .then( doc => {
+        })
+        .then((doc) => _processBinaryDefaults(doc, mediaMap))
+        .then((doc) => {
             xformDoc = doc;
 
-            return _transform( xslForm, xformDoc, xsltParams );
-        } )
-        .then( htmlDoc => {
-            htmlDoc = _correctAction( htmlDoc, 'setgeopoint' );
-            htmlDoc = _correctAction( htmlDoc, 'setvalue' );
-            htmlDoc = _replaceTheme( htmlDoc, survey.theme );
-            htmlDoc = _replaceMediaSources( htmlDoc, mediaMap );
-            htmlDoc = _replaceLanguageTags( htmlDoc, survey );
-            if ( survey.markdown !== false ) {
-                survey.form = _renderMarkdown( htmlDoc, mediaMap );
+            return _transform(xslForm, xformDoc, xsltParams);
+        })
+        .then((htmlDoc) => {
+            htmlDoc = _correctAction(htmlDoc, 'setgeopoint');
+            htmlDoc = _correctAction(htmlDoc, 'setvalue');
+            htmlDoc = _replaceTheme(htmlDoc, survey.theme);
+            htmlDoc = _replaceMediaSources(htmlDoc, mediaMap);
+            htmlDoc = _replaceLanguageTags(htmlDoc, survey);
+            if (survey.markdown !== false) {
+                survey.form = _renderMarkdown(htmlDoc, mediaMap);
             } else {
-                survey.form = _docToString( htmlDoc );
+                survey.form = _docToString(htmlDoc);
             }
 
-            return _transform( xslModel, xformDoc );
-        } )
-        .then( xmlDoc => {
-            xmlDoc = _replaceMediaSources( xmlDoc, mediaMap );
-            xmlDoc = _addInstanceIdNodeIfMissing( xmlDoc );
-            survey.model = xmlDoc.root().get( '*' ).toString( false );
+            return _transform(xslModel, xformDoc);
+        })
+        .then((xmlDoc) => {
+            xmlDoc = _replaceMediaSources(xmlDoc, mediaMap);
+            xmlDoc = _addInstanceIdNodeIfMissing(xmlDoc);
+            survey.model = xmlDoc.root().get('*').toString(false);
             survey.transformerVersion = pkg.version;
 
             delete survey.xform;
@@ -167,7 +176,7 @@ function transform( survey ) {
             delete survey.openclinica;
 
             return survey;
-        } );
+        });
 }
 
 /**
@@ -178,24 +187,24 @@ function transform( survey ) {
  * @param {object} xsltParams - Params object.
  * @return {Promise&lt;Error|object>} libxmljs result document object.
  */
-function _transform( xslStr, xmlDoc, xsltParams ) {
+function _transform(xslStr, xmlDoc, xsltParams) {
     const params = xsltParams || {};
 
-    return new Promise( ( resolve, reject ) => {
-        libxslt.parse( xslStr, ( error, stylesheet ) => {
-            if ( error ) {
-                reject( error );
+    return new Promise((resolve, reject) => {
+        libxslt.parse(xslStr, (error, stylesheet) => {
+            if (error) {
+                reject(error);
             } else {
-                stylesheet.apply( xmlDoc, params, ( error, result ) => {
-                    if ( error ) {
-                        reject( error );
+                stylesheet.apply(xmlDoc, params, (error, result) => {
+                    if (error) {
+                        reject(error);
                     } else {
-                        resolve( result );
+                        resolve(result);
                     }
-                } );
+                });
             }
-        } );
-    } );
+        });
+    });
 }
 
 /**
@@ -203,29 +212,33 @@ function _transform( xslStr, xmlDoc, xsltParams ) {
  * @param {Record&lt;string, string>} [mediaMap] - map of media filenames and their URLs
  * @return {XMLJSDocument} libxmljs object
  */
-function _processBinaryDefaults( doc, mediaMap ) {
-    doc.find( '/h:html/h:head/xmlns:model/xmlns:bind[@type="binary"]', NAMESPACES )
-        .forEach( bind => {
-            const nodeset = bind.attr( 'nodeset' );
+function _processBinaryDefaults(doc, mediaMap) {
+    doc.find(
+        '/h:html/h:head/xmlns:model/xmlns:bind[@type="binary"]',
+        NAMESPACES
+    ).forEach((bind) => {
+        const nodeset = bind.attr('nodeset');
 
-            if ( nodeset &amp;&amp; nodeset.value() ) {
-                const path = `/h:html/h:head/xmlns:model/xmlns:instance${nodeset.value().replace( /\//g, '/xmlns:' )}`;
-                const dataNode = doc.get( path, NAMESPACES );
+        if (nodeset &amp;&amp; nodeset.value()) {
+            const path = `/h:html/h:head/xmlns:model/xmlns:instance${nodeset
+                .value()
+                .replace(/\//g, '/xmlns:')}`;
+            const dataNode = doc.get(path, NAMESPACES);
 
-                if ( dataNode ) {
-                    const text = dataNode.text();
+            if (dataNode) {
+                const text = dataNode.text();
 
-                    // Very crude URL checker which is fine for now,
-                    // because at this point we don't expect anything other than jr://
-                    if ( /^[a-zA-Z]+:\/\//.test( text ) ) {
-                        const value = getMediaPath( mediaMap, text );
-                        const escapedText = escapeURLPath( text );
+                // Very crude URL checker which is fine for now,
+                // because at this point we don't expect anything other than jr://
+                if (/^[a-zA-Z]+:\/\//.test(text)) {
+                    const value = getMediaPath(mediaMap, text);
+                    const escapedText = escapeURLPath(text);
 
-                        dataNode.attr( { 'src': value } ).text( escapedText );
-                    }
+                    dataNode.attr({ src: value }).text(escapedText);
                 }
             }
-        } );
+        }
+    });
 
     return doc;
 }
@@ -238,34 +251,42 @@ function _processBinaryDefaults( doc, mediaMap ) {
  * @param {'setvalue' | 'setgeopoint'} localName - local XML tag name
  * @return {object} doc - libxmljs object
  */
-function _correctAction( doc, localName = 'setvalue' ) {
+function _correctAction(doc, localName = 'setvalue') {
     /*
-        * See setvalue.xml (/data/person/age_changed). A &lt;setvalue> inside a form control results
-        * in one label.question with a nested label.setvalue which is weird syntax (and possibly invalid HTML).
-        */
-    doc.find( `//*[contains(@class, "question")]//label/input[@data-${localName}]` ).forEach( setValueEl => {
+     * See setvalue.xml (/data/person/age_changed). A &lt;setvalue> inside a form control results
+     * in one label.question with a nested label.setvalue which is weird syntax (and possibly invalid HTML).
+     */
+    doc.find(
+        `//*[contains(@class, "question")]//label/input[@data-${localName}]`
+    ).forEach((setValueEl) => {
         const clone = setValueEl.clone();
-        setValueEl.parent().addNextSibling( clone );
+        setValueEl.parent().addNextSibling(clone);
         setValueEl.parent().remove();
-    } );
+    });
 
     /*
-        * See setvalue.xml (/data/person/age). A &lt;setvalue> inside a repeat to set a default value that also has a question with the same name, results
-        * in one .question and .setvalue with the same name, which will leads to all kinds of problems in enketo-core
-        * as name is presumed to be unique.
-        *
-        * Note that a label.setvalue is always to set a default value (with odk-new-repeat, odk-instance-first-load), never
-        * a value change directive (with xforms-value-changed)
-        */
-    doc.find( `//label[contains(@class, "${localName}")]/input[@data-${localName}]` ).forEach( setValueEl => {
-        const name = setValueEl.attr( 'name' ).value();
-        const questionSameName = doc.get( `//*[@name="${name}" and ( contains(../@class, 'question') or contains(../../@class, 'option-wrapper')) and not(@type='hidden')]` );
-        if ( questionSameName ) {
+     * See setvalue.xml (/data/person/age). A &lt;setvalue> inside a repeat to set a default value that also has a question with the same name, results
+     * in one .question and .setvalue with the same name, which will leads to all kinds of problems in enketo-core
+     * as name is presumed to be unique.
+     *
+     * Note that a label.setvalue is always to set a default value (with odk-new-repeat, odk-instance-first-load), never
+     * a value change directive (with xforms-value-changed)
+     */
+    doc.find(
+        `//label[contains(@class, "${localName}")]/input[@data-${localName}]`
+    ).forEach((setValueEl) => {
+        const name = setValueEl.attr('name').value();
+        const questionSameName = doc.get(
+            `//*[@name="${name}" and ( contains(../@class, 'question') or contains(../../@class, 'option-wrapper')) and not(@type='hidden')]`
+        );
+        if (questionSameName) {
             // Note that if the question has radiobuttons or checkboxes only the first of those gets the setvalue attributes.
-            [ `data-${localName}`, 'data-event' ].forEach( att => questionSameName.attr( att, setValueEl.attr( att ).value() ) );
+            [`data-${localName}`, 'data-event'].forEach((att) =>
+                questionSameName.attr(att, setValueEl.attr(att).value())
+            );
             setValueEl.parent().remove();
         }
-    } );
+    });
 
     return doc;
 }
@@ -276,17 +297,17 @@ function _correctAction( doc, localName = 'setvalue' ) {
  * @param  {string} xmlStr - XML string.
  * @return {Promise&lt;XMLJSDocument>} libxmljs result document object.
  */
-function _parseXml( xmlStr ) {
+function _parseXml(xmlStr) {
     let doc;
 
-    return new Promise( ( resolve, reject ) => {
+    return new Promise((resolve, reject) => {
         try {
-            doc = libxmljs.parseXml( xmlStr );
-            resolve( doc );
-        } catch ( e ) {
-            reject( e );
+            doc = libxmljs.parseXml(xmlStr);
+            resolve(doc);
+        } catch (e) {
+            reject(e);
         }
-    } );
+    });
 }
 
 /**
@@ -296,20 +317,20 @@ function _parseXml( xmlStr ) {
  * @param {string} theme - Theme name.
  * @return {object} libxmljs object.
  */
-function _replaceTheme( doc, theme ) {
+function _replaceTheme(doc, theme) {
     const HAS_THEME = /(theme-)[^"'\s]+/;
 
-    if ( !theme ) {
+    if (!theme) {
         return doc;
     }
 
-    const formClassAttr = doc.root().get( '/root/form' ).attr( 'class' );
+    const formClassAttr = doc.root().get('/root/form').attr('class');
     const formClassValue = formClassAttr.value();
 
-    if ( HAS_THEME.test( formClassValue ) ) {
-        formClassAttr.value( formClassValue.replace( HAS_THEME, `$1${theme}` ) );
+    if (HAS_THEME.test(formClassValue)) {
+        formClassAttr.value(formClassValue.replace(HAS_THEME, `$1${theme}`));
     } else {
-        formClassAttr.value( `${formClassValue} theme-${theme}` );
+        formClassAttr.value(`${formClassValue} theme-${theme}`);
     }
 
     return doc;
@@ -322,30 +343,27 @@ function _replaceTheme( doc, theme ) {
  * @param {Record&lt;string, string>} [mediaMap] - map of media filenames and their URLs
  * @return {XMLJSDocument} libxmljs object
  */
-function _replaceMediaSources( xmlDoc, mediaMap ) {
-    if ( !mediaMap ) {
+function _replaceMediaSources(xmlDoc, mediaMap) {
+    if (!mediaMap) {
         return xmlDoc;
     }
 
     // iterate through each element with a src attribute
-    xmlDoc.find( '//*[@src] | //a[@href]' ).forEach( mediaEl => {
-        const attribute = ( mediaEl.name().toLowerCase() === 'a' ) ? 'href' : 'src';
-        const src = mediaEl.attr( attribute ).value();
-        const replacement = getMediaPath( mediaMap, src );
+    xmlDoc.find('//*[@src] | //a[@href]').forEach((mediaEl) => {
+        const attribute = mediaEl.name().toLowerCase() === 'a' ? 'href' : 'src';
+        const src = mediaEl.attr(attribute).value();
+        const replacement = getMediaPath(mediaMap, src);
 
-        if ( replacement ) {
-            mediaEl.attr( attribute, replacement );
+        if (replacement) {
+            mediaEl.attr(attribute, replacement);
         }
-    } );
+    });
 
     // add form logo &lt;img> element if applicable
-    const formLogo = mediaMap[ 'form_logo.png' ];
-    const formLogoEl = xmlDoc.get( '//*[@class="form-logo"]' );
-    if ( formLogo &amp;&amp; formLogoEl ) {
-        formLogoEl
-            .node( 'img' )
-            .attr( 'src', formLogo )
-            .attr( 'alt', 'form logo' );
+    const formLogo = mediaMap['form_logo.png'];
+    const formLogoEl = xmlDoc.get('//*[@class="form-logo"]');
+    if (formLogo &amp;&amp; formLogoEl) {
+        formLogoEl.node('img').attr('src', formLogo).attr('alt', 'form logo');
     }
 
     return xmlDoc;
@@ -361,62 +379,66 @@ function _replaceMediaSources( xmlDoc, mediaMap ) {
  * @param {object} survey - Survey object.
  * @return {object} libxmljs object.
  */
-function _replaceLanguageTags( doc, survey ) {
+function _replaceLanguageTags(doc, survey) {
     const map = {};
 
-    const languageElements = doc.find( '/root/form/select[@id="form-languages"]/option' );
+    const languageElements = doc.find(
+        '/root/form/select[@id="form-languages"]/option'
+    );
 
     // List of parsed language objects
-    const languages = languageElements.map( el => {
+    const languages = languageElements.map((el) => {
         const lang = el.text();
 
-        return language.parse( lang, _getLanguageSampleText( doc, lang ) );
-    } );
+        return language.parse(lang, _getLanguageSampleText(doc, lang));
+    });
 
     // forms without itext and only one language, still need directionality info
-    if ( languages.length === 0 ) {
-        languages.push( language.parse( '', _getLanguageSampleText( doc, '' ) ) );
+    if (languages.length === 0) {
+        languages.push(language.parse('', _getLanguageSampleText(doc, '')));
     }
 
     // add or correct dir and value attributes, and amend textcontent of options in language selector
-    languageElements.forEach( ( el, index ) => {
-        const val = el.attr( 'value' ).value();
-        if ( val &amp;&amp; val !== languages[ index ].tag ) {
-            map[ val ] = languages[ index ].tag;
+    languageElements.forEach((el, index) => {
+        const val = el.attr('value').value();
+        if (val &amp;&amp; val !== languages[index].tag) {
+            map[val] = languages[index].tag;
         }
-        el.attr( {
-            'data-dir': languages[ index ].dir,
-            'value': languages[ index ].tag
-        } ).text( languages[ index ].desc );
-    } );
+        el.attr({
+            'data-dir': languages[index].dir,
+            value: languages[index].tag,
+        }).text(languages[index].desc);
+    });
 
     // correct lang attributes
-    languages.forEach( lang => {
-        if ( lang.src === lang.tag ) {
+    languages.forEach((lang) => {
+        if (lang.src === lang.tag) {
             return;
         }
-        doc.find( `/root/form//*[@lang="${lang.src}"]` ).forEach( el => {
-            el.attr( {
-                lang: lang.tag
-            } );
-        } );
-    } );
+        doc.find(`/root/form//*[@lang="${lang.src}"]`).forEach((el) => {
+            el.attr({
+                lang: lang.tag,
+            });
+        });
+    });
 
     // correct default lang attribute
-    const langSelectorElement = doc.get( '/root/form/*[@data-default-lang]' );
-    if ( langSelectorElement ) {
-        const defaultLang = langSelectorElement.attr( 'data-default-lang' ).value();
-        languages.some( lang => {
-            if ( lang.src === defaultLang ) {
-                langSelectorElement.attr( {
-                    'data-default-lang': lang.tag
-                } );
+    const langSelectorElement = doc.get('/root/form/*[@data-default-lang]');
+    if (langSelectorElement) {
+        const defaultLang = langSelectorElement
+            .attr('data-default-lang')
+            .value();
+        languages.some((lang) => {
+            if (lang.src === defaultLang) {
+                langSelectorElement.attr({
+                    'data-default-lang': lang.tag,
+                });
 
                 return true;
             }
 
             return false;
-        } );
+        });
     }
 
     survey.languageMap = map;
@@ -431,13 +453,20 @@ function _replaceLanguageTags( doc, survey ) {
  * @param {string} lang - Language name.
  * @return {string} the text sample.
  */
-function _getLanguageSampleText( doc, lang ) {
+function _getLanguageSampleText(doc, lang) {
     // First find non-empty text content of a hint with that lang attribute.
     // If not found, find any span with that lang attribute.
-    const langSampleEl = doc.get( `/root/form//span[contains(@class, "or-hint") and @lang="${lang}" and normalize-space() and not(./text() = '-')]` ) ||
-        doc.get( `/root/form//span[@lang="${lang}" and normalize-space() and not(./text() = '-')]` );
+    const langSampleEl =
+        doc.get(
+            `/root/form//span[contains(@class, "or-hint") and @lang="${lang}" and normalize-space() and not(./text() = '-')]`
+        ) ||
+        doc.get(
+            `/root/form//span[@lang="${lang}" and normalize-space() and not(./text() = '-')]`
+        );
 
-    return ( langSampleEl &amp;&amp; langSampleEl.text().trim().length ) ? langSampleEl.text() : 'nothing';
+    return langSampleEl &amp;&amp; langSampleEl.text().trim().length
+        ? langSampleEl.text()
+        : 'nothing';
 }
 
 /**
@@ -447,22 +476,27 @@ function _getLanguageSampleText( doc, lang ) {
  * @param {object} doc - libxmljs object.
  * @return {object} libxmljs object.
  */
-function _addInstanceIdNodeIfMissing( doc ) {
-    const xformsPath = '/xmlns:root/xmlns:model/xmlns:instance/*/xmlns:meta/xmlns:instanceID';
-    const openrosaPath = '/xmlns:root/xmlns:model/xmlns:instance/*/orx:meta/orx:instanceID';
-    const instanceIdEl = doc.get( `${xformsPath} | ${openrosaPath}`, NAMESPACES );
+function _addInstanceIdNodeIfMissing(doc) {
+    const xformsPath =
+        '/xmlns:root/xmlns:model/xmlns:instance/*/xmlns:meta/xmlns:instanceID';
+    const openrosaPath =
+        '/xmlns:root/xmlns:model/xmlns:instance/*/orx:meta/orx:instanceID';
+    const instanceIdEl = doc.get(`${xformsPath} | ${openrosaPath}`, NAMESPACES);
 
-    if ( !instanceIdEl ) {
-        const rootEl = doc.get( '/xmlns:root/xmlns:model/xmlns:instance/*', NAMESPACES );
-        const metaEl = doc.get( '/xmlns:root/xmlns:model/xmlns:instance/*/xmlns:meta', NAMESPACES );
+    if (!instanceIdEl) {
+        const rootEl = doc.get(
+            '/xmlns:root/xmlns:model/xmlns:instance/*',
+            NAMESPACES
+        );
+        const metaEl = doc.get(
+            '/xmlns:root/xmlns:model/xmlns:instance/*/xmlns:meta',
+            NAMESPACES
+        );
 
-        if ( metaEl ) {
-            metaEl
-                .node( 'instanceID' );
-        } else if ( rootEl ) {
-            rootEl
-                .node( 'meta' )
-                .node( 'instanceID' );
+        if (metaEl) {
+            metaEl.node('instanceID');
+        } else if (rootEl) {
+            rootEl.node('meta').node('instanceID');
         }
     }
 
@@ -476,56 +510,70 @@ function _addInstanceIdNodeIfMissing( doc ) {
  * @param {Record&lt;string, string>} [mediaMap] - map of media filenames and their URLs
  * @return {string} html string.
  */
-function _renderMarkdown( htmlDoc, mediaMap ) {
+function _renderMarkdown(htmlDoc, mediaMap) {
     const replacements = {};
 
     // First turn all outputs into text so *&lt;span class="or-output>&lt;/span>* can be detected
-    htmlDoc.find( '/root/form//span[contains(@class, "or-output")]' ).forEach( ( el, index ) => {
-        const key = `---output-${index}`;
-        const textNode = el.childNodes()[ 0 ].clone();
-        replacements[ key ] = el.toString();
-        textNode.text( key );
-        el.replace( textNode );
-        // Note that we end up in a situation where we likely have sibling text nodes...
-    } );
+    htmlDoc
+        .find('/root/form//span[contains(@class, "or-output")]')
+        .forEach((el, index) => {
+            const key = `---output-${index}`;
+            const textNode = el.childNodes()[0].clone();
+            replacements[key] = el.toString();
+            textNode.text(key);
+            el.replace(textNode);
+            // Note that we end up in a situation where we likely have sibling text nodes...
+        });
 
     // Now render markdown
-    htmlDoc.find( '/root/form//span[contains(@class, "question-label") or contains(@class, "or-hint")]' ).forEach( ( el, index ) => {
-        let key;
-        /**
-         * Using text() is done because:
-         * a) We are certain that these &lt;span>s do not contain other elements, other than formatting/markdown &lt;span>s.
-         * b) This avoids the need to merge any sibling text nodes that could have been created in the previous step.
-         *
-         * Note that text() will convert &amp;gt; to >
-         */
-        const original = el.text().replace( '&lt;', '&amp;lt;' ).replace( '>', '&amp;gt;' );
-        let rendered = markdown.toHtml( original );
+    htmlDoc
+        .find(
+            '/root/form//span[contains(@class, "question-label") or contains(@class, "or-hint")]'
+        )
+        .forEach((el, index) => {
+            let key;
+            /**
+             * Using text() is done because:
+             * a) We are certain that these &lt;span>s do not contain other elements, other than formatting/markdown &lt;span>s.
+             * b) This avoids the need to merge any sibling text nodes that could have been created in the previous step.
+             *
+             * Note that text() will convert &amp;gt; to >
+             */
+            const original = el
+                .text()
+                .replace('&lt;', '&amp;lt;')
+                .replace('>', '&amp;gt;');
+            let rendered = markdown.toHtml(original);
 
-        if ( original !== rendered ) {
-            if ( mediaMap != null ) {
-                const fragment = libxmljs.parseHtmlFragment( rendered );
+            if (original !== rendered) {
+                if (mediaMap != null) {
+                    const fragment = libxmljs.parseHtmlFragment(rendered);
 
-                rendered = _replaceMediaSources( fragment, mediaMap ).toString( false );
+                    rendered = _replaceMediaSources(
+                        fragment,
+                        mediaMap
+                    ).toString(false);
+                }
+
+                key = `$$$${index}`;
+                replacements[key] = rendered;
+                el.text(key);
             }
-
-            key = `$$$${index}`;
-            replacements[ key ] = rendered;
-            el.text( key );
-        }
-    } );
+        });
 
     // TODO: does this result in self-closing tags?
-    let htmlStr = _docToString( htmlDoc );
+    let htmlStr = _docToString(htmlDoc);
 
     // Now replace the placeholders with the rendered HTML
     // in reverse order so outputs are done last
-    Object.keys( replacements ).reverse().forEach( key => {
-        const replacement = replacements[ key ];
-        if ( replacement ) {
-            htmlStr = htmlStr.replace( key, replacement );
-        }
-    } );
+    Object.keys(replacements)
+        .reverse()
+        .forEach((key) => {
+            const replacement = replacements[key];
+            if (replacement) {
+                htmlStr = htmlStr.replace(key, replacement);
+            }
+        });
 
     return htmlStr;
 }
@@ -534,9 +582,9 @@ function _renderMarkdown( htmlDoc, mediaMap ) {
  * @param {object} doc - libxmljs object.
  * @return {string} stringified document.
  */
-function _docToString( doc ) {
+function _docToString(doc) {
     // TODO: does this result in self-closing tags?
-    return doc.root().get( '*' ).toString( false );
+    return doc.root().get('*').toString(false);
 }
 
 /**
@@ -545,7 +593,7 @@ function _docToString( doc ) {
  * @return {string} hash representing version of XSL stylesheets
  */
 function _getVersion() {
-    return _md5( xslForm + xslModel + pkg.version );
+    return _md5(xslForm + xslModel + pkg.version);
 }
 
 /**
@@ -554,11 +602,11 @@ function _getVersion() {
  * @param {string|Buffer} message - The string or buffer.
  * @return {string} The hash.
  */
-function _md5( message ) {
-    const hash = crypto.createHash( 'md5' );
-    hash.update( message );
+function _md5(message) {
+    const hash = crypto.createHash('md5');
+    hash.update(message);
 
-    return hash.digest( 'hex' );
+    return hash.digest('hex');
 }
 
 module.exports = {
@@ -567,7 +615,7 @@ module.exports = {
     NAMESPACES,
     sheets: {
         xslForm,
-        xslModel
+        xslModel,
     },
     escapeURLPath,
 };

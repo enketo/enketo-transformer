@@ -77,26 +77,28 @@
 </code></pre>
 <h3 id="use-as-module">Use as module</h3>
 <pre class="prettyprint source lang-js"><code>const transformer = require('enketo-transformer');
-const xform = fs.readFileSync( 'path/to/xform.xml' );
+const xform = fs.readFileSync('path/to/xform.xml');
 
-transformer.transform( {
-    // required string of XForm
-    xform: xform,
-    // optional string, to add theme if no theme is defined in the XForm
-    theme: 'sometheme',
-    // optional map, to replace jr://..../myfile.png URLs
-    media: {
-        'myfile.png' : '/path/to/somefile.png',
-        'myfile.mp3' : '/another/path/to/2.mp3'
-    },
-    // optional ability to disable markdown rendering (default is true)
-    markdown: false,
-    // optional preprocess function that transforms the XForm (as libXMLJs object) to
-    // e.g. correct incompatible XForm syntax before Enketo's transformation takes place
-    preprocess: doc => doc,
-} ).then(function( result ){
-    // do something with result
-});
+transformer
+    .transform({
+        // required string of XForm
+        xform: xform,
+        // optional string, to add theme if no theme is defined in the XForm
+        theme: 'sometheme',
+        // optional map, to replace jr://..../myfile.png URLs
+        media: {
+            'myfile.png': '/path/to/somefile.png',
+            'myfile.mp3': '/another/path/to/2.mp3',
+        },
+        // optional ability to disable markdown rendering (default is true)
+        markdown: false,
+        // optional preprocess function that transforms the XForm (as libXMLJs object) to
+        // e.g. correct incompatible XForm syntax before Enketo's transformation takes place
+        preprocess: (doc) => doc,
+    })
+    .then(function (result) {
+        // do something with result
+    });
 </code></pre>
 <h3 id="install-as-app-(web-api)">Install as app (web API)</h3>
 <ol>
@@ -117,12 +119,11 @@ transformer.transform( {
 </code></pre>
 <h3 id="response-format">Response format</h3>
 <pre class="prettyprint source lang-json"><code>{
-    &quot;form&quot; : &quot;&lt;form>.....&lt;/form>&quot;,
+    &quot;form&quot;: &quot;&lt;form>.....&lt;/form>&quot;,
     &quot;model&quot;: &quot;&lt;model>...&lt;/model>&quot;,
     &quot;transformerVersion&quot;: &quot;1.13.0&quot;,
     &quot;languageMap&quot;: { &quot;Français&quot;: &quot;fr&quot;, &quot;English&quot;: &quot;en&quot; }
 }
-
 </code></pre>
 <h3 id="test">Test</h3>
 <ul>

@@ -51,8 +51,8 @@
  * @module language
  */
 
-const tags = require( 'language-tags' );
-const stringDirection = require( 'string-direction' );
+const tags = require('language-tags');
+const stringDirection = require('string-direction');
 
 /**
  * @typedef LanguageObj
@@ -71,35 +71,35 @@ const stringDirection = require( 'string-direction' );
  * @param {string} sample - A text sample.
  * @return {LanguageObj} language object.
  */
-function parse( lang, sample ) {
+function parse(lang, sample) {
     // TODO: this should be refactored
     let ianaLang;
     const language = {
         desc: lang.trim(),
         tag: lang.trim(),
-        src: lang
+        src: lang,
     };
-    const parts = lang.match( /^([^(]+)\((.*)\)\s*$/ );
+    const parts = lang.match(/^([^(]+)\((.*)\)\s*$/);
 
-    if ( parts &amp;&amp; parts.length > 2 ) {
-        language.desc = parts[ 1 ].trim();
-        language.tag = parts[ 2 ].trim();
-        ianaLang = _getLangWithTag( language.tag );
+    if (parts &amp;&amp; parts.length > 2) {
+        language.desc = parts[1].trim();
+        language.tag = parts[2].trim();
+        ianaLang = _getLangWithTag(language.tag);
     } else {
         // First check whether lang is a known IANA subtag like 'en' or 'en-GB'
-        ianaLang = _getLangWithTag( lang.split( '-' )[ 0 ] );
-        if ( ianaLang ) {
-            language.desc = ianaLang.descriptions()[ 0 ];
+        ianaLang = _getLangWithTag(lang.split('-')[0]);
+        if (ianaLang) {
+            language.desc = ianaLang.descriptions()[0];
         } else {
             // Check whether IANA language can be found with description
-            ianaLang = _getLangWithDesc( language.desc );
-            if ( ianaLang ) {
+            ianaLang = _getLangWithDesc(language.desc);
+            if (ianaLang) {
                 language.tag = ianaLang.data.subtag;
             }
         }
     }
 
-    language.dir = _getDirectionality( sample );
+    language.dir = _getDirectionality(sample);
 
     return language;
 }
@@ -110,10 +110,10 @@ function parse( lang, sample ) {
  * @param {string} desc - Language description.
  * @return {LanguageObj} the first language object result that was found.
  */
-function _getLangWithDesc( desc ) {
-    const results = ( desc ) ? tags.search( desc ).filter( _languagesOnly ) : [];
+function _getLangWithDesc(desc) {
+    const results = desc ? tags.search(desc).filter(_languagesOnly) : [];
 
-    return results[ 0 ] || '';
+    return results[0] || '';
 }
 
 /**
@@ -122,8 +122,8 @@ function _getLangWithDesc( desc ) {
  * @param  {string} tag - Subtag.
  * @return {LanguageObj} the first language object result that was found.
  */
-function _getLangWithTag( tag ) {
-    return ( tag ) ? tags.subtags( tag ).filter( _languagesOnly )[ 0 ] : '';
+function _getLangWithTag(tag) {
+    return tag ? tags.subtags(tag).filter(_languagesOnly)[0] : '';
 }
 
 /**
@@ -132,7 +132,7 @@ function _getLangWithTag( tag ) {
  * @param  {LanguageObj} obj - Language object returned by 'language-tags' library.
  * @return {boolean} whether filter evaluated to true.
  */
-function _languagesOnly( obj ) {
+function _languagesOnly(obj) {
     return obj.data &amp;&amp; obj.data.type === 'language';
 }
 
@@ -142,9 +142,9 @@ function _languagesOnly( obj ) {
  * @param {string} sample - A text sample.
  * @return {string} either 'rtl' or the default 'ltr'.
  */
-function _getDirectionality( sample ) {
-    const direction = stringDirection.getDirection( sample );
-    if ( direction !== 'ltr' ) {
+function _getDirectionality(sample) {
+    const direction = stringDirection.getDirection(sample);
+    if (direction !== 'ltr') {
         return 'rtl';
     }
 
@@ -152,7 +152,7 @@ function _getDirectionality( sample ) {
 }
 
 module.exports = {
-    parse
+    parse,
 };
 </code></pre>
         </article>
