@@ -1,0 +1,6 @@
+# Ignore artifacts:
+
+.nyc*
+*/node_modules/*
+docs/*
+test-coverage/*

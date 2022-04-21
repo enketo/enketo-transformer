@@ -14,20 +14,14 @@ module.exports = {
         */
         // package: 'package.json',
         readme: 'README.md',
-        template: 'node_modules/docdash'
+        template: 'node_modules/docdash',
     },
-    plugins: [
-        'plugins/markdown',
-        'jsdoc-plugin-typescript'
-    ],
+    plugins: ['plugins/markdown', 'jsdoc-plugin-typescript'],
     typescript: {
-        'moduleRoot': 'src'
+        moduleRoot: 'src',
     },
     source: {
-        include: [
-            'src/',
-            './README.md'
-        ]
+        include: ['src/', './README.md'],
     },
     templates: {
         cleverLinks: true,
@@ -35,18 +29,19 @@ module.exports = {
         default: {
             outputSourceFiles: true,
             includeDate: false,
-            useLongnameInNav: true
-        }
+            useLongnameInNav: true,
+        },
     },
     markdown: {
-        idInHeadings: true
+        idInHeadings: true,
     },
     docdash: {
         static: true,
         sort: true,
         meta: {
             title: 'Enketo Transformer',
-            description: 'Library/app that transforms ODK-compliant XForms into a format that enketo-core consumes'
+            description:
+                'Library/app that transforms ODK-compliant XForms into a format that enketo-core consumes',
         },
         search: true,
         collapse: false,
@@ -59,14 +54,14 @@ module.exports = {
                 href: 'https://github.com/enketo/enketo-transformer',
                 target: '_blank',
                 class: 'menu-item',
-                id: 'repository'
+                id: 'repository',
             },
             'Change log': {
                 href: 'https://github.com/enketo/enketo-transformer/blob/master/CHANGELOG.md',
                 target: '_blank',
                 class: 'menu-item',
-                id: 'change-log'
-            }
+                id: 'change-log',
+            },
         },
         sectionOrder: [
             'Tutorials',
@@ -76,7 +71,7 @@ module.exports = {
             'Events',
             'Namespaces',
             'Mixins',
-            'Interfaces'
-        ]
-    }
+            'Interfaces',
+        ],
+    },
 };
