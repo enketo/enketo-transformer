@@ -474,6 +474,21 @@ describe('transformer', () => {
             ]);
         });
 
+        // bug https://github.com/enketo/enketo-transformer/issues/149
+        it('without mangling markdown-created HTML elements', () => {
+            const xform = fs.readFileSync(
+                './test/forms/bold-media.xml',
+                'utf8'
+            );
+            const media = {
+                'users.xml': '/path/to/users.xml',
+            };
+            const result = transformer.transform({ xform, media });
+            return expect(result)
+                .to.eventually.have.property('form')
+                .and.to.contain('<strong>Note with bold</strong> nnnn');
+        });
+
         describe('spaces in jr: media URLs', () => {
             const xform = fs.readFileSync(
                 './test/forms/jr-url-space.xml',
@@ -664,6 +679,11 @@ describe('transformer', () => {
                                 .and.to.contain(
                                     'hallo%20spaceboy/wishful%20beginnings.xml'
                                 ),
+
+                            // issue https://github.com/enketo/enketo-transformer/issues/149
+                            expect(result)
+                                .to.have.property('form')
+                                .and.to.contain('markdown</a><br>'),
                         ]);
                     });
                 });

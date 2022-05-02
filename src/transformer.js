@@ -80,11 +80,15 @@ function transform(survey) {
           }
         : {};
 
-    const mediaMap = Object.fromEntries(
-        Object.entries(survey.media || {}).map((entry) =>
-            entry.map(escapeURLPath)
-        )
-    );
+    let mediaMap = null;
+
+    if (survey.media) {
+        mediaMap = Object.fromEntries(
+            Object.entries(survey.media).map((entry) =>
+                entry.map(escapeURLPath)
+            )
+        );
+    }
 
     return _parseXml(survey.xform)
         .then((doc) => {
@@ -498,12 +502,15 @@ function _renderMarkdown(htmlDoc, mediaMap) {
 
             if (original !== rendered) {
                 if (mediaMap != null) {
-                    const fragment = libxmljs.parseHtmlFragment(rendered);
+                    const fragment = libxmljs.parseHtmlFragment(
+                        `<div class="temporary-root">${rendered}</div>`
+                    );
 
-                    rendered = _replaceMediaSources(
-                        fragment,
-                        mediaMap
-                    ).toString(false);
+                    rendered = _replaceMediaSources(fragment, mediaMap)
+                        .root()
+                        .childNodes()
+                        .map((node) => node.toString(false))
+                        .join('');
                 }
 
                 key = `$$$${index}`;
