@@ -480,7 +480,10 @@ describe('transformer', () => {
                 './test/forms/bold-media.xml',
                 'utf8'
             );
-            const result = transformer.transform({ xform });
+            const media = {
+                'users.xml': '/path/to/users.xml',
+            };
+            const result = transformer.transform({ xform, media });
             return expect(result)
                 .to.eventually.have.property('form')
                 .and.to.contain('<strong>Note with bold</strong> nnnn');

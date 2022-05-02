@@ -80,11 +80,15 @@ function transform(survey) {
           }
         : {};
 
-    const mediaMap = Object.fromEntries(
-        Object.entries(survey.media || {}).map((entry) =>
-            entry.map(escapeURLPath)
-        )
-    );
+    let mediaMap = null;
+
+    if (survey.media) {
+        mediaMap = Object.fromEntries(
+            Object.entries(survey.media).map((entry) =>
+                entry.map(escapeURLPath)
+            )
+        );
+    }
 
     return _parseXml(survey.xform)
         .then((doc) => {
