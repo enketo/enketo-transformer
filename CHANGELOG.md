@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.4] - 2022-05-04
+
+##### Changed
+
+-   Fixed mangling of markdown-produced HTML next to top-level text nodes when a mediamap is provided (#150)
+
 ## [2.1.3] - 2022-04-21
 
 ##### Changed
