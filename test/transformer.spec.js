@@ -731,6 +731,25 @@ describe('transformer', () => {
                     '/hallo%20spaceboy/wishful%20beginnings.xml?p=q&amp;r'
                 );
             });
+
+            // Regression in https://github.com/enketo/enketo-transformer/pull/150.
+            // Before that change, omitting a media mapping would fall back to an empty object
+            // as a default.
+            it('returns an empty media map when none was provided at the call site', async () => {
+                const result = await transformer.transform({ xform });
+
+                expect(result.form).to.contain('jr://images/first%20image.jpg');
+                expect(result.form).to.contain('jr://audio/a%20song.mp3');
+                expect(result.form).to.contain('jr://video/some%20video.mp4');
+                expect(result.model).to.contain(
+                    'jr://images/another%20image.png'
+                );
+                expect(result.model).to.contain('jr://file/an%20instance.xml');
+                expect(result.model).to.contain(
+                    'jr://file-csv/a%20spreadsheet.csv'
+                );
+                expect(result.form).to.contain('jr://file/a%20link.xml');
+            });
         });
     });
 
