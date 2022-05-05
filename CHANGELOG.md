@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.5] - 2022-05-05
+
+##### Changed
+
+-   Fixed regression when transforming forms with no media mapping, when the form has binary defaults or references jr: URLs in markdown. (#152)
+
 ## [2.1.4] - 2022-05-04
 
 ##### Changed
