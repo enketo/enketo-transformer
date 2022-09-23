@@ -523,7 +523,12 @@ function _renderMarkdown(htmlDoc, mediaMap) {
         .forEach((key) => {
             const replacement = replacements[key];
             if (replacement) {
-                htmlStr = htmlStr.replace(key, replacement);
+                /**
+                 * The replacement is called as a function here so special string
+                 * replacement sequences are preserved if they appear within Markdown.
+                 *  @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_string_as_the_replacement}
+                 */
+                htmlStr = htmlStr.replace(key, () => replacement);
             }
         });
 

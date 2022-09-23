@@ -257,6 +257,20 @@ describe('transformer', () => {
                     'formatted: <em><span class="or-output" data-value="/output/txt"> </span></em> and'
                 );
         });
+
+        it('preserves text containing special string replacement sequences', async () => {
+            const xform = fs.readFileSync(
+                './test/forms/md-str-replace-chars.xml',
+                'utf8'
+            );
+            const result = await transformer.transform({
+                xform,
+            });
+
+            expect(result.form).to.contain(
+                "<em>$' is $` this $&amp; the $$ real $0 $&lt;life&gt;?</em>"
+            );
+        });
     });
 
     describe('does not render markdown', () => {
