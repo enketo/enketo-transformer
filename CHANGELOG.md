@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.6] - 2022-10-27
+
+##### Changed
+
+-   Fixed special string.replace sequences in Markdown (#153)
+
 ## [2.1.5] - 2022-05-05
 
 ##### Changed
