@@ -49,7 +49,7 @@
         "string-direction": "0.1.x"
     },
     "devDependencies": {
-        "@xmldom/xmldom": "^0.7.4",
+        "@xmldom/xmldom": "^0.7.6",
         "chai": "^4.3.6",
         "chai-as-promised": "^7.1.1",
         "docdash": "^1.2.0",
@@ -64,14 +64,14 @@
         "eslint-plugin-react": "^7.29.4",
         "eslint-plugin-react-hooks": "^4.5.0",
         "eslint-plugin-unicorn": "^36.0.0",
-        "grunt": "^1.5.2",
+        "grunt": "^1.5.3",
         "http-server": "^13.1.0",
         "istanbul-reporter-shield-badge": "^1.2.1",
         "jsdoc": "^3.6.10",
         "jsdoc-plugin-typescript": "^2.0.7",
         "markdown-eslint-parser": "^1.2.1",
         "mocha": "^9.2.2",
-        "nodemon": "^2.0.16",
+        "nodemon": "^2.0.20",
         "nyc": "^15.1.0",
         "prettier": "^2.6.2",
         "rimraf": "^3.0.2"
