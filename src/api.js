@@ -27,7 +27,7 @@ class FetchError extends Error {
 }
 
 /**
- * @param {import('express').Request} req
+ * @param {express.Request} req
  * @returns {Promise<string>}
  */
 const getXForm = async (req) => {
