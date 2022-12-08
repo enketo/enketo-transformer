@@ -45,8 +45,8 @@
         "express": "^5.0.0-beta.1",
         "language-tags": "1.0.5",
         "libxslt": "0.10.0",
-        "request": "^2.88.2",
-        "string-direction": "0.1.x"
+        "string-direction": "0.1.x",
+        "undici": "^5.13.0"
     },
     "devDependencies": {
         "@xmldom/xmldom": "^0.7.6",
