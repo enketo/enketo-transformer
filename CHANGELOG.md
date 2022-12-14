@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.7] - 2022-12-14
+
+##### Changed
+
+-   Replace request with undici (Node's official fetch package), update dependencies, patch vulnerabilities (#155)
+
 ## [2.1.6] - 2022-10-27
 
 ##### Changed
