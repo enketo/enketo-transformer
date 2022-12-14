@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>url.js - Enketo Transformer</title>
+    <title>FetchError - Enketo Transformer</title>
     
     <meta name="description" content="Library/app that transforms ODK-compliant XForms into a format that enketo-core consumes" />
     
@@ -37,61 +37,222 @@
 
 <div id="main">
     
-    <h1 class="page-title">url.js</h1>
+    <h1 class="page-title">FetchError</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**
- * @param {string} value - a fully qualified URL, or a relative path
- * @return {string}
- */
-function escapeURLPath(value) {
-    const isFullyQualified = /^[a-z]+:/i.test(value);
-    const urlString = isFullyQualified
-        ? value
-        : `file:///${value.replace(/^\//, '')}`;
-    const url = new URL(urlString);
+        <h2>
+            <span class="ancestors"><a href="module-api.html">api</a>~</span>
+        
+        FetchError
+        </h2>
+        
+    
+</header>
 
-    if (isFullyQualified) {
-        return url.href;
-    }
+<article>
+    
+        <div class="container-overview">
+        
+            
 
-    const { pathname, search } = url;
-    const path = value.startsWith('/') ? pathname : pathname.replace(/^\//, '');
+    
 
-    return `${path}${search}`;
-}
+    <h4 class="name" id="FetchError"><span class="type-signature"></span>new FetchError<span class="signature">(status, message)</span><span class="type-signature"></span></h4>
 
-/**
- * @param {Record&lt;string, string>} mediaMap
- * @param {string} mediaURL
- */
-function getMediaPath(mediaMap, mediaURL) {
-    const mediaPath = mediaURL.match(/jr:\/\/[\w-]+\/(.+)/);
+    
 
-    if (mediaPath == null) {
-        return escapeURLPath(mediaURL);
-    }
 
-    const path = escapeURLPath(mediaPath[1]);
-    const value = mediaMap[path];
 
-    return value || escapeURLPath(mediaURL);
-}
 
-module.exports = {
-    escapeURLPath,
-    getMediaPath,
-};
-</code></pre>
-        </article>
-    </section>
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line18">line 18</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>status</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        </div>
+    
+
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li>Error</li>
+    </ul>
+
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
