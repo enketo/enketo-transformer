@@ -119,17 +119,17 @@ DEBUG=api,transformer,markdown,language node app.js
 Releases are done each time a dependent tool needs an `enketo-transformer` change.
 
 1. Create release PR
+1. Update `CHANGELOG.md`
+1. Update version in `package.json`
+    - Bump to major version if downstream has to make changes.
 1. Check [Dependabot](https://github.com/enketo/enketo-transformer/security/dependabot) for alerts
 1. Run `npm update`
     - Check if `node-libxslt` has been updated because it has caused problems in the past
 1. Run `npm audit`
     - Run `npm audit fix --production` to apply most important fixes
-1. Run `npm ci`
+1. Run `npm i`
 1. Run `npm test`
 1. Run `npm run build-docs`
-1. Update `CHANGELOG.md`
-1. Update version in `package.json`
-    - Bump to major version if downstream has to make changes.
 1. Merge PR with all changes
 1. Create GitHub release
 1. Tag and publish the release
