@@ -1,7 +1,4 @@
-const chai = require('chai');
-
-const { expect } = chai;
-const markdown = require('../src/markdown');
+import markdown from '../src/markdown';
 
 describe('markdown', () => {
     describe('rendering', () => {
