@@ -130,16 +130,14 @@ describe('for incompatible forms that require preprocessing', () => {
     it('preprocess fn does nothing if not provided...', async () => {
         const doc = await getTransformedModelDocument('bad-external.xml');
 
-        return Promise.all([
-            expect(doc).to.be.an.instanceOf(XMLDocument),
-            expect(doc.getElementsByTagName('instance')).to.have.length(2),
-            expect(doc.getElementById('existing')).to.not.be.null,
-            expect(
-                doc.getElementById('existing')!.getAttribute('src')
-            ).to.equal('jr://file/existing.xml'),
-            expect(doc.getElementById('counties')).to.be.null,
-            expect(doc.getElementById('cities')).to.be.null,
-        ]);
+        expect(doc).to.be.an.instanceOf(XMLDocument);
+        expect(doc.getElementsByTagName('instance')).to.have.length(2);
+        expect(doc.getElementById('existing')).to.not.be.null;
+        expect(doc.getElementById('existing')!.getAttribute('src')).to.equal(
+            'jr://file/existing.xml'
+        );
+        expect(doc.getElementById('counties')).to.be.null;
+        expect(doc.getElementById('cities')).to.be.null;
     });
 
     it('preprocess fn corrects instances if necessary', async () => {
@@ -148,28 +146,22 @@ describe('for incompatible forms that require preprocessing', () => {
             'text/xml'
         );
 
-        return Promise.all([
-            expect(preprocessedModel).to.be.an.instanceOf(XMLDocument),
-            expect(
-                preprocessedModel.getElementsByTagName('instance')
-            ).to.have.length(4),
-            expect(preprocessedModel.getElementById('existing')).to.not.be.null,
-            expect(
-                preprocessedModel
-                    .getElementById('existing')!
-                    .getAttribute('src')
-            ).to.equal('jr://file/existing.xml'),
-            expect(preprocessedModel.getElementById('counties')).to.not.be.null,
-            expect(
-                preprocessedModel
-                    .getElementById('counties')!
-                    .getAttribute('src')
-            ).to.equal('esri://file-csv/list_name/counties/itemsets.csv'),
-            expect(preprocessedModel.getElementById('cities')).to.not.be.null,
-            expect(
-                preprocessedModel.getElementById('cities')!.getAttribute('src')
-            ).to.equal('esri://file-csv/list_name/cities/itemsets.csv'),
-        ]);
+        expect(preprocessedModel).to.be.an.instanceOf(XMLDocument);
+        expect(
+            preprocessedModel.getElementsByTagName('instance')
+        ).to.have.length(4);
+        expect(preprocessedModel.getElementById('existing')).to.not.be.null;
+        expect(
+            preprocessedModel.getElementById('existing')!.getAttribute('src')
+        ).to.equal('jr://file/existing.xml');
+        expect(preprocessedModel.getElementById('counties')).to.not.be.null;
+        expect(
+            preprocessedModel.getElementById('counties')!.getAttribute('src')
+        ).to.equal('esri://file-csv/list_name/counties/itemsets.csv');
+        expect(preprocessedModel.getElementById('cities')).to.not.be.null;
+        expect(
+            preprocessedModel.getElementById('cities')!.getAttribute('src')
+        ).to.equal('esri://file-csv/list_name/cities/itemsets.csv');
     });
 
     it('fn corrects body elements if necessary', () => {

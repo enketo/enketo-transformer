@@ -66,17 +66,16 @@ describe('transformer', () => {
     });
 
     describe('transforms valid XForms', () => {
-        it('without an error', () =>
-            Promise.all([
-                expect(widgets).to.be.an('object'),
-                expect(widgets).to.have.property('form').and.to.not.be.empty,
-                expect(widgets).to.have.property('model').and.to.not.be.empty,
-                expect(widgets).to.have.property('transformerVersion').and.to
-                    .not.be.empty,
-            ]));
+        it('without an error', () => {
+            expect(widgets).to.be.an('object');
+            expect(widgets.form).to.not.be.empty;
+            expect(widgets.model).to.not.be.empty;
+            expect(widgets.transformerVersion).to.not.be.empty;
+        });
 
-        it('does not include the xform in the response', () =>
-            expect(widgets).to.not.have.property('xform'));
+        it('does not include the xform in the response', () => {
+            expect(widgets).to.not.have.property('xform');
+        });
     });
 
     describe('transforms invalid XForms', () => {
@@ -94,34 +93,26 @@ describe('transformer', () => {
 
     describe('puts attributes on root', () => {
         it('copies the formId', async () => {
-            expect(widgets)
-                .to.have.property('form')
-                .and.to.contain('data-form-id="widgets"');
+            expect(widgets.form).to.contain('data-form-id="widgets"');
         });
 
         it('copies the formId with accents', async () => {
             const result = await getTransformedForm('form-id-with-accent.xml');
 
-            return expect(result)
-                .to.have.property('form')
-                .and.to.contain('data-form-id="Éphémère"');
+            expect(result.form).to.contain('data-form-id="Éphémère"');
         });
 
         // https://github.com/enketo/enketo-transformer/issues/100
         it('copies the formId with spaces', async () => {
             const result = await getTransformedForm('form-id-with-space.xml');
 
-            return expect(result)
-                .to.have.property('form')
-                .and.to.contain('data-form-id="FormId with spaces"');
+            expect(result.form).to.contain('data-form-id="FormId with spaces"');
         });
     });
 
     describe('copies attributes on the `<model>`', () => {
         it('copies the odk:xforms-version attribute', () => {
-            expect(autocomplete)
-                .to.have.property('model')
-                .and.to.contain('odk:xforms-version="1.0.0"');
+            expect(autocomplete.model).to.contain('odk:xforms-version="1.0.0"');
         });
     });
 
@@ -131,9 +122,7 @@ describe('transformer', () => {
                 theme: 'mytheme',
             });
 
-            expect(result)
-                .to.have.property('form')
-                .and.to.contain('theme-mytheme');
+            expect(result.form).to.contain('theme-mytheme');
         });
 
         it('leaves the XForm-defined theme unchanged if the theme value provided is falsy', async () => {
@@ -159,20 +148,10 @@ describe('transformer', () => {
                 theme: false,
             });
 
-            return Promise.all([
-                expect(result1)
-                    .to.have.property('form')
-                    .and.to.contain('theme-one'),
-                expect(result2)
-                    .to.have.property('form')
-                    .and.to.contain('theme-one'),
-                expect(result3)
-                    .to.have.property('form')
-                    .and.to.contain('theme-one'),
-                expect(result4)
-                    .to.have.property('form')
-                    .and.to.contain('theme-one'),
-            ]);
+            expect(result1.form).to.contain('theme-one');
+            expect(result2.form).to.contain('theme-one');
+            expect(result3.form).to.contain('theme-one');
+            expect(result4.form).to.contain('theme-one');
         });
 
         it('replaces a theme defined in the XForm with a provided one', async () => {
@@ -185,54 +164,38 @@ describe('transformer', () => {
                 theme: 'mytheme',
             });
 
-            return Promise.all([
-                expect(result)
-                    .to.have.property('form')
-                    .and.to.not.contain('theme-one'),
-                expect(result)
-                    .to.have.property('form')
-                    .and.to.contain('theme-mytheme'),
-            ]);
+            expect(result.form).to.not.contain('theme-one');
+            expect(result.form).to.contain('theme-mytheme');
         });
     });
 
     describe('manipulates languages and', () => {
         it('provides a languageMap as output property', () => {
-            expect(advancedRequired)
-                .to.have.property('languageMap')
-                .and.to.deep.equal({
-                    dutch: 'nl',
-                    english: 'en',
-                });
+            expect(advancedRequired.languageMap).to.deep.equal({
+                dutch: 'nl',
+                english: 'en',
+            });
         });
 
         it('provides an empty languageMap as output property if nothing was changed', () => {
-            expect(widgets)
-                .to.have.property('languageMap')
-                .and.to.deep.equal({});
+            expect(widgets.languageMap).to.deep.equal({});
         });
     });
 
     describe('renders markdown', () => {
         it('takes into account that libxmljs Element.text() converts html entities', async () => {
-            return Promise.all([
-                expect(external)
-                    .to.have.property('form')
-                    .and.to.not.contain(
-                        '&lt;span style="color:pink;"&gt;Intro&lt;/span&gt;'
-                    ),
-                expect(external)
-                    .to.have.property('form')
-                    .and.to.contain('<span style="color:pink;">Intro</span>'),
-            ]);
+            expect(external.form).to.not.contain(
+                '&lt;span style="color:pink;"&gt;Intro&lt;/span&gt;'
+            );
+            expect(external.form).to.contain(
+                '<span style="color:pink;">Intro</span>'
+            );
         });
 
         it('and picks up formatting of <output>s', () => {
-            expect(formattedOutput)
-                .to.have.property('form')
-                .and.to.contain(
-                    'formatted: <em><span class="or-output" data-value="/output/txt"> </span></em> and'
-                );
+            expect(formattedOutput.form).to.contain(
+                'formatted: <em><span class="or-output" data-value="/output/txt"> </span></em> and'
+            );
         });
 
         it('preserves text containing special string replacement sequences', async () => {
@@ -250,11 +213,9 @@ describe('transformer', () => {
                 markdown: false,
             });
 
-            expect(result)
-                .to.have.property('form')
-                .and.to.contain(
-                    'formatted: *<span class="or-output" data-value="/output/txt"> </span>* and _normal_ text'
-                );
+            expect(result.form).to.contain(
+                'formatted: *<span class="or-output" data-value="/output/txt"> </span>* and _normal_ text'
+            );
         });
     });
 
@@ -262,15 +223,9 @@ describe('transformer', () => {
         it('strips arbitrary HTML in labels but preserves text', async () => {
             const result = await getTransformedForm('arbitrary-html.xml');
 
-            return Promise.all([
-                expect(result)
-                    .to.have.property('form')
-                    .and.to.not.contain('<div class="arbitrary-html">'),
+            expect(result.form).to.not.contain('<div class="arbitrary-html">');
 
-                expect(result)
-                    .to.have.property('form')
-                    .and.to.contain('Label text'),
-            ]);
+            expect(result.form).to.contain('Label text');
         });
     });
 
@@ -286,33 +241,15 @@ describe('transformer', () => {
                 media,
             });
 
-            return Promise.all([
-                expect(result1)
-                    .to.have.property('form')
-                    .and.to.contain('jr://images/happy.jpg'),
-                expect(result1)
-                    .to.have.property('form')
-                    .and.to.contain('jr://images/pigeon.png'),
-                expect(result1)
-                    .to.have.property('form')
-                    .and.to.not.contain('/i/am/happy.jpg'),
-                expect(result1)
-                    .to.have.property('form')
-                    .and.to.not.contain('/a/b/pigeon.png'),
+            expect(result1.form).to.contain('jr://images/happy.jpg');
+            expect(result1.form).to.contain('jr://images/pigeon.png');
+            expect(result1.form).to.not.contain('/i/am/happy.jpg');
+            expect(result1.form).to.not.contain('/a/b/pigeon.png');
 
-                expect(result2)
-                    .to.have.property('form')
-                    .and.to.not.contain('jr://images/happy.jpg'),
-                expect(result2)
-                    .to.have.property('form')
-                    .and.to.not.contain('jr://images/pigeon.png'),
-                expect(result2)
-                    .to.have.property('form')
-                    .and.to.contain('/i/am/happy.jpg'),
-                expect(result2)
-                    .to.have.property('form')
-                    .and.to.contain('/a/b/pigeon.png'),
-            ]);
+            expect(result2.form).to.not.contain('jr://images/happy.jpg');
+            expect(result2.form).to.not.contain('jr://images/pigeon.png');
+            expect(result2.form).to.contain('/i/am/happy.jpg');
+            expect(result2.form).to.contain('/a/b/pigeon.png');
         });
 
         it('in the View by replacing big-image link hrefs according to a provided map', async () => {
@@ -330,20 +267,10 @@ describe('transformer', () => {
                 media,
             });
 
-            return Promise.all([
-                expect(result)
-                    .to.have.property('form')
-                    .and.not.to.contain('jr://images/happy.jpg'),
-                expect(result)
-                    .to.have.property('form')
-                    .and.not.to.contain('jr://images/very-happy.jpg'),
-                expect(result)
-                    .to.have.property('form')
-                    .and.to.contain('/i/am/happy.jpg'),
-                expect(result)
-                    .to.have.property('form')
-                    .and.to.contain('/i/am/very-happy.jpg'),
-            ]);
+            expect(result.form).not.to.contain('jr://images/happy.jpg');
+            expect(result.form).not.to.contain('jr://images/very-happy.jpg');
+            expect(result.form).to.contain('/i/am/happy.jpg');
+            expect(result.form).to.contain('/i/am/very-happy.jpg');
         });
 
         it('in the Model by replacing them according to a provided map', async () => {
@@ -357,33 +284,17 @@ describe('transformer', () => {
                 media,
             });
 
-            return Promise.all([
-                expect(result1)
-                    .to.have.property('model')
-                    .and.to.contain('jr://file-csv/neighborhoods.csv'),
-                expect(result1)
-                    .to.have.property('model')
-                    .and.to.contain('jr://file/cities.xml'),
-                expect(result1)
-                    .to.have.property('model')
-                    .and.to.not.contain('/path/to/neighborhoods.csv'),
-                expect(result1)
-                    .to.have.property('model')
-                    .and.to.not.contain('/path/to/cities.xml'),
+            expect(result1.model).to.contain('jr://file-csv/neighborhoods.csv');
+            expect(result1.model).to.contain('jr://file/cities.xml');
+            expect(result1.model).to.not.contain('/path/to/neighborhoods.csv');
+            expect(result1.model).to.not.contain('/path/to/cities.xml');
 
-                expect(result2)
-                    .to.have.property('model')
-                    .and.to.not.contain('jr://file-csv/neighborhoods.csv'),
-                expect(result2)
-                    .to.have.property('model')
-                    .and.to.not.contain('jr://file/cities.xml'),
-                expect(result2)
-                    .to.have.property('model')
-                    .and.to.contain('/path/to/neighborhoods.csv'),
-                expect(result2)
-                    .to.have.property('model')
-                    .and.to.contain('/path/to/cities.xml'),
-            ]);
+            expect(result2.model).to.not.contain(
+                'jr://file-csv/neighborhoods.csv'
+            );
+            expect(result2.model).to.not.contain('jr://file/cities.xml');
+            expect(result2.model).to.contain('/path/to/neighborhoods.csv');
+            expect(result2.model).to.contain('/path/to/cities.xml');
         });
 
         it(`in the model for binary questions that contain a default value by copying to a
@@ -398,18 +309,12 @@ describe('transformer', () => {
                 media,
             });
 
-            return Promise.all([
-                expect(result)
-                    .to.have.property('model')
-                    .and.to.contain(
-                        '<ann src="https://feelings/unhappy.jpg">jr://images/unhappy.jpg</ann>'
-                    ),
-                expect(result)
-                    .to.have.property('model')
-                    .and.to.contain(
-                        '<dra src="https://feelings/indifferent.png">jr://images/indifferent.png</dra>'
-                    ),
-            ]);
+            expect(result.model).to.contain(
+                '<ann src="https://feelings/unhappy.jpg">jr://images/unhappy.jpg</ann>'
+            );
+            expect(result.model).to.contain(
+                '<dra src="https://feelings/indifferent.png">jr://images/indifferent.png</dra>'
+            );
         });
 
         it('by adding a form logo <img> if needed', async () => {
@@ -422,14 +327,8 @@ describe('transformer', () => {
                 media,
             });
 
-            return Promise.all([
-                expect(result1)
-                    .to.have.property('form')
-                    .and.to.not.contain('<img src="/i/am/logo.png"'),
-                expect(result2)
-                    .to.have.property('form')
-                    .and.to.contain('<img src="/i/am/logo.png"'),
-            ]);
+            expect(result1.form).to.not.contain('<img src="/i/am/logo.png"');
+            expect(result2.form).to.contain('<img src="/i/am/logo.png"');
         });
 
         // bug https://github.com/enketo/enketo-transformer/issues/149
@@ -441,9 +340,9 @@ describe('transformer', () => {
                 media,
             });
 
-            return expect(result)
-                .to.have.property('form')
-                .and.to.contain('<strong>Note with bold</strong> nnnn');
+            expect(result.form).to.contain(
+                '<strong>Note with bold</strong> nnnn'
+            );
         });
 
         describe('spaces in jr: media URLs', () => {
@@ -543,104 +442,70 @@ describe('transformer', () => {
                     it('escapes media in labels', () => {
                         const result = results[index];
 
-                        return Promise.all([
-                            expect(result)
-                                .to.have.property('form')
-                                .and.to.not.contain(
-                                    'jr://images/first image.jpg'
-                                ),
-                            expect(result)
-                                .to.have.property('form')
-                                .and.to.not.contain('jr://audio/a song.mp3'),
-                            expect(result)
-                                .to.have.property('form')
-                                .and.to.not.contain(
-                                    'jr://video/some video.mp4'
-                                ),
+                        expect(result.form).to.not.contain(
+                            'jr://images/first image.jpg'
+                        );
+                        expect(result.form).to.not.contain(
+                            'jr://audio/a song.mp3'
+                        );
+                        expect(result.form).to.not.contain(
+                            'jr://video/some video.mp4'
+                        );
 
-                            expect(result)
-                                .to.have.property('form')
-                                .and.to.contain(
-                                    'hallo%20spaceboy/spiders%20from%20mars.jpg'
-                                ),
-                            expect(result)
-                                .to.have.property('form')
-                                .and.to.contain(
-                                    'hallo%20spaceboy/space%20oddity.mp3'
-                                ),
-                            expect(result)
-                                .to.have.property('form')
-                                .and.to.contain(
-                                    'hallo%20spaceboy/a%20small%20plot%20of%20land.mp4'
-                                ),
-                        ]);
+                        expect(result.form).to.contain(
+                            'hallo%20spaceboy/spiders%20from%20mars.jpg'
+                        );
+                        expect(result.form).to.contain(
+                            'hallo%20spaceboy/space%20oddity.mp3'
+                        );
+                        expect(result.form).to.contain(
+                            'hallo%20spaceboy/a%20small%20plot%20of%20land.mp4'
+                        );
                     });
 
                     it('escapes binary defaults', () => {
                         const result = results[index];
 
-                        return Promise.all([
-                            expect(result)
-                                .to.have.property('model')
-                                .and.to.not.contain(
-                                    'jr://images/another image.png'
-                                ),
+                        expect(result.model).to.not.contain(
+                            'jr://images/another image.png'
+                        );
 
-                            expect(result)
-                                .to.have.property('model')
-                                .and.to.contain(
-                                    'hallo%20spaceboy/under%20pressure.png'
-                                ),
-                        ]);
+                        expect(result.model).to.contain(
+                            'hallo%20spaceboy/under%20pressure.png'
+                        );
                     });
 
                     it('escapes external instance URLs', () => {
                         const result = results[index];
 
-                        return Promise.all([
-                            expect(result)
-                                .to.have.property('model')
-                                .and.to.not.contain(
-                                    'jr://file/an instance.xml'
-                                ),
-                            expect(result)
-                                .to.have.property('model')
-                                .and.to.not.contain(
-                                    'jr://file-csv/a spreadsheet.csv'
-                                ),
+                        expect(result.model).to.not.contain(
+                            'jr://file/an instance.xml'
+                        );
+                        expect(result.model).to.not.contain(
+                            'jr://file-csv/a spreadsheet.csv'
+                        );
 
-                            expect(result)
-                                .to.have.property('model')
-                                .and.to.contain(
-                                    'hallo%20spaceboy/golden%20years.xml'
-                                ),
-                            expect(result)
-                                .to.have.property('model')
-                                .and.to.contain(
-                                    'hallo%20spaceboy/little%20wonder.csv'
-                                ),
-                        ]);
+                        expect(result.model).to.contain(
+                            'hallo%20spaceboy/golden%20years.xml'
+                        );
+                        expect(result.model).to.contain(
+                            'hallo%20spaceboy/little%20wonder.csv'
+                        );
                     });
 
                     it('escapes media URLs in markdown linkes', () => {
                         const result = results[index];
 
-                        return Promise.all([
-                            expect(result)
-                                .to.have.property('form')
-                                .and.to.not.contain('jr://file/a link.xml'),
+                        expect(result.form).to.not.contain(
+                            'jr://file/a link.xml'
+                        );
 
-                            expect(result)
-                                .to.have.property('form')
-                                .and.to.contain(
-                                    'hallo%20spaceboy/wishful%20beginnings.xml'
-                                ),
+                        expect(result.form).to.contain(
+                            'hallo%20spaceboy/wishful%20beginnings.xml'
+                        );
 
-                            // issue https://github.com/enketo/enketo-transformer/issues/149
-                            expect(result)
-                                .to.have.property('form')
-                                .and.to.contain('markdown</a><br>'),
-                        ]);
+                        // issue https://github.com/enketo/enketo-transformer/issues/149
+                        expect(result.form).to.contain('markdown</a><br>');
                     });
                 });
             });
@@ -720,23 +585,15 @@ describe('transformer', () => {
             const count1 = count(widgets);
             const count2 = count(advancedRequired);
 
-            return Promise.all([
-                expect(count1).to.equal(4),
-                expect(count2).to.equal(0),
-            ]);
+            expect(count1).to.equal(4);
+            expect(count2).to.equal(0);
         });
     });
 
     describe('processes required questions', () => {
         it('and adds the data-required HTML attribute for required XForm attributes keeping the value unchanged', () => {
-            Promise.all([
-                expect(widgets)
-                    .to.have.property('form')
-                    .and.to.contain('data-required="true()"'),
-                expect(widgets)
-                    .to.have.property('form')
-                    .and.to.not.contain(' required="required"'),
-            ]);
+            expect(widgets.form).to.contain('data-required="true()"');
+            expect(widgets.form).to.not.contain(' required="required"');
         });
 
         it('and does not add the data-required attribute if the value is false()', async () => {
@@ -748,9 +605,7 @@ describe('transformer', () => {
                 xform,
             });
 
-            expect(result)
-                .to.have.property('form')
-                .and.to.not.contain('data-required');
+            expect(result.form).to.not.contain('data-required');
         });
 
         it('and adds the correct number of required-msg elements', async () => {
@@ -760,30 +615,20 @@ describe('transformer', () => {
             const count1 = count(widgets);
             const count2 = count(advancedRequired);
 
-            return Promise.all([
-                expect(count1).to.equal(1),
-                expect(count2).to.equal(2),
-            ]);
+            expect(count1).to.equal(1);
+            expect(count2).to.equal(2);
         });
 
         it('and adds a default requiredMsg if no custom is provided', () => {
-            expect(widgets)
-                .to.have.property('form')
-                .and.to.contain('data-i18n="constraint.required"');
+            expect(widgets.form).to.contain('data-i18n="constraint.required"');
         });
 
         it('and adds a custom requiredMsg if provided', () => {
-            return Promise.all([
-                expect(advancedRequired)
-                    .to.have.property('form')
-                    .and.to.not.contain('data-i18n'),
-                expect(advancedRequired)
-                    .to.have.property('form')
-                    .and.to.contain('custom verplicht bericht'),
-                expect(advancedRequired)
-                    .to.have.property('form')
-                    .and.to.contain('custom required message'),
-            ]);
+            expect(advancedRequired.form).to.not.contain('data-i18n');
+            expect(advancedRequired.form).to.contain(
+                'custom verplicht bericht'
+            );
+            expect(advancedRequired.form).to.contain('custom required message');
         });
     });
 
@@ -801,27 +646,19 @@ describe('transformer', () => {
 
     describe('processes multiline questions', () => {
         it('and outputs a textarea for appearance="multiline" on text input', () => {
-            expect(widgets)
-                .to.have.property('form')
-                .and.to.contain('<textarea');
+            expect(widgets.form).to.contain('<textarea');
         });
 
         it('and outputs a textarea for appearance="multi-line" on text input', () => {
-            expect(widgets)
-                .to.have.property('form')
-                .and.to.contain('<textarea');
+            expect(widgets.form).to.contain('<textarea');
         });
 
         it('and outputs a textarea for appearance="textarea" on text input', () => {
-            expect(widgets)
-                .to.have.property('form')
-                .and.to.contain('<textarea');
+            expect(widgets.form).to.contain('<textarea');
         });
 
         it('and outputs a textarea for appearance="text-area" on text input', () => {
-            expect(widgets)
-                .to.have.property('form')
-                .and.to.contain('<textarea');
+            expect(widgets.form).to.contain('<textarea');
         });
 
         it('and outputs a textarea for rows="x" attribute on text input, with a rows appearance', async () => {
@@ -831,76 +668,64 @@ describe('transformer', () => {
             );
             const result = await transform({ xform });
 
-            return Promise.all([
-                expect(result)
-                    .to.have.property('form')
-                    .and.to.contain('<textarea'),
-                expect(result)
-                    .to.have.property('form')
-                    .and.to.contain('or-appearance-rows-5'),
-            ]);
+            expect(result.form).to.contain('<textarea');
+            expect(result.form).to.contain('or-appearance-rows-5');
         });
     });
 
     describe('processes autocomplete questions by producing <datalist> elements', () => {
         it('and outputs <datalist> elements', () => {
-            return Promise.all([
-                expect(autocompleteDoc).to.be.an('object'),
-                expect(
-                    autocompleteDoc.getElementsByTagName('select')
-                ).to.have.length(4),
-                expect(
-                    autocompleteDoc.getElementsByTagName('datalist')
-                ).to.have.length(2),
-                expect(
-                    autocompleteDoc
-                        .getElementById('selectoneautocompletethree')!
-                        .nodeName.toLowerCase()
-                ).to.equal('datalist'),
-                expect(
-                    autocompleteDoc
-                        .getElementsByTagName('input')[0]
-                        .getAttribute('list')
-                ).to.equal('selectoneautocompletethree'),
-                expect(
-                    autocompleteDoc
-                        .getElementsByTagName('input')[0]
-                        .getAttribute('type')
-                ).to.equal('text'),
-                expect(
-                    autocompleteDoc
-                        .getElementById('selectoneautocompletefour')!
-                        .nodeName.toLowerCase()
-                ).to.equal('datalist'),
-                expect(
-                    autocompleteDoc
-                        .getElementsByTagName('input')[1]
-                        .getAttribute('list')
-                ).to.equal('selectoneautocompletefour'),
-            ]);
+            expect(autocompleteDoc).to.be.an('object');
+            expect(
+                autocompleteDoc.getElementsByTagName('select')
+            ).to.have.length(4);
+            expect(
+                autocompleteDoc.getElementsByTagName('datalist')
+            ).to.have.length(2);
+            expect(
+                autocompleteDoc
+                    .getElementById('selectoneautocompletethree')!
+                    .nodeName.toLowerCase()
+            ).to.equal('datalist');
+            expect(
+                autocompleteDoc
+                    .getElementsByTagName('input')[0]
+                    .getAttribute('list')
+            ).to.equal('selectoneautocompletethree');
+            expect(
+                autocompleteDoc
+                    .getElementsByTagName('input')[0]
+                    .getAttribute('type')
+            ).to.equal('text');
+            expect(
+                autocompleteDoc
+                    .getElementById('selectoneautocompletefour')!
+                    .nodeName.toLowerCase()
+            ).to.equal('datalist');
+            expect(
+                autocompleteDoc
+                    .getElementsByTagName('input')[1]
+                    .getAttribute('list')
+            ).to.equal('selectoneautocompletefour');
         });
     });
 
     describe('processes a model with namespaces', () => {
-        it('leaves namespace prefixes and declarations intact on nodes', () =>
-            Promise.all([
-                expect(modelNamespace)
-                    .to.have.property('model')
-                    .and.to.contain('<orx:instanceID'),
-                expect(modelNamespace)
-                    .to.have.property('model')
-                    .and.to.contain('xmlns:orx="http://openrosa.org/xforms"'),
-                expect(modelNamespace)
-                    .to.have.property('form')
-                    .and.to.contain('name="/data/orx:meta/orx:instanceID'),
-            ]));
+        it('leaves namespace prefixes and declarations intact on nodes', () => {
+            expect(modelNamespace.model).to.contain('<orx:instanceID');
+            expect(modelNamespace.model).to.contain(
+                'xmlns:orx="http://openrosa.org/xforms"'
+            );
+            expect(modelNamespace.form).to.contain(
+                'name="/data/orx:meta/orx:instanceID'
+            );
+        });
 
-        it('leaves namespace prefixes and declarations intact on node attributes', () =>
-            Promise.all([
-                expect(modelNamespace)
-                    .to.have.property('model')
-                    .and.to.contain('<a orx:comment="/data/a_comment"/>'),
-            ]));
+        it('leaves namespace prefixes and declarations intact on node attributes', () => {
+            expect(modelNamespace.model).to.contain(
+                '<a orx:comment="/data/a_comment"/>'
+            );
+        });
     });
 
     describe('for backwards compatibility of forms without a /meta/instanceID node', () => {
@@ -910,23 +735,17 @@ describe('transformer', () => {
             result1 = await getTransformedForm('no-instance-id.xml');
         });
         it('adds a /meta/instanceID node', () =>
-            expect(result1)
-                .to.have.property('model')
-                .and.to.contain('<meta><instanceID/></meta>'));
+            expect(result1.model).to.contain('<meta><instanceID/></meta>'));
 
         it('does not add it if it contains /meta/instanceID in the OpenRosa namespace', () =>
-            expect(modelNamespace)
-                .to.have.property('model')
-                .and.to.not.contain('<instanceID/>'));
+            expect(modelNamespace.model).to.not.contain('<instanceID/>'));
     });
 
     describe('converts deprecated', () => {
         it('method="form-data-post" to "post" in submission element', async () => {
             const result = await getTransformedForm('deprecated.xml');
 
-            expect(result)
-                .to.have.property('form')
-                .and.to.contain('method="post"');
+            expect(result.form).to.contain('method="post"');
         });
     });
 
@@ -943,7 +762,7 @@ describe('transformer', () => {
         it('works for itemset nodesets using a simple randomize()', async () => {
             const result = await transform({ xform });
 
-            return expect(result).to.have.property('form').and.to.match(MATCH);
+            expect(result.form).to.match(MATCH);
         });
 
         it('works for itemset nodesets using a randomize() with static seed', async () => {
@@ -954,7 +773,7 @@ describe('transformer', () => {
                 ),
             });
 
-            return expect(result).to.have.property('form').and.to.match(MATCH);
+            expect(result.form).to.match(MATCH);
         });
 
         it.skip('works for itemset nodesets using a simple randomize() with complex multi-parameter predicate function', async () => {
@@ -965,7 +784,7 @@ describe('transformer', () => {
                 ),
             });
 
-            return expect(result).to.have.property('form').and.to.match(MATCH);
+            expect(result.form).to.match(MATCH);
         });
 
         it.skip('works for itemset nodesets using a randomize() with a static seed and with a complex multi-parameter predicate function', async () => {
@@ -976,7 +795,7 @@ describe('transformer', () => {
                 ),
             });
 
-            return expect(result).to.have.property('form').and.to.match(MATCH);
+            expect(result.form).to.match(MATCH);
         });
     });
 
@@ -1640,9 +1459,7 @@ describe('custom stuff', () => {
         it('by turning it into the data-for attribute', async () => {
             const result = await getTransformedForm('for.xml');
 
-            expect(result)
-                .to.have.property('form')
-                .and.to.contain('data-for="../a"');
+            expect(result.form).to.contain('data-for="../a"');
         });
     });
 
@@ -1652,9 +1469,7 @@ describe('custom stuff', () => {
                 openclinica: 1,
             });
 
-            return expect(result)
-                .to.have.property('form')
-                .and.to.contain('data-oc-external="clinicaldata"');
+            expect(result.form).to.contain('data-oc-external="clinicaldata"');
         });
 
         it('for setvalue/odk-instance-first-load actions by turning it into the data-oc-external attribute', async () => {
@@ -1662,9 +1477,7 @@ describe('custom stuff', () => {
                 openclinica: 1,
             });
 
-            return expect(result)
-                .to.have.property('form')
-                .and.to.contain('data-oc-external="clinicaldata"');
+            expect(result.form).to.contain('data-oc-external="clinicaldata"');
         });
 
         it('for setgeopoint/odk-instance-first-load actions by turning it into the data-oc-external attribute', async () => {
@@ -1672,9 +1485,7 @@ describe('custom stuff', () => {
                 openclinica: 1,
             });
 
-            return expect(result)
-                .to.have.property('form')
-                .and.to.contain('data-oc-external="clinicaldata"');
+            expect(result.form).to.contain('data-oc-external="clinicaldata"');
         });
     });
 
@@ -1687,12 +1498,9 @@ describe('custom stuff', () => {
                 }
             );
 
-            return expect(result)
-                .to.have.property('form')
-                .and.to.satisfy(
-                    (form: string) =>
-                        form.match(/or-relevant-msg/g)!.length === 4
-                );
+            expect(result.form).to.satisfy(
+                (form: string) => form.match(/or-relevant-msg/g)!.length === 4
+            );
         });
 
         it('are ignored by default', async () => {
@@ -1700,9 +1508,7 @@ describe('custom stuff', () => {
                 'relevant_constraint_required.xml'
             );
 
-            return expect(result)
-                .to.have.property('form')
-                .and.not.to.contain('or-relevant-msg');
+            expect(result.form).not.to.contain('or-relevant-msg');
         });
     });
 
@@ -1721,43 +1527,43 @@ describe('custom stuff', () => {
 
             describe('are added via oc:constraint[N] attribute', () => {
                 it('works for N=1', () =>
-                    expect(result)
-                        .to.have.property('form')
-                        .and.to.contain('data-oc-constraint1=". != \'a\'"'));
+                    expect(result.form).to.contain(
+                        'data-oc-constraint1=". != \'a\'"'
+                    ));
 
                 it('works for N=20', () =>
-                    expect(result)
-                        .to.have.property('form')
-                        .and.to.contain('data-oc-constraint20=". != \'c\'"'));
+                    expect(result.form).to.contain(
+                        'data-oc-constraint20=". != \'c\'"'
+                    ));
 
-                // it( 'ignores oc:constraint without a number', () => {
-                //    return expect( result ).to.have.property( 'form' ).and.to.not.contain( 'constraint to be ignored' );
-                // } );
+                it('ignores oc:constraint without a number', () => {
+                    expect(result.form).to.not.contain(
+                        'constraint to be ignored'
+                    );
+                });
 
                 it('does not add constraint messages in this manner', () =>
-                    expect(result)
-                        .to.have.property('form')
-                        .and.to.not.contain('data-oc-constraint20Msg="'));
+                    expect(result.form).to.not.contain(
+                        'data-oc-constraint20Msg="'
+                    ));
             });
 
             describe('can get individual constraint messages with the oc:constraint[N]Msg attribute', () => {
                 it('works for N=1', () =>
-                    expect(result)
-                        .to.have.property('form')
-                        .and.to.contain('class="or-constraint1-msg'));
+                    expect(result.form).to.contain(
+                        'class="or-constraint1-msg'
+                    ));
 
                 it('works for N=20', () =>
-                    expect(result)
-                        .to.have.property('form')
-                        .and.to.contain('class="or-constraint20-msg'));
+                    expect(result.form).to.contain(
+                        'class="or-constraint20-msg'
+                    ));
 
                 it('ignores constraint messages without a number', () =>
                     // The text "msg to be ignored is actually part of the result but is not present in a .or-constraint-msg span elmement
-                    expect(result)
-                        .to.have.property('form')
-                        .and.not.to.match(
-                            /or-constraint-msg [^>]+>msg to be ignored/
-                        ));
+                    expect(result.form).not.to.match(
+                        /or-constraint-msg [^>]+>msg to be ignored/
+                    ));
             });
         });
 
@@ -1771,24 +1577,24 @@ describe('custom stuff', () => {
             });
 
             it('for N=1 (attribute)', () =>
-                expect(result)
-                    .to.have.property('form')
-                    .and.not.to.contain('data-oc-constraint1=". != \'a\'"'));
+                expect(result.form).not.to.contain(
+                    'data-oc-constraint1=". != \'a\'"'
+                ));
 
             it('for N=20 (attribute)', () =>
-                expect(result)
-                    .to.have.property('form')
-                    .and.not.to.contain('data-oc-constraint20=". != \'c\'"'));
+                expect(result.form).not.to.contain(
+                    'data-oc-constraint20=". != \'c\'"'
+                ));
 
             it('for N=1 (message)', () =>
-                expect(result)
-                    .to.have.property('form')
-                    .and.not.to.contain('class="or-constraint1-msg'));
+                expect(result.form).not.to.contain(
+                    'class="or-constraint1-msg'
+                ));
 
             it('for N=20 (message', () =>
-                expect(result)
-                    .to.have.property('form')
-                    .and.not.to.contain('class="or-constraint20-msg'));
+                expect(result.form).not.to.contain(
+                    'class="or-constraint20-msg'
+                ));
         });
 
         it('with different ways of specify a "value" for setvalue', async () => {

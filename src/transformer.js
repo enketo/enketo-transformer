@@ -61,6 +61,7 @@ const version = _getVersion();
  * @property {string} form
  * @property {string} model
  * @property {string} transformerVersion
+ * @property {Record<string, string>} languageMap
  */
 
 /**
