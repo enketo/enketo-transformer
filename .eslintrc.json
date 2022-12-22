@@ -7,13 +7,29 @@
     "globals": {
         "Promise": true
     },
-    "extends": ["airbnb", "prettier"],
-    "plugins": ["chai-friendly", "jsdoc", "prettier", "unicorn"],
+    "extends": ["plugin:@typescript-eslint/recommended", "airbnb", "prettier"],
+    "plugins": [
+        "chai-friendly",
+        "jsdoc",
+        "prettier",
+        "unicorn",
+        "@typescript-eslint"
+    ],
+    "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "sourceType": "module",
         "ecmaVersion": 2020
     },
     "settings": {
+        "import/extensions": [".js", ".ts"],
+        "import/parsers": {
+            "@typescript-eslint/parser": [".ts"]
+        },
+        "import/resolver": {
+            "node": {
+                "extensions": [".js", ".ts"]
+            }
+        },
         "jsdoc": {
             "tagNamePreference": {
                 "returns": "return"
@@ -21,6 +37,8 @@
         }
     },
     "rules": {
+        "@typescript-eslint/no-non-null-assertion": "error",
+        "chai-friendly/no-unused-expressions": "error",
         "prettier/prettier": "error",
 
         "guard-for-in": "warn",
@@ -35,6 +53,7 @@
         ],
         "no-shadow": "warn",
         "no-underscore-dangle": "warn",
+        "no-unused-expressions": "off",
         "no-use-before-define": [
             "warn",
             {
@@ -53,9 +72,51 @@
         },
 
         {
+            "files": ["./**/*.js"],
+            "rules": {
+                "@typescript-eslint/no-var-requires": "off"
+            }
+        },
+
+        {
             "files": ["./test/**/*.js"],
             "env": {
                 "mocha": true
+            }
+        },
+
+        {
+            "files": ["./**/*.ts"],
+            "rules": {
+                "@typescript-eslint/no-unused-expressions": "off"
+            }
+        },
+
+        {
+            "files": ["./test/**/*.ts"],
+            "plugins": ["vitest"],
+            "globals": {
+                "describe": true,
+                "it": true,
+                "expect": true,
+                "beforeAll": true,
+                "beforeEach": true,
+                "afterAll": true,
+                "afterEach": true
+            },
+            "rules": {
+                "@typescript-eslint/no-non-null-assertion": "off",
+                "import/extensions": [
+                    "error",
+                    "ignorePackages",
+                    {
+                        "js": "never",
+                        "jsx": "never",
+                        "ts": "never",
+                        "tsx": "never"
+                    }
+                ],
+                "no-undef": "off"
             }
         }
     ]

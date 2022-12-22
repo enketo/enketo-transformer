@@ -7,6 +7,7 @@ import {
 } from './shared';
 
 import type { TransformedSurvey } from '../src/transformer';
+import type { Document } from './shared';
 
 function findElementByName(
     htmlDoc: Document,
@@ -84,7 +85,7 @@ describe('transformer', () => {
         invalidXForms.forEach((xform) => {
             it.fails('with a parse error', async () => {
                 await transform({
-                    // @ts-expect-error
+                    // @ts-expect-error: this is specifically testing invalid values
                     xform,
                 });
             });
@@ -139,12 +140,12 @@ describe('transformer', () => {
             });
             const result3 = await transform({
                 xform: newXform,
-                // @ts-expect-error
+                // @ts-expect-error: this is specifically testing non-theme values
                 theme: null,
             });
             const result4 = await transform({
                 xform: newXform,
-                // @ts-expect-error
+                // @ts-expect-error: this is specifically testing non-theme values
                 theme: false,
             });
 

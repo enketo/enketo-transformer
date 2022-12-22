@@ -17,7 +17,6 @@ describe('for incompatible forms that require preprocessing', () => {
     let preprocessedForm: Document;
 
     const preprocess: TransformPreprocess = function (doc) {
-        const libxmljs = this;
         const model = doc.get('/h:html/h:head/xmlns:model', NAMESPACES);
 
         if (!model) {
@@ -76,7 +75,7 @@ describe('for incompatible forms that require preprocessing', () => {
                  */
                 const children = input.childNodes();
                 const attrs = input.attrs();
-                const select1 = new libxmljs.Element(doc, 'select1').namespace(
+                const select1 = new this.Element(doc, 'select1').namespace(
                     NAMESPACES.xmlns
                 );
 
@@ -205,10 +204,9 @@ describe('for incompatible forms that require preprocessing', () => {
         ]);
     });
 
-    it('fn does not correct instances if not necessary', async () => {
-        return Promise.all([
+    it('fn does not correct instances if not necessary', async () =>
+        Promise.all([
             expect(preprocessedForm).to.be.an.instanceOf(Document),
             expect(preprocessedForm.getElementById('counties')).to.be.null,
-        ]);
-    });
+        ]));
 });
