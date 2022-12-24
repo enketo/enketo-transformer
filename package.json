@@ -23,10 +23,11 @@
         "eslint-check": "eslint app.js src/**/*.js vite.config.ts test/**/*.ts",
         "eslint-fix": "eslint app.js src/**/*.js vite.config.ts test/**/*.ts --fix",
         "prettier-fix": "prettier --write .",
-        "test": "vitest run --coverage && npm run prettier-fix && npm run eslint-fix && node update-readme-with-shield-badge.js",
+        "test": "vitest run --coverage && npm run prettier-fix && npm run eslint-fix && tsc && node update-readme-with-shield-badge.js",
         "test:watch": "vitest",
         "build-docs": "rimraf docs && ./node_modules/.bin/jsdoc -c jsdoc.config.js",
-        "develop": "DEBUG=api,transformer,markdown,language node app.js & http-server test/forms -p 8081"
+        "develop": "DEBUG=api,transformer,markdown,language node app.js & http-server test/forms -p 8081",
+        "tsc": "tsc"
     },
     "repository": {
         "type": "git",

@@ -1,4 +1,0 @@
-{
-    "extends": "../tsconfig.json",
-    "files": ["../typings/test.d.ts"]
-}

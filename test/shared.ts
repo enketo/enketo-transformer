@@ -81,15 +81,14 @@ export const getTransformedModelDocument = async (
 };
 
 /**
- * TODO: `@xmldom/xmldom` does not export `Document`. It's pretty linkely that @see {@link https://github.com/WebReflection/linkedom | `linkedom`}:
+ * TODO: `@xmldom/xmldom` does not export `Document`. It's pretty linkely that {@link https://github.com/WebReflection/linkedom linkedom}:
  *
  * 1. Does export it.
  * 2. Is a drop-in replacement for `@xmldom/xmldom`.
  * 3. Could very possibly go away soon anyway ;)
  */
-export const Document = parser.parseFromString('<a>', 'text/html').constructor;
+const document = parser.parseFromString('<a>', 'text/html');
 
-/**
- * TODO: this is at least temporarily a necessary fib.
- */
-export const XMLDocument = Document;
+export const DocumentConstructor = document.constructor;
+
+export type Document = typeof document;

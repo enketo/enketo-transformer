@@ -1,10 +1,9 @@
 import { NAMESPACES } from '../src/transformer';
 import {
-    Document,
+    DocumentConstructor as Document,
     getTransformedForm,
     getTransformedModelDocument,
     parser,
-    XMLDocument,
 } from './shared';
 
 import type {
@@ -129,7 +128,7 @@ describe('for incompatible forms that require preprocessing', () => {
     it('preprocess fn does nothing if not provided...', async () => {
         const doc = await getTransformedModelDocument('bad-external.xml');
 
-        expect(doc).to.be.an.instanceOf(XMLDocument);
+        expect(doc).to.be.an.instanceOf(Document);
         expect(doc.getElementsByTagName('instance')).to.have.length(2);
         expect(doc.getElementById('existing')).to.not.be.null;
         expect(doc.getElementById('existing')!.getAttribute('src')).to.equal(
@@ -145,7 +144,7 @@ describe('for incompatible forms that require preprocessing', () => {
             'text/xml'
         );
 
-        expect(preprocessedModel).to.be.an.instanceOf(XMLDocument);
+        expect(preprocessedModel).to.be.an.instanceOf(Document);
         expect(
             preprocessedModel.getElementsByTagName('instance')
         ).to.have.length(4);
