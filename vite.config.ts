@@ -19,6 +19,13 @@ export default defineConfig({
         // functionality which depends on libxmljs/libxslt.
         threads: false,
 
+        coverage: {
+            provider: 'istanbul',
+            include: ['src/**/*.js'],
+            reporter: ['html', 'text-summary', 'json'],
+            reportsDirectory: './test-coverage',
+        },
+
         globals: true,
         include: ['test/**/*.spec.ts'],
         reporters: 'verbose',
