@@ -43,6 +43,20 @@
 
         "guard-for-in": "warn",
         "import/extensions": "warn",
+        "import/no-extraneous-dependencies": [
+            "error",
+            {
+                "devDependencies": ["vite.config.ts", "test/**/*.ts"],
+                "optionalDependencies": false,
+                "peerDependencies": false
+            }
+        ],
+        "import/no-unresolved": [
+            "error",
+            {
+                "ignore": ["vitest/config"]
+            }
+        ],
         "import/order": "warn",
         "no-param-reassign": "warn",
         "no-restricted-syntax": [
@@ -79,33 +93,9 @@
         },
 
         {
-            "files": ["./test/**/*.js"],
-            "env": {
-                "mocha": true
-            }
-        },
-
-        {
             "files": ["./**/*.ts"],
             "rules": {
-                "@typescript-eslint/no-unused-expressions": "off"
-            }
-        },
-
-        {
-            "files": ["./test/**/*.ts"],
-            "plugins": ["vitest"],
-            "globals": {
-                "describe": true,
-                "it": true,
-                "expect": true,
-                "beforeAll": true,
-                "beforeEach": true,
-                "afterAll": true,
-                "afterEach": true
-            },
-            "rules": {
-                "@typescript-eslint/no-non-null-assertion": "off",
+                "@typescript-eslint/no-unused-expressions": "off",
                 "import/extensions": [
                     "error",
                     "ignorePackages",
@@ -115,7 +105,15 @@
                         "ts": "never",
                         "tsx": "never"
                     }
-                ],
+                ]
+            }
+        },
+
+        {
+            "files": ["./test/**/*.ts"],
+            "plugins": ["vitest"],
+            "rules": {
+                "@typescript-eslint/no-non-null-assertion": "off",
                 "no-undef": "off"
             }
         }
