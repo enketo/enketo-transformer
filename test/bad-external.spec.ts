@@ -1,19 +1,23 @@
-import chai from 'chai';
-import transformer from '../src/transformer';
-import { getXForm, parser } from './shared';
+import { NAMESPACES } from '../src/transformer';
+import {
+    Document,
+    getTransformedForm,
+    getTransformedModelDocument,
+    parser,
+    XMLDocument,
+} from './shared';
 
-import type { TransformPreprocess } from '../src/transformer';
+import type {
+    TransformedSurvey,
+    TransformPreprocess,
+} from '../src/transformer';
 
 describe('for incompatible forms that require preprocessing', () => {
-    let xform: string;
-
-    beforeAll(async () => {
-        xform = await getXForm('bad-external.xml');
-    });
+    let preprocessed: TransformedSurvey;
+    let preprocessedForm: Document;
 
     const preprocess: TransformPreprocess = function (doc) {
         const libxmljs = this;
-        const { NAMESPACES } = transformer;
         const model = doc.get('/h:html/h:head/xmlns:model', NAMESPACES);
 
         if (!model) {
@@ -113,118 +117,106 @@ describe('for incompatible forms that require preprocessing', () => {
         return doc;
     };
 
-    it('preprocess fn does nothing if not provided...', () => {
-        const result = transformer.transform({
-            xform,
-        });
-
-        return result.then((res) => {
-            const doc = parser.parseFromString(res.model, 'text/xml');
-
-            return Promise.all([
-                expect(doc).to.be.an('object'),
-                expect(doc.getElementsByTagName('instance')).to.have.length(2),
-                expect(doc.getElementById('existing')).to.not.be.null,
-                expect(
-                    doc.getElementById('existing')!.getAttribute('src')
-                ).to.equal('jr://file/existing.xml'),
-                expect(doc.getElementById('counties')).to.be.null,
-                expect(doc.getElementById('cities')).to.be.null,
-            ]);
-        });
-    });
-
-    it('preprocess fn corrects instances if necessary', () => {
-        const result = transformer.transform({
-            xform,
+    beforeAll(async () => {
+        preprocessed = await getTransformedForm('bad-external.xml', {
             preprocess,
         });
+        preprocessedForm = parser.parseFromString(
+            preprocessed.form,
+            'text/html'
+        );
+    });
 
-        return result.then((res) => {
-            const doc = parser.parseFromString(res.model, 'text/xml');
+    it('preprocess fn does nothing if not provided...', async () => {
+        const doc = await getTransformedModelDocument('bad-external.xml');
 
-            return Promise.all([
-                expect(doc).to.be.an('object'),
-                expect(doc.getElementsByTagName('instance')).to.have.length(4),
-                expect(doc.getElementById('existing')).to.not.be.null,
-                expect(
-                    doc.getElementById('existing')!.getAttribute('src')
-                ).to.equal('jr://file/existing.xml'),
-                expect(doc.getElementById('counties')).to.not.be.null,
-                expect(
-                    doc.getElementById('counties')!.getAttribute('src')
-                ).to.equal('esri://file-csv/list_name/counties/itemsets.csv'),
-                expect(doc.getElementById('cities')).to.not.be.null,
-                expect(
-                    doc.getElementById('cities')!.getAttribute('src')
-                ).to.equal('esri://file-csv/list_name/cities/itemsets.csv'),
-            ]);
-        });
+        return Promise.all([
+            expect(doc).to.be.an.instanceOf(XMLDocument),
+            expect(doc.getElementsByTagName('instance')).to.have.length(2),
+            expect(doc.getElementById('existing')).to.not.be.null,
+            expect(
+                doc.getElementById('existing')!.getAttribute('src')
+            ).to.equal('jr://file/existing.xml'),
+            expect(doc.getElementById('counties')).to.be.null,
+            expect(doc.getElementById('cities')).to.be.null,
+        ]);
+    });
+
+    it('preprocess fn corrects instances if necessary', async () => {
+        const preprocessedModel = parser.parseFromString(
+            preprocessed.model,
+            'text/xml'
+        );
+
+        return Promise.all([
+            expect(preprocessedModel).to.be.an.instanceOf(XMLDocument),
+            expect(
+                preprocessedModel.getElementsByTagName('instance')
+            ).to.have.length(4),
+            expect(preprocessedModel.getElementById('existing')).to.not.be.null,
+            expect(
+                preprocessedModel
+                    .getElementById('existing')!
+                    .getAttribute('src')
+            ).to.equal('jr://file/existing.xml'),
+            expect(preprocessedModel.getElementById('counties')).to.not.be.null,
+            expect(
+                preprocessedModel
+                    .getElementById('counties')!
+                    .getAttribute('src')
+            ).to.equal('esri://file-csv/list_name/counties/itemsets.csv'),
+            expect(preprocessedModel.getElementById('cities')).to.not.be.null,
+            expect(
+                preprocessedModel.getElementById('cities')!.getAttribute('src')
+            ).to.equal('esri://file-csv/list_name/cities/itemsets.csv'),
+        ]);
     });
 
     it('fn corrects body elements if necessary', () => {
-        const result = transformer.transform({
-            xform,
-            preprocess,
-        });
+        const selects = preprocessedForm.getElementsByTagName('select');
 
-        return result.then((res) => {
-            const doc = parser.parseFromString(res.form, 'text/xml');
-            const selects = doc.getElementsByTagName('select');
-
-            return Promise.all([
-                expect(selects).to.have.length(2), // language selector and the one with appearance=minimal
-                expect(selects[1].getAttribute('name')).to.equal(
-                    '/select_one_external/city2'
-                ),
-                expect(selects[1].getAttribute('data-type-xml')).to.equal(
-                    'select1'
-                ),
-                expect(
-                    selects[1]
-                        .getElementsByTagName('option')[0]
-                        .getAttribute('class')
-                ).to.equal('itemset-template'),
-                expect(
-                    selects[1]
-                        .getElementsByTagName('option')[0]
-                        .getAttribute('data-items-path')
-                ).to.equal(
-                    "instance('cities')/root/item[state= /select_one_external/state  and county= /select_one_external/county ]"
-                ),
-                expect(
-                    (
-                        selects[1].nextSibling!.nextSibling! as Element
-                    ).getAttribute('class')
-                ).to.equal('itemset-labels'),
-                expect(
-                    (
-                        selects[1].nextSibling!.nextSibling! as Element
-                    ).getAttribute('data-label-ref')
-                ).to.equal('translate(label)'),
-                expect(
-                    (
-                        selects[1].nextSibling!.nextSibling! as Element
-                    ).getAttribute('data-value-ref')
-                ).to.equal('name'),
-            ]);
-        });
+        return Promise.all([
+            expect(selects).to.have.length(2), // language selector and the one with appearance=minimal
+            expect(selects[1].getAttribute('name')).to.equal(
+                '/select_one_external/city2'
+            ),
+            expect(selects[1].getAttribute('data-type-xml')).to.equal(
+                'select1'
+            ),
+            expect(
+                selects[1]
+                    .getElementsByTagName('option')[0]
+                    .getAttribute('class')
+            ).to.equal('itemset-template'),
+            expect(
+                selects[1]
+                    .getElementsByTagName('option')[0]
+                    .getAttribute('data-items-path')
+            ).to.equal(
+                "instance('cities')/root/item[state= /select_one_external/state  and county= /select_one_external/county ]"
+            ),
+            expect(
+                (selects[1].nextSibling!.nextSibling! as Element).getAttribute(
+                    'class'
+                )
+            ).to.equal('itemset-labels'),
+            expect(
+                (selects[1].nextSibling!.nextSibling! as Element).getAttribute(
+                    'data-label-ref'
+                )
+            ).to.equal('translate(label)'),
+            expect(
+                (selects[1].nextSibling!.nextSibling! as Element).getAttribute(
+                    'data-value-ref'
+                )
+            ).to.equal('name'),
+        ]);
     });
 
     it('fn does not correct instances if not necessary', async () => {
-        const xform = await getXForm('widgets.xml');
-        const result = transformer.transform({
-            xform,
-            preprocess,
-        });
-
-        return result.then((res) => {
-            const doc = parser.parseFromString(res.model, 'text/xml');
-
-            return Promise.all([
-                expect(doc).to.be.an('object'),
-                expect(doc.getElementById('counties')).to.be.null,
-            ]);
-        });
+        return Promise.all([
+            expect(preprocessedForm).to.be.an.instanceOf(Document),
+            expect(preprocessedForm.getElementById('counties')).to.be.null,
+        ]);
     });
 });

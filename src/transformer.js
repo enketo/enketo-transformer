@@ -52,7 +52,7 @@ const version = _getVersion();
  * @property {string} [theme]
  * @property {boolean} [markdown]
  * @property {Record<string, string>} [media]
- * @property {boolean} [openclinica]
+ * @property {boolean | number} [openclinica]
  * @property {TransformPreprocess} [preprocess]
  */
 
