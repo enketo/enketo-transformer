@@ -23,7 +23,5 @@
         "strict": true,
         "target": "es2018",
         "types": ["node"]
-    },
-    "exclude": ["node_modules", "typings/test.d.ts"],
-    "include": ["src", "typings"]
+    }
 }

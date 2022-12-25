@@ -21,7 +21,7 @@
         "ecmaVersion": 2020
     },
     "settings": {
-        "import/extensions": [".js", ".ts"],
+        "import/extensions": [".ts"],
         "import/parsers": {
             "@typescript-eslint/parser": [".ts"]
         },
@@ -46,7 +46,12 @@
         "import/no-extraneous-dependencies": [
             "error",
             {
-                "devDependencies": ["vite.config.ts", "test/**/*.ts"],
+                "devDependencies": [
+                    "app.ts",
+                    "vite.config.ts",
+                    "src/api.ts",
+                    "test/**/*.ts"
+                ],
                 "optionalDependencies": false,
                 "peerDependencies": false
             }
@@ -82,13 +87,6 @@
             "parser": "markdown-eslint-parser",
             "rules": {
                 "prettier/prettier": ["error", { "parser": "markdown" }]
-            }
-        },
-
-        {
-            "files": ["./**/*.js"],
-            "rules": {
-                "@typescript-eslint/no-var-requires": "off"
             }
         },
 
