@@ -11,7 +11,7 @@
         "experimentalDecorators": true,
         "forceConsistentCasingInFileNames": true,
         "inlineSourceMap": true,
-        "lib": ["dom", "ES2018"],
+        "lib": ["ES2018"],
         "module": "amd",
         "moduleResolution": "node",
         "noEmit": true,
@@ -21,8 +21,9 @@
         "resolveJsonModule": true,
         "skipLibCheck": true,
         "strict": true,
-        "target": "es2018"
+        "target": "es2018",
+        "types": ["node"]
     },
-    "exclude": ["node_modules"],
+    "exclude": ["node_modules", "typings/test.d.ts"],
     "include": ["src", "test", "typings"]
 }

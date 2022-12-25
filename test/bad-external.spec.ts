@@ -1,17 +1,17 @@
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
+import chai from 'chai';
+import transformer from '../src/transformer';
+import { getXForm, parser } from './shared';
 
-const { expect } = chai;
-const fs = require('fs');
-const { DOMParser } = require('@xmldom/xmldom');
-const transformer = require('../src/transformer');
-
-chai.use(chaiAsPromised);
+import type { TransformPreprocess } from '../src/transformer';
 
 describe('for incompatible forms that require preprocessing', () => {
-    const xform = fs.readFileSync('./test/forms/bad-external.xml');
-    const parser = new DOMParser();
-    const preprocess = function (doc) {
+    let xform: string;
+
+    beforeAll(async () => {
+        xform = await getXForm('bad-external.xml');
+    });
+
+    const preprocess: TransformPreprocess = function (doc) {
         const libxmljs = this;
         const { NAMESPACES } = transformer;
         const model = doc.get('/h:html/h:head/xmlns:model', NAMESPACES);
@@ -36,8 +36,8 @@ describe('for incompatible forms that require preprocessing', () => {
                  * Preprocess Model
                  * - add instances
                  */
-                const match = query.match(/^instance\('([^)]+)'\)/);
-                const id = match && match.length ? match[1] : null;
+                const match = query?.match(/^instance\('([^)]+)'\)/);
+                const id = match?.length ? match[1] : null;
 
                 if (
                     id &&
@@ -78,10 +78,12 @@ describe('for incompatible forms that require preprocessing', () => {
 
                 // add all attributes including unknowns, except the query attribute
                 attrs.forEach((attr) => {
-                    const obj = {};
-                    obj[attr.name()] = attr.value();
-                    if (attr.name() !== 'query') {
-                        select1.attr(obj);
+                    const name = attr.name();
+
+                    if (name !== 'query') {
+                        const value = attr.value();
+
+                        select1.attr(name, value);
                     }
                 });
 
@@ -108,7 +110,6 @@ describe('for incompatible forms that require preprocessing', () => {
             }
         );
 
-        // console.log( doc.toString( true ) );
         return doc;
     };
 
@@ -125,7 +126,7 @@ describe('for incompatible forms that require preprocessing', () => {
                 expect(doc.getElementsByTagName('instance')).to.have.length(2),
                 expect(doc.getElementById('existing')).to.not.be.null,
                 expect(
-                    doc.getElementById('existing').getAttribute('src')
+                    doc.getElementById('existing')!.getAttribute('src')
                 ).to.equal('jr://file/existing.xml'),
                 expect(doc.getElementById('counties')).to.be.null,
                 expect(doc.getElementById('cities')).to.be.null,
@@ -147,15 +148,15 @@ describe('for incompatible forms that require preprocessing', () => {
                 expect(doc.getElementsByTagName('instance')).to.have.length(4),
                 expect(doc.getElementById('existing')).to.not.be.null,
                 expect(
-                    doc.getElementById('existing').getAttribute('src')
+                    doc.getElementById('existing')!.getAttribute('src')
                 ).to.equal('jr://file/existing.xml'),
                 expect(doc.getElementById('counties')).to.not.be.null,
                 expect(
-                    doc.getElementById('counties').getAttribute('src')
+                    doc.getElementById('counties')!.getAttribute('src')
                 ).to.equal('esri://file-csv/list_name/counties/itemsets.csv'),
                 expect(doc.getElementById('cities')).to.not.be.null,
                 expect(
-                    doc.getElementById('cities').getAttribute('src')
+                    doc.getElementById('cities')!.getAttribute('src')
                 ).to.equal('esri://file-csv/list_name/cities/itemsets.csv'),
             ]);
         });
@@ -192,25 +193,28 @@ describe('for incompatible forms that require preprocessing', () => {
                     "instance('cities')/root/item[state= /select_one_external/state  and county= /select_one_external/county ]"
                 ),
                 expect(
-                    selects[1].nextSibling.nextSibling.getAttribute('class')
+                    (
+                        selects[1].nextSibling!.nextSibling! as Element
+                    ).getAttribute('class')
                 ).to.equal('itemset-labels'),
                 expect(
-                    selects[1].nextSibling.nextSibling.getAttribute(
-                        'data-label-ref'
-                    )
+                    (
+                        selects[1].nextSibling!.nextSibling! as Element
+                    ).getAttribute('data-label-ref')
                 ).to.equal('translate(label)'),
                 expect(
-                    selects[1].nextSibling.nextSibling.getAttribute(
-                        'data-value-ref'
-                    )
+                    (
+                        selects[1].nextSibling!.nextSibling! as Element
+                    ).getAttribute('data-value-ref')
                 ).to.equal('name'),
             ]);
         });
     });
 
-    it('fn does not correct instances if not necessary', () => {
+    it('fn does not correct instances if not necessary', async () => {
+        const xform = await getXForm('widgets.xml');
         const result = transformer.transform({
-            xform: fs.readFileSync('./test/forms/widgets.xml'),
+            xform,
             preprocess,
         });
 

@@ -24,7 +24,9 @@
         "eslint-fix": "eslint app.js src/**/*.js test/**/*.js --fix",
         "prettier-fix": "prettier --write .",
         "test": "nyc mocha test/*.spec.js --timeout 6000 && npm run prettier-fix && npm run eslint-fix && node update-readme-with-shield-badge.js",
-        "test:watch": "nodemon --exec 'mocha test/*.spec.js --timeout 6000000' --watch src --watch test --ext js,xml,xsl",
+        "vitest": "vitest run",
+        "test:watch": "nodemon --exec 'mocha test/*.spec.js --timeout 6000000' --watch src --watch test --ext js,xml,xsl,ts",
+        "vitest:watch": "vitest",
         "build-docs": "rimraf docs && ./node_modules/.bin/jsdoc -c jsdoc.config.js",
         "develop": "DEBUG=api,transformer,markdown,language node app.js & http-server test/forms -p 8081"
     },
@@ -50,6 +52,7 @@
     },
     "devDependencies": {
         "@types/express": "^4.17.14",
+        "@types/node": "^18.11.17",
         "@xmldom/xmldom": "^0.7.9",
         "chai": "^4.3.7",
         "chai-as-promised": "^7.1.1",
@@ -75,7 +78,9 @@
         "nodemon": "^2.0.20",
         "nyc": "^15.1.0",
         "prettier": "^2.8.1",
-        "rimraf": "^3.0.2"
+        "rimraf": "^3.0.2",
+        "vite": "^4.0.3",
+        "vitest": "^0.26.2"
     },
     "volta": {
         "node": "16.5.0",
