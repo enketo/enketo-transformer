@@ -9,31 +9,32 @@
  * PRs are very welcome!
  */
 
-const express = require('express');
-const { request } = require('undici');
-const transformer = require('./transformer');
+import express from 'express';
+import { request } from 'undici';
+import { transform } from './transformer';
 
 const router = express.Router();
 
 class FetchError extends Error {
-    /**
-     * @param {number} status
-     * @param {string} message
-     */
-    constructor(status, message) {
+    readonly status: number;
+
+    constructor(status: number, message: string) {
         super(message);
         this.status = status;
     }
 }
 
-/**
- * @param {express.Request} req
- * @returns {Promise<string>}
- */
-const getXForm = async (req) => {
+const getXForm = async (req: express.Request) => {
     const url = req.query.xform;
 
     try {
+        if (typeof url !== 'string') {
+            throw new FetchError(
+                400,
+                'An `xform` query parameter is required.'
+            );
+        }
+
         const response = await request(url, {
             headers: {
                 'X-OpenRosa-Version': '1.0',
@@ -56,7 +57,7 @@ const getXForm = async (req) => {
     } catch (error) {
         console.error(`Error occurred when requesting ${url}`, error);
 
-        if (error.status == null) {
+        if (error instanceof Error && !(error instanceof FetchError)) {
             throw new FetchError(500, error.message ?? 'Unknown error.');
         }
 
@@ -64,18 +65,14 @@ const getXForm = async (req) => {
     }
 };
 
-/**
- * @param {import('express').Request} req
- * @returns {Promise<import('./transformer').TransformedSurvey>}
- */
-const getTransformedSurvey = async (req) => {
+const getTransformedSurvey = async (req: express.Request) => {
     const isPost = req.method === 'POST';
     const payload = isPost ? req.body : req.query;
     const { markdown, openclinica, theme } = payload;
     const media = isPost ? payload.media : {};
     const xform = req.method === 'POST' ? payload.xform : await getXForm(req);
 
-    return transformer.transform({
+    return transform({
         xform,
         markdown: markdown !== 'false',
         openclinica: openclinica === 'true',
@@ -104,42 +101,55 @@ router
             next(error);
         }
     })
-    .get('/', async (req, res) => {
+    .get('/', async (req, res, next) => {
         try {
             const survey = await getTransformedSurvey(req);
 
             res.json(survey);
         } catch (error) {
-            res.status(error.status).send(
-                `${error.message} (stack: ${error.stack})`
-            );
+            next(error);
         }
     })
-    .post('/', async (req, res) => {
+    .post('/', async (req, res, next) => {
         try {
             const survey = await getTransformedSurvey(req);
 
             res.json(survey);
         } catch (error) {
-            res.status(error.status).send(
-                `${error.message} (stack: ${error.stack})`
-            );
+            next(error);
         }
     })
     // for development purposes, to return HTML that can be easily inspected in the developer console
-    .get('/htmlform', async (req, res) => {
+    .get('/htmlform', async (req, res, next) => {
         try {
             const { form } = await getTransformedSurvey(req);
 
             res.set('Content-Type', 'text/html');
             res.end(form);
         } catch (error) {
-            res.status(error.status).send.send(
-                `${error.message} (stack: ${error.stack})`
-            );
+            next(error);
         }
     });
 
-module.exports = (app) => {
-    app.use('/transform', router);
+const errorHandler: express.ErrorRequestHandler = (
+    error: unknown,
+    _req,
+    res
+) => {
+    if (error instanceof FetchError) {
+        res.status(error.status).send(
+            `${error.message} (stack: ${error.stack})`
+        );
+    } else {
+        res.status(500).send(`Unknown error: ${error}`);
+    }
 };
+
+export const api = (app: express.Application) => {
+    app.use('/transform', router, errorHandler);
+};
+
+/**
+ * Exported for backwards compatibility, prefer named imports.
+ */
+export default api;
