@@ -1,12 +1,13 @@
-const express = require('express');
+import bodyParser from 'body-parser';
+import express from 'express';
+import config from './config/config.json';
+import api from './src/api';
 
 const app = express();
-const bodyParser = require('body-parser');
-const config = require('./config/config.json');
 
-for (const item in config) {
-    app.set(item, config[item]);
-}
+Object.entries(config).forEach(([key, value]) => {
+    app.set(key, value);
+});
 
 app.use(bodyParser.json());
 app.use(
@@ -15,7 +16,7 @@ app.use(
     })
 );
 
-require('./src/api')(app);
+api(app);
 
 app.listen(app.get('port'), () => {
     console.warn(`enketo-transformer running on port ${app.get('port')}!`);
