@@ -2,5 +2,6 @@
 
 .nyc*
 */node_modules/*
+dist/*
 docs/*
 test-coverage/*

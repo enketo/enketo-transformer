@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 import crypto from 'crypto';
 import libxslt from 'libxslt';
 import type {
@@ -13,14 +12,14 @@ import { escapeURLPath, getMediaPath } from './url';
 
 const { libxmljs } = libxslt;
 
-const xslForm = fs.readFileSync(
-    path.join(__dirname, './xsl/openrosa2html5form.xsl'),
-    'utf8'
-);
-const xslModel = fs.readFileSync(
-    path.join(__dirname, './xsl/openrosa2xmlmodel.xsl'),
-    'utf8'
-);
+const getXSL = (fileName: string) => {
+    const { pathname } = new URL(`./xsl/${fileName}`, import.meta.url);
+
+    return fs.readFileSync(pathname, 'utf8');
+};
+
+const xslForm = getXSL('openrosa2html5form.xsl');
+const xslModel = getXSL('openrosa2xmlmodel.xsl');
 
 export const NAMESPACES = {
     xmlns: 'http://www.w3.org/2002/xforms',

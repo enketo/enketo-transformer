@@ -3,7 +3,15 @@
     "version": "2.1.7",
     "description": "Library/app that transforms ODK-compliant XForms into a format that Enketo can consume",
     "license": "Apache-2.0",
-    "main": "src/transformer.js",
+    "type": "module",
+    "main": "./dist/enketo-transformer.umd.cjs",
+    "module": "./dist/enketo-transformer.js",
+    "exports": {
+        ".": {
+            "import": "./dist/enketo-transformer.js",
+            "require": "./dist/enketo-transformer.umd.cjs"
+        }
+    },
     "bugs": {
         "url": "https://github.com/enketo/enketo-transformer/issues",
         "email": "martijn@enketo.org"
@@ -19,15 +27,15 @@
     },
     "contributors": [],
     "scripts": {
-        "start": "node app.js",
+        "build": "vite build",
+        "start": "vite",
         "eslint-check": "eslint app.ts src/**/*.ts vite.config.ts test/**/*.ts",
         "eslint-fix": "eslint app.ts src/**/*.ts vite.config.ts test/**/*.ts --fix",
         "prettier-fix": "prettier --write .",
         "test": "vitest run --coverage && npm run prettier-fix && npm run eslint-fix && tsc && node update-readme-with-shield-badge.js",
         "test:watch": "vitest",
         "build-docs": "rimraf docs && ./node_modules/.bin/jsdoc -c jsdoc.config.js",
-        "develop": "DEBUG=api,transformer,markdown,language node app.js & http-server test/forms -p 8081",
-        "develop": "DEBUG=api,transformer,markdown,language node app.ts & http-server test/forms -p 8081",
+        "develop": "DEBUG=api,transformer,markdown,language vite & http-server test/forms -p 8081",
         "tsc": "tsc --project . && tsc --project ./test"
     },
     "repository": {
@@ -82,6 +90,7 @@
         "rimraf": "^3.0.2",
         "typescript": "^4.9.4",
         "vite": "^4.0.3",
+        "vite-plugin-node": "^1.0.0",
         "vitest": "^0.26.2"
     },
     "volta": {

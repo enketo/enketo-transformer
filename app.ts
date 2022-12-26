@@ -18,6 +18,4 @@ app.use(
 
 api(app);
 
-app.listen(app.get('port'), () => {
-    console.warn(`enketo-transformer running on port ${app.get('port')}!`);
-});
+export { app };
