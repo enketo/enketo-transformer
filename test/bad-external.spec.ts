@@ -31,7 +31,7 @@ describe('for incompatible forms that require preprocessing', () => {
                     return;
                 }
 
-                const query = q.value();
+                const query = q.value()!;
                 const ref = r.value();
 
                 /**
@@ -85,7 +85,7 @@ describe('for incompatible forms that require preprocessing', () => {
                     if (name !== 'query') {
                         const value = attr.value();
 
-                        select1.attr(name, value);
+                        select1.attr(name, value!);
                     }
                 });
 

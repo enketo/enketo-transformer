@@ -20,14 +20,15 @@
     "contributors": [],
     "scripts": {
         "start": "node app.js",
-        "eslint-check": "eslint app.js src/**/*.js vite.config.ts test/**/*.ts",
-        "eslint-fix": "eslint app.js src/**/*.js vite.config.ts test/**/*.ts --fix",
+        "eslint-check": "eslint app.ts src/**/*.ts vite.config.ts test/**/*.ts",
+        "eslint-fix": "eslint app.ts src/**/*.ts vite.config.ts test/**/*.ts --fix",
         "prettier-fix": "prettier --write .",
         "test": "vitest run --coverage && npm run prettier-fix && npm run eslint-fix && tsc && node update-readme-with-shield-badge.js",
         "test:watch": "vitest",
         "build-docs": "rimraf docs && ./node_modules/.bin/jsdoc -c jsdoc.config.js",
         "develop": "DEBUG=api,transformer,markdown,language node app.js & http-server test/forms -p 8081",
-        "tsc": "tsc"
+        "develop": "DEBUG=api,transformer,markdown,language node app.ts & http-server test/forms -p 8081",
+        "tsc": "tsc --project . && tsc --project ./test"
     },
     "repository": {
         "type": "git",

@@ -3,7 +3,10 @@ import stringDirection from 'string-direction';
 
 import type { Tag, Subtag } from 'language-tags';
 
-class Language {
+/**
+ * @package
+ */
+export class Language {
     /**
      * Included for backwards compatibility, prefer:
      *
@@ -40,7 +43,6 @@ class Language {
 }
 
 export type {
-    Language,
     /**
      * Exported for backwards compatibility, prefer:
      *
@@ -68,25 +70,25 @@ export const parseLanguage = (
 
     const parts = sourceLanguage.match(/^([^(]+)\((.*)\)\s*$/);
 
-    if (parts && parts.length > 2) {
-        description = parts[1].trim();
-        tag = parts[2].trim();
-    } else {
-        // First check whether `sourceLanguage` is a known IANA subtag like 'en' or 'en-GB'
-        const languageFromTag = getLanguageFromSubtag(
-            sourceLanguage.split('-')[0]
+    if (parts && parts.length >= 2) {
+        return new Language(
+            sourceLanguage,
+            parts[1].trim(),
+            parts[2].trim(),
+            directionality
         );
+    }
+    // First check whether `sourceLanguage` is a known IANA subtag like 'en' or 'en-GB'
+    const languageFromTag = getLanguageFromSubtag(sourceLanguage.split('-')[0]);
 
-        if (languageFromTag == null) {
-            const { subtag } =
-                getLanguageFromDescription(description)?.data ?? {};
+    if (languageFromTag == null) {
+        const language = getLanguageFromDescription(description);
 
-            if (subtag != null) {
-                tag = subtag;
-            }
-        } else {
-            description = languageFromTag.descriptions()[0];
+        if (typeof language === 'object' && language.data.subtag != null) {
+            tag = language.data.subtag;
         }
+    } else {
+        description = languageFromTag.descriptions()[0];
     }
 
     return new Language(sourceLanguage, description, tag, directionality);
@@ -96,13 +98,15 @@ export const parseLanguage = (
  * Performs IANA search to find language object with provided description.
  */
 const getLanguageFromDescription = (description: string) =>
-    tags.search(description).find(isLanguage);
+    description.trim() === ''
+        ? ''
+        : tags.search(description).find(isLanguage) ?? '';
 
 /**
  * Performs IANA search to find language object with provided subtag.
  */
 const getLanguageFromSubtag = (subtag: string) =>
-    tags.subtags(subtag).find(isLanguage) ?? null;
+    subtag.trim() === '' ? null : tags.subtags(subtag).find(isLanguage) ?? null;
 
 const isLanguage = (object: Tag | Subtag) => object.data.type === 'language';
 
