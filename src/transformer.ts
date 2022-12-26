@@ -1,17 +1,17 @@
-/**
- * @module transformer
- */
-
-const pkg = require('../package');
-const crypto = require('crypto');
-const libxslt = require('libxslt');
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
+import libxslt from 'libxslt';
+import type {
+    Document as XMLJSDocument,
+    DocumentFragment as XMLJSDocumentFragment,
+} from 'libxmljs';
+import pkg from '../package.json';
+import language from './language';
+import markdown from './markdown';
+import { escapeURLPath, getMediaPath } from './url';
 
 const { libxmljs } = libxslt;
-const fs = require('fs');
-const path = require('path');
-const markdown = require('./markdown');
-const language = require('./language');
-const { escapeURLPath, getMediaPath } = require('./url');
 
 const xslForm = fs.readFileSync(
     path.join(__dirname, './xsl/openrosa2html5form.xsl'),
@@ -21,58 +21,42 @@ const xslModel = fs.readFileSync(
     path.join(__dirname, './xsl/openrosa2xmlmodel.xsl'),
     'utf8'
 );
-/**
- * @constant
- */
-const NAMESPACES = {
+
+export const NAMESPACES = {
     xmlns: 'http://www.w3.org/2002/xforms',
     orx: 'http://openrosa.org/xforms',
     h: 'http://www.w3.org/1999/xhtml',
-};
-/**
- * @constant
- * @static
- * @type {string}
- */
-const version = _getVersion();
+} as const;
 
-/**
- * @typedef {import('libxmljs').Document} XMLJSDocument
- */
+type LibXMLJS = typeof libxmljs;
 
-/**
- * @callback TransformPreprocess
- * @param {typeof libxmljs} this
- * @param {XMLJSDocument} doc
- */
+export type TransformPreprocess = (
+    this: LibXMLJS,
+    doc: XMLJSDocument
+) => XMLJSDocument;
 
-/**
- * @typedef Survey
- * @property {string} xform
- * @property {string} [theme]
- * @property {boolean} [markdown]
- * @property {Record<string, string>} [media]
- * @property {boolean | number} [openclinica]
- * @property {TransformPreprocess} [preprocess]
- */
+export interface Survey {
+    xform: string;
+    markdown?: boolean;
+    media?: Record<string, string>;
+    openclinica?: boolean | number;
+    preprocess?: TransformPreprocess;
+    theme?: string;
+}
 
-/**
- * @typedef TransformedSurvey
- * @property {string} form
- * @property {string} model
- * @property {string} transformerVersion
- * @property {Record<string, string>} languageMap
- */
+export interface TransformedSurvey {
+    form: string;
+    languageMap: Record<string, string>;
+    model: string;
+    transformerVersion: string;
+}
 
 /**
  * Performs XSLT transformation on XForm and process the result.
- *
- * @static
- * @param {Survey} survey - Survey object with at least an xform property.
- * @return {Promise<TransformedSurvey>} promise
  */
-function transform(survey) {
-    let xformDoc;
+export const transform = (survey: Survey): Promise<TransformedSurvey> => {
+    let xformDoc: XMLJSDocument;
+
     const xsltParams = survey.openclinica
         ? {
               openclinica: 1,
@@ -85,7 +69,7 @@ function transform(survey) {
         )
     );
 
-    return _parseXml(survey.xform)
+    return parseXML(survey.xform)
         .then((doc) => {
             if (typeof survey.preprocess === 'function') {
                 doc = survey.preprocess.call(libxmljs, doc);
@@ -93,60 +77,58 @@ function transform(survey) {
 
             return doc;
         })
-        .then((doc) => _processBinaryDefaults(doc, mediaMap))
+        .then((doc) => processBinaryDefaults(doc, mediaMap))
         .then((doc) => {
             xformDoc = doc;
 
-            return _transform(xslForm, xformDoc, xsltParams);
+            return xslTransform(xslForm, xformDoc, xsltParams);
         })
         .then((htmlDoc) => {
-            htmlDoc = _correctAction(htmlDoc, 'setgeopoint');
-            htmlDoc = _correctAction(htmlDoc, 'setvalue');
-            htmlDoc = _replaceTheme(htmlDoc, survey.theme);
-            htmlDoc = _replaceMediaSources(htmlDoc, mediaMap);
-            htmlDoc = _replaceLanguageTags(htmlDoc, survey);
-            if (survey.markdown !== false) {
-                survey.form = _renderMarkdown(htmlDoc, mediaMap);
-            } else {
-                survey.form = _docToString(htmlDoc);
-            }
+            htmlDoc = correctAction(htmlDoc, 'setgeopoint');
+            htmlDoc = correctAction(htmlDoc, 'setvalue');
+            htmlDoc = replaceTheme(htmlDoc, survey.theme);
+            htmlDoc = replaceMediaSources(htmlDoc, mediaMap);
 
-            return _transform(xslModel, xformDoc);
+            const languageMap = replaceLanguageTags(htmlDoc);
+            const form =
+                survey.markdown !== false
+                    ? renderMarkdown(htmlDoc, mediaMap)
+                    : docToString(htmlDoc);
+            const xmlDoc = xslTransform(xslModel, xformDoc);
+
+            return Promise.all([form, languageMap, xmlDoc]);
         })
-        .then((xmlDoc) => {
-            xmlDoc = _replaceMediaSources(xmlDoc, mediaMap);
-            xmlDoc = _addInstanceIdNodeIfMissing(xmlDoc);
-            survey.model = xmlDoc.root().get('*').toString(false);
-            survey.transformerVersion = pkg.version;
+        .then(([form, languageMap, xmlDoc]) => {
+            xmlDoc = replaceMediaSources(xmlDoc, mediaMap);
+            xmlDoc = addInstanceIdNodeIfMissing(xmlDoc);
 
-            delete survey.xform;
-            delete survey.media;
-            delete survey.preprocess;
-            delete survey.markdown;
-            delete survey.openclinica;
+            const model = docToString(xmlDoc);
 
-            return survey;
+            return {
+                form,
+                model,
+                languageMap,
+                transformerVersion: PACKAGE_VESION,
+            };
         });
+};
+
+interface XSLTParams {
+    openclinica?: number;
 }
 
-/**
- * Performs a generic XSLT transformation.
- *
- * @param {string} xslStr - XSL stylesheet content as string
- * @param {object} xmlDoc - libxmljs object of XML document
- * @param {object} xsltParams - Params object.
- * @return {Promise<Error|object>} libxmljs result document object.
- */
-function _transform(xslStr, xmlDoc, xsltParams) {
-    const params = xsltParams || {};
-
-    return new Promise((resolve, reject) => {
+const xslTransform = (
+    xslStr: string,
+    xmlDoc: XMLJSDocument,
+    xsltParams: XSLTParams = {} as XSLTParams
+) =>
+    new Promise<XMLJSDocument>((resolve, reject) => {
         libxslt.parse(xslStr, (error, stylesheet) => {
-            if (error) {
+            if (stylesheet == null) {
                 reject(error);
             } else {
-                stylesheet.apply(xmlDoc, params, (error, result) => {
-                    if (error) {
+                stylesheet.apply(xmlDoc, xsltParams, (error, result) => {
+                    if (result == null) {
                         reject(error);
                     } else {
                         resolve(result);
@@ -155,14 +137,11 @@ function _transform(xslStr, xmlDoc, xsltParams) {
             }
         });
     });
-}
 
-/**
- * @param {XMLJSDocument} doc - libxmljs object.
- * @param {Record<string, string>} [mediaMap] - map of media filenames and their URLs
- * @return {XMLJSDocument} libxmljs object
- */
-function _processBinaryDefaults(doc, mediaMap) {
+const processBinaryDefaults = (
+    doc: XMLJSDocument,
+    mediaMap: Record<string, string>
+) => {
     doc.find(
         '/h:html/h:head/xmlns:model/xmlns:bind[@type="binary"]',
         NAMESPACES
@@ -172,7 +151,7 @@ function _processBinaryDefaults(doc, mediaMap) {
         if (nodeset && nodeset.value()) {
             const path = `/h:html/h:head/xmlns:model/xmlns:instance${nodeset
                 .value()
-                .replace(/\//g, '/xmlns:')}`;
+                ?.replace(/\//g, '/xmlns:')}`;
             const dataNode = doc.get(path, NAMESPACES);
 
             if (dataNode) {
@@ -191,17 +170,16 @@ function _processBinaryDefaults(doc, mediaMap) {
     });
 
     return doc;
-}
+};
 
 /**
  * Correct some <setvalue>/<odk:setgeopoint> issues in the XSL stylesheets.
  * This is much easier to correct in javascript than in XSLT
- *
- * @param {object} doc - libxmljs object
- * @param {'setvalue' | 'setgeopoint'} localName - local XML tag name
- * @return {object} doc - libxmljs object
  */
-function _correctAction(doc, localName = 'setvalue') {
+const correctAction = (
+    doc: XMLJSDocument,
+    localName: 'setvalue' | 'setgeopoint' = 'setvalue'
+) => {
     /*
      * See setvalue.xml (/data/person/age_changed). A <setvalue> inside a form control results
      * in one label.question with a nested label.setvalue which is weird syntax (and possibly invalid HTML).
@@ -210,8 +188,8 @@ function _correctAction(doc, localName = 'setvalue') {
         `//*[contains(@class, "question")]//label/input[@data-${localName}]`
     ).forEach((setValueEl) => {
         const clone = setValueEl.clone();
-        setValueEl.parent().addNextSibling(clone);
-        setValueEl.parent().remove();
+        setValueEl.parent()?.addNextSibling(clone);
+        setValueEl.parent()?.remove();
     });
 
     /*
@@ -225,83 +203,81 @@ function _correctAction(doc, localName = 'setvalue') {
     doc.find(
         `//label[contains(@class, "${localName}")]/input[@data-${localName}]`
     ).forEach((setValueEl) => {
-        const name = setValueEl.attr('name').value();
+        const name = setValueEl.attr('name')?.value();
         const questionSameName = doc.get(
             `//*[@name="${name}" and ( contains(../@class, 'question') or contains(../../@class, 'option-wrapper')) and not(@type='hidden')]`
         );
         if (questionSameName) {
             // Note that if the question has radiobuttons or checkboxes only the first of those gets the setvalue attributes.
-            [`data-${localName}`, 'data-event'].forEach((att) =>
-                questionSameName.attr(att, setValueEl.attr(att).value())
-            );
-            setValueEl.parent().remove();
+            [`data-${localName}`, 'data-event'].forEach((name) => {
+                questionSameName.attr(
+                    name,
+                    setValueEl.attr(name)?.value() ?? name
+                );
+            });
+            setValueEl.parent()?.remove();
         }
     });
 
     return doc;
-}
+};
 
-/**
- * Parses and XML string into a libxmljs object.
- *
- * @param  {string} xmlStr - XML string.
- * @return {Promise<XMLJSDocument>} libxmljs result document object.
- */
-function _parseXml(xmlStr) {
-    let doc;
-
-    return new Promise((resolve, reject) => {
+const parseXML = (xmlStr: string) =>
+    new Promise<XMLJSDocument>((resolve, reject) => {
         try {
-            doc = libxmljs.parseXml(xmlStr);
+            const doc = libxmljs.parseXml(xmlStr);
+
             resolve(doc);
         } catch (e) {
             reject(e);
         }
     });
-}
 
-/**
- * Replaces the form-defined theme.
- *
- * @param {object} doc - libxmljs object.
- * @param {string} theme - Theme name.
- * @return {object} libxmljs object.
- */
-function _replaceTheme(doc, theme) {
+const replaceTheme = (doc: XMLJSDocument, theme?: string) => {
     const HAS_THEME = /(theme-)[^"'\s]+/;
 
     if (!theme) {
         return doc;
     }
 
-    const formClassAttr = doc.root().get('/root/form').attr('class');
+    const formClassAttr = doc.root().get('/root/form')?.attr('class');
+
+    if (formClassAttr == null) {
+        return doc;
+    }
+
     const formClassValue = formClassAttr.value();
 
-    if (HAS_THEME.test(formClassValue)) {
+    if (
+        formClassAttr != null &&
+        formClassValue != null &&
+        HAS_THEME.test(formClassValue)
+    ) {
         formClassAttr.value(formClassValue.replace(HAS_THEME, `$1${theme}`));
     } else {
         formClassAttr.value(`${formClassValue} theme-${theme}`);
     }
 
     return doc;
-}
+};
 
-/**
- * Replaces xformManifest urls with URLs according to an internal Enketo Express url format.
- *
- * @param {XMLJSDocument} xmlDoc - libxmljs object.
- * @param {Record<string, string>} [mediaMap] - map of media filenames and their URLs
- * @return {XMLJSDocument} libxmljs object
- */
-function _replaceMediaSources(xmlDoc, mediaMap) {
+const replaceMediaSources = <T extends XMLJSDocument | XMLJSDocumentFragment>(
+    root: T,
+    mediaMap?: Record<string, string>
+) => {
     if (!mediaMap) {
-        return xmlDoc;
+        return root;
     }
 
     // iterate through each element with a src attribute
-    xmlDoc.find('//*[@src] | //a[@href]').forEach((mediaEl) => {
+    root.find('//*[@src] | //a[@href]').forEach((mediaEl) => {
         const attribute = mediaEl.name().toLowerCase() === 'a' ? 'href' : 'src';
-        const src = mediaEl.attr(attribute).value();
+        const src = mediaEl.attr(attribute)?.value();
+
+        if (src == null) {
+            return;
+        }
+
         const replacement = getMediaPath(mediaMap, src);
 
         if (replacement) {
@@ -311,26 +287,22 @@ function _replaceMediaSources(xmlDoc, mediaMap) {
 
     // add form logo <img> element if applicable
     const formLogo = mediaMap['form_logo.png'];
-    const formLogoEl = xmlDoc.get('//*[@class="form-logo"]');
+    const formLogoEl = root.get('//*[@class="form-logo"]');
     if (formLogo && formLogoEl) {
         formLogoEl.node('img').attr('src', formLogo).attr('alt', 'form logo');
     }
 
-    return xmlDoc;
-}
+    return root;
+};
 
 /**
  * Replaces all lang attributes to the valid IANA tag if found.
  * Also add the dir attribute to the languages in the language selector.
  *
- * @see  http://www.w3.org/International/questions/qa-choosing-language-tags
- *
- * @param {object} doc - libxmljs object.
- * @param {object} survey - Survey object.
- * @return {object} libxmljs object.
+ * @see http://www.w3.org/International/questions/qa-choosing-language-tags
  */
-function _replaceLanguageTags(doc, survey) {
-    const map = {};
+const replaceLanguageTags = (doc: XMLJSDocument) => {
+    const map: Record<string, string> = {};
 
     const languageElements = doc.find(
         '/root/form/select[@id="form-languages"]/option'
@@ -340,17 +312,17 @@ function _replaceLanguageTags(doc, survey) {
     const languages = languageElements.map((el) => {
         const lang = el.text();
 
-        return language.parse(lang, _getLanguageSampleText(doc, lang));
+        return language.parse(lang, getLanguageSampleText(doc, lang));
     });
 
     // forms without itext and only one language, still need directionality info
     if (languages.length === 0) {
-        languages.push(language.parse('', _getLanguageSampleText(doc, '')));
+        languages.push(language.parse('', getLanguageSampleText(doc, '')));
     }
 
     // add or correct dir and value attributes, and amend textcontent of options in language selector
     languageElements.forEach((el, index) => {
-        const val = el.attr('value').value();
+        const val = el.attr('value')?.value();
         if (val && val !== languages[index].tag) {
             map[val] = languages[index].tag;
         }
@@ -377,7 +349,7 @@ function _replaceLanguageTags(doc, survey) {
     if (langSelectorElement) {
         const defaultLang = langSelectorElement
             .attr('data-default-lang')
-            .value();
+            ?.value();
         languages.some((lang) => {
             if (lang.src === defaultLang) {
                 langSelectorElement.attr({
@@ -391,42 +363,31 @@ function _replaceLanguageTags(doc, survey) {
         });
     }
 
-    survey.languageMap = map;
-
-    return doc;
-}
+    return map;
+};
 
 /**
  * Obtains a non-empty hint text or other text sample of a particular form language.
- *
- * @param {object} doc - libxmljs object.
- * @param {string} lang - Language name.
- * @return {string} the text sample.
  */
-function _getLanguageSampleText(doc, lang) {
+const getLanguageSampleText = (doc: XMLJSDocument, language: string) => {
     // First find non-empty text content of a hint with that lang attribute.
     // If not found, find any span with that lang attribute.
     const langSampleEl =
         doc.get(
-            `/root/form//span[contains(@class, "or-hint") and @lang="${lang}" and normalize-space() and not(./text() = '-')]`
+            `/root/form//span[contains(@class, "or-hint") and @lang="${language}" and normalize-space() and not(./text() = '-')]`
         ) ||
         doc.get(
-            `/root/form//span[@lang="${lang}" and normalize-space() and not(./text() = '-')]`
+            `/root/form//span[@lang="${language}" and normalize-space() and not(./text() = '-')]`
         );
 
-    return langSampleEl && langSampleEl.text().trim().length
-        ? langSampleEl.text()
-        : 'nothing';
-}
+    return langSampleEl?.text().trim() || 'nothing';
+};
 
 /**
  * Temporary function to add a /meta/instanceID node if this is missing.
  * This used to be done in enketo-xslt but was removed when support for namespaces was added.
- *
- * @param {object} doc - libxmljs object.
- * @return {object} libxmljs object.
  */
-function _addInstanceIdNodeIfMissing(doc) {
+const addInstanceIdNodeIfMissing = (doc: XMLJSDocument) => {
     const xformsPath =
         '/xmlns:root/xmlns:model/xmlns:instance/*/xmlns:meta/xmlns:instanceID';
     const openrosaPath =
@@ -451,17 +412,16 @@ function _addInstanceIdNodeIfMissing(doc) {
     }
 
     return doc;
-}
+};
 
 /**
  * Converts a subset of Markdown in all textnode children of labels and hints into HTML
- *
- * @param  {object} htmlDoc - libxmljs object.
- * @param {Record<string, string>} [mediaMap] - map of media filenames and their URLs
- * @return {string} html string.
  */
-function _renderMarkdown(htmlDoc, mediaMap) {
-    const replacements = {};
+const renderMarkdown = (
+    htmlDoc: XMLJSDocument,
+    mediaMap: Record<string, string>
+) => {
+    const replacements: Record<string, string> = {};
 
     // First turn all outputs into text so *<span class="or-output></span>* can be detected
     htmlDoc
@@ -500,7 +460,7 @@ function _renderMarkdown(htmlDoc, mediaMap) {
                     `<div class="temporary-root">${rendered}</div>`
                 );
 
-                rendered = _replaceMediaSources(fragment, mediaMap)
+                rendered = replaceMediaSources(fragment, mediaMap)
                     .root()
                     .childNodes()
                     .map((node) => node.toString(false))
@@ -513,7 +473,7 @@ function _renderMarkdown(htmlDoc, mediaMap) {
         });
 
     // TODO: does this result in self-closing tags?
-    let htmlStr = _docToString(htmlDoc);
+    let htmlStr = docToString(htmlDoc);
 
     // Now replace the placeholders with the rendered HTML
     // in reverse order so outputs are done last
@@ -532,46 +492,44 @@ function _renderMarkdown(htmlDoc, mediaMap) {
         });
 
     return htmlStr;
-}
+};
 
-/**
- * @param {object} doc - libxmljs object.
- * @return {string} stringified document.
- */
-function _docToString(doc) {
+const docToString = (doc: XMLJSDocument) => {
+    const element = doc.root().get('*');
+
+    if (element == null) {
+        throw new Error('Document has no elements');
+    }
+
     // TODO: does this result in self-closing tags?
-    return doc.root().get('*').toString(false);
-}
+    return element.toString(false);
+};
 
-/**
- * Gets a hash of the 2 XSL stylesheets.
- *
- * @return {string} hash representing version of XSL stylesheets
- */
-function _getVersion() {
-    return _md5(xslForm + xslModel + pkg.version);
-}
-
-/**
- * Calculate the md5 hash of a message.
- *
- * @param {string|Buffer} message - The string or buffer.
- * @return {string} The hash.
- */
-function _md5(message) {
+const md5 = (message: string | Buffer) => {
     const hash = crypto.createHash('md5');
     hash.update(message);
 
     return hash.digest('hex');
-}
+};
 
-module.exports = {
+const PACKAGE_VESION = pkg.version;
+
+const VERSION = md5(xslForm + xslModel + PACKAGE_VESION);
+
+export const sheets = {
+    xslForm,
+    xslModel,
+};
+
+export { escapeURLPath };
+
+/**
+ * Exported for backwards compatibility, prefer named imports from enketo-transformer's index module.
+ */
+export default {
     transform,
-    version,
+    version: VERSION,
     NAMESPACES,
-    sheets: {
-        xslForm,
-        xslModel,
-    },
+    sheets,
     escapeURLPath,
 };
