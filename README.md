@@ -129,7 +129,6 @@ Releases are done each time a dependent tool needs an `enketo-transformer` chang
     - Run `npm audit fix --production` to apply most important fixes
 1. Run `npm i`
 1. Run `npm test`
-1. Run `npm run build-docs`
 1. Merge PR with all changes
 1. Create GitHub release
 1. Tag and publish the release
