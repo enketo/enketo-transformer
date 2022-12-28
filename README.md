@@ -20,30 +20,32 @@ npm install enketo-transformer --save
 
 ### Use as module
 
-```js
-const transformer = require('enketo-transformer');
-const xform = fs.readFileSync('path/to/xform.xml');
+```ts
+import { transform } from 'enketo-transformer';
 
-transformer
-    .transform({
-        // required string of XForm
-        xform: xform,
-        // optional string, to add theme if no theme is defined in the XForm
-        theme: 'sometheme',
-        // optional map, to replace jr://..../myfile.png URLs
-        media: {
-            'myfile.png': '/path/to/somefile.png',
-            'myfile.mp3': '/another/path/to/2.mp3',
-        },
-        // optional ability to disable markdown rendering (default is true)
-        markdown: false,
-        // optional preprocess function that transforms the XForm (as libXMLJs object) to
-        // e.g. correct incompatible XForm syntax before Enketo's transformation takes place
-        preprocess: (doc) => doc,
-    })
-    .then(function (result) {
-        // do something with result
-    });
+const xform = fs.readFileSync('path/to/xform.xml');
+const result = await transform({
+    // required string of XForm
+    xform: xform,
+
+    // optional string, to add theme if no theme is defined in the XForm
+    theme: 'sometheme',
+
+    // optional map, to replace jr://..../myfile.png URLs
+    media: {
+        'myfile.png': '/path/to/somefile.png',
+        'myfile.mp3': '/another/path/to/2.mp3',
+    },
+
+    // optional ability to disable markdown rendering (default is true)
+    markdown: false,
+
+    // optional preprocess function that transforms the XForm (as libXMLJs object) to
+    // e.g. correct incompatible XForm syntax before Enketo's transformation takes place
+    preprocess: (doc) => doc,
+});
+
+// ... do something with result
 ```
 
 ### Install as app (web API)
