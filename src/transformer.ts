@@ -45,70 +45,57 @@ export interface TransformedSurvey {
 /**
  * Performs XSLT transformation on XForm and process the result.
  */
-export const transform = (survey: Survey): Promise<TransformedSurvey> => {
-    let xformDoc: XMLJSDocument;
+export const transform = async (survey: Survey): Promise<TransformedSurvey> => {
+    const { xform, markdown, media, openclinica, preprocess, theme } = survey;
 
-    const xsltParams = survey.openclinica
+    const xsltParams = openclinica
         ? {
               openclinica: 1,
           }
         : {};
 
     const mediaMap = Object.fromEntries(
-        Object.entries(survey.media || {}).map((entry) =>
-            entry.map(escapeURLPath)
-        )
+        Object.entries(media || {}).map((entry) => entry.map(escapeURLPath))
     );
 
-    return parseXML(survey.xform)
-        .then((doc) => {
-            if (typeof survey.preprocess === 'function') {
-                doc = survey.preprocess.call(libxmljs, doc);
-            }
+    const doc = await parseXML(xform);
+    const xformDoc =
+        typeof preprocess === 'function' ? preprocess.call(libxmljs, doc) : doc;
 
-            return doc;
-        })
-        .then((doc) => processBinaryDefaults(doc, mediaMap))
-        .then((doc) => {
-            xformDoc = doc;
+    processBinaryDefaults(xformDoc, mediaMap);
 
-            return xslTransform(xslForm, xformDoc, xsltParams);
-        })
-        .then((htmlDoc) => {
-            htmlDoc = correctAction(htmlDoc, 'setgeopoint');
-            htmlDoc = correctAction(htmlDoc, 'setvalue');
-            htmlDoc = replaceTheme(htmlDoc, survey.theme);
-            htmlDoc = replaceMediaSources(htmlDoc, mediaMap);
+    const htmlDoc = await xslTransform(xslForm, xformDoc, xsltParams);
 
-            const languageMap = replaceLanguageTags(htmlDoc);
-            const form =
-                survey.markdown !== false
-                    ? renderMarkdown(htmlDoc, mediaMap)
-                    : docToString(htmlDoc);
-            const xmlDoc = xslTransform(xslModel, xformDoc);
+    correctAction(htmlDoc, 'setgeopoint');
+    correctAction(htmlDoc, 'setvalue');
+    replaceTheme(htmlDoc, theme);
+    replaceMediaSources(htmlDoc, mediaMap);
 
-            return Promise.all([form, languageMap, xmlDoc]);
-        })
-        .then(([form, languageMap, xmlDoc]) => {
-            xmlDoc = replaceMediaSources(xmlDoc, mediaMap);
-            xmlDoc = addInstanceIdNodeIfMissing(xmlDoc);
+    const languageMap = replaceLanguageTags(htmlDoc);
+    const form =
+        markdown !== false
+            ? renderMarkdown(htmlDoc, mediaMap)
+            : docToString(htmlDoc);
+    const xmlDoc = await xslTransform(xslModel, xformDoc);
 
-            const model = docToString(xmlDoc);
+    replaceMediaSources(xmlDoc, mediaMap);
+    addInstanceIdNodeIfMissing(xmlDoc);
 
-            // @ts-expect-error - This fails because `xform` is not optional, but this is API-consistent behavior.
-            delete survey.xform;
-            delete survey.media;
-            delete survey.preprocess;
-            delete survey.markdown;
-            delete survey.openclinica;
+    const model = docToString(xmlDoc);
 
-            return Object.assign(survey, {
-                form,
-                model,
-                languageMap,
-                transformerVersion: PACKAGE_VESION,
-            });
-        });
+    // @ts-expect-error - This fails because `xform` is not optional, but this is API-consistent behavior.
+    delete survey.xform;
+    delete survey.media;
+    delete survey.preprocess;
+    delete survey.markdown;
+    delete survey.openclinica;
+
+    return Object.assign(survey, {
+        form,
+        model,
+        languageMap,
+        transformerVersion: PACKAGE_VESION,
+    });
 };
 
 interface XSLTParams {
@@ -166,8 +153,6 @@ const processBinaryDefaults = (
             }
         }
     });
-
-    return doc;
 };
 
 /**
@@ -216,8 +201,6 @@ const correctAction = (
             setValueEl.parent()?.remove();
         }
     });
-
-    return doc;
 };
 
 const parseXML = (xmlStr: string) =>
@@ -235,13 +218,13 @@ const replaceTheme = (doc: XMLJSDocument, theme?: string) => {
     const HAS_THEME = /(theme-)[^"'\s]+/;
 
     if (!theme) {
-        return doc;
+        return;
     }
 
     const formClassAttr = doc.root().get('/root/form')?.attr('class');
 
     if (formClassAttr == null) {
-        return doc;
+        return;
     }
 
     const formClassValue = formClassAttr.value();
@@ -255,8 +238,6 @@ const replaceTheme = (doc: XMLJSDocument, theme?: string) => {
     } else {
         formClassAttr.value(`${formClassValue} theme-${theme}`);
     }
-
-    return doc;
 };
 
 const replaceMediaSources = <T extends XMLJSDocument | XMLJSDocumentFragment>(
@@ -264,7 +245,7 @@ const replaceMediaSources = <T extends XMLJSDocument | XMLJSDocumentFragment>(
     mediaMap?: Record<string, string>
 ) => {
     if (!mediaMap) {
-        return root;
+        return;
     }
 
     // iterate through each element with a src attribute
@@ -289,8 +270,6 @@ const replaceMediaSources = <T extends XMLJSDocument | XMLJSDocumentFragment>(
     if (formLogo && formLogoEl) {
         formLogoEl.node('img').attr('src', formLogo).attr('alt', 'form logo');
     }
-
-    return root;
 };
 
 /**
@@ -300,7 +279,7 @@ const replaceMediaSources = <T extends XMLJSDocument | XMLJSDocumentFragment>(
  * @see http://www.w3.org/International/questions/qa-choosing-language-tags
  */
 const replaceLanguageTags = (doc: XMLJSDocument) => {
-    const map: Record<string, string> = {};
+    const languageMap: Record<string, string> = {};
 
     const languageElements = doc.find(
         '/root/form/select[@id="form-languages"]/option'
@@ -322,7 +301,7 @@ const replaceLanguageTags = (doc: XMLJSDocument) => {
     languageElements.forEach((el, index) => {
         const val = el.attr('value')?.value();
         if (val && val !== languages[index].tag) {
-            map[val] = languages[index].tag;
+            languageMap[val] = languages[index].tag;
         }
         el.attr({
             'data-dir': languages[index].directionality,
@@ -361,7 +340,7 @@ const replaceLanguageTags = (doc: XMLJSDocument) => {
         });
     }
 
-    return map;
+    return languageMap;
 };
 
 /**
@@ -408,8 +387,6 @@ const addInstanceIdNodeIfMissing = (doc: XMLJSDocument) => {
             rootEl.node('meta').node('instanceID');
         }
     }
-
-    return doc;
 };
 
 /**
@@ -458,7 +435,9 @@ const renderMarkdown = (
                     `<div class="temporary-root">${rendered}</div>`
                 );
 
-                rendered = replaceMediaSources(fragment, mediaMap)
+                replaceMediaSources(fragment, mediaMap);
+
+                rendered = fragment
                     .root()
                     .childNodes()
                     .map((node) => node.toString(false))
