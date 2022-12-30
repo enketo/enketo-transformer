@@ -1,22 +1,27 @@
-import { DOMParser } from '@xmldom/xmldom';
-import fs from 'fs/promises';
+import { DOMParser } from 'linkedom';
+import type { Attr } from 'linkedom/types/interface/attr';
+import type { Element as BaseElement } from 'linkedom/types/interface/element';
+import type { Node } from 'linkedom/types/interface/node';
 import { transform } from '../src/transformer';
 
 import type { Survey } from '../src/transformer';
 
-export const getXForm = async (fileName: string) => {
-    const fileContents = await fs.readFile(`./test/forms/${fileName}`);
+export const getXForm = async (filePath: string) => {
+    const fixturePath = filePath.includes('/')
+        ? filePath
+        : `./test/forms/${filePath}`;
+    const { default: fixture } = await import(`${fixturePath}?raw`);
 
-    return String(fileContents);
+    return fixture;
 };
 
 type GetTransformedFormOptions = Omit<Survey, 'xform'>;
 
 export const getTransformedForm = async (
-    fileName: string,
+    filePath: string,
     options?: GetTransformedFormOptions
 ) => {
-    const xform = await getXForm(fileName);
+    const xform = await getXForm(filePath);
 
     return transform({
         ...options,
@@ -24,71 +29,77 @@ export const getTransformedForm = async (
     });
 };
 
-const attributeMissedValuePattern =
-    /^\[xmldom warning\]\s+attribute "[^"]+" missed value!!/;
-
-class SuppressAttributeShorthandWarningDOMParser extends DOMParser {
-    private isParsingHTML = false;
-
-    constructor() {
-        super({
-            errorHandler: {
-                warning: (msg: string) => {
-                    if (
-                        this.isParsingHTML &&
-                        attributeMissedValuePattern.test(msg)
-                    ) {
-                        return;
-                    }
-
-                    console.warn(msg);
-                },
-            },
-        });
-    }
-
-    parseFromString(xmlsource: string, mimeType?: string) {
-        if (mimeType === 'text/html') {
-            this.isParsingHTML = true;
-        }
-
-        try {
-            return super.parseFromString(xmlsource, mimeType);
-        } finally {
-            this.isParsingHTML = false;
-        }
-    }
-}
-
-export const parser = new SuppressAttributeShorthandWarningDOMParser();
+export const parser = new DOMParser();
 
 export const getTransformedFormDocument = async (
-    fileName: string,
+    filePath: string,
     options?: GetTransformedFormOptions
 ) => {
-    const { form } = await getTransformedForm(fileName, options);
+    const { form } = await getTransformedForm(filePath, options);
 
     return parser.parseFromString(form, 'text/html');
 };
 
 export const getTransformedModelDocument = async (
-    fileName: string,
+    filePath: string,
     options?: GetTransformedFormOptions
 ) => {
-    const { model } = await getTransformedForm(fileName, options);
+    const { model } = await getTransformedForm(filePath, options);
 
     return parser.parseFromString(model, 'text/xml');
 };
 
-/**
- * TODO: `@xmldom/xmldom` does not export `Document`. It's pretty linkely that {@link https://github.com/WebReflection/linkedom linkedom}:
- *
- * 1. Does export it.
- * 2. Is a drop-in replacement for `@xmldom/xmldom`.
- * 3. Could very possibly go away soon anyway ;)
- */
-const document = parser.parseFromString('<a>', 'text/html');
+export const XMLDocument = parser.parseFromString(
+    '<a/>',
+    'text/xml'
+).constructor;
 
-export const DocumentConstructor = document.constructor;
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export type XMLDocument = import('linkedom/types/xml/document').XMLDocument;
 
-export type Document = typeof document;
+export const HTMLDocument = parser.parseFromString(
+    '<p></p>',
+    'text/html'
+).constructor;
+
+export type DOMMimeType = 'text/xml' | 'text/html';
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export type HTMLDocument = import('linkedom/types/html/document').HTMLDocument;
+
+export type Document = XMLDocument | HTMLDocument;
+
+declare module 'linkedom/types/interface/attr' {
+    interface Attr {
+        namespaceURI: string;
+    }
+}
+
+declare module 'linkedom/types/interface/node' {
+    interface Node {
+        cloneNode<T extends Omit<Node, '_getParent'>>(
+            this: T,
+            deep?: boolean
+        ): T;
+    }
+}
+
+interface TypedNodeList<T extends Node = Node> extends Iterable<T> {
+    item(i: number): T | void;
+}
+
+export interface Element extends Omit<BaseElement, 'attributes'> {
+    get attributes(): TypedNodeList<Attr>;
+}
+
+/* The `linkedom` library does not provide an `XMLSerializer`. This is roughly
+ * its API equivalent. */
+export const serializer = {
+    serializeToString(node?: Node | null) {
+        if (node == null) {
+            throw new Error('Serialization failed.');
+        }
+
+        return node.toString();
+    },
+};

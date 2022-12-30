@@ -1,15 +1,18 @@
 import { NAMESPACES } from '../src/transformer';
 import {
-    DocumentConstructor as Document,
+    Document,
+    HTMLDocument,
     getTransformedForm,
     getTransformedModelDocument,
     parser,
+    XMLDocument,
 } from './shared';
 
 import type {
     TransformedSurvey,
     TransformPreprocess,
 } from '../src/transformer';
+import type { Element } from './shared';
 
 describe('for incompatible forms that require preprocessing', () => {
     let preprocessed: TransformedSurvey;
@@ -128,7 +131,7 @@ describe('for incompatible forms that require preprocessing', () => {
     it('preprocess fn does nothing if not provided...', async () => {
         const doc = await getTransformedModelDocument('bad-external.xml');
 
-        expect(doc).to.be.an.instanceOf(Document);
+        expect(doc).to.be.an.instanceOf(XMLDocument);
         expect(doc.getElementsByTagName('instance')).to.have.length(2);
         expect(doc.getElementById('existing')).to.not.be.null;
         expect(doc.getElementById('existing')!.getAttribute('src')).to.equal(
@@ -144,7 +147,7 @@ describe('for incompatible forms that require preprocessing', () => {
             'text/xml'
         );
 
-        expect(preprocessedModel).to.be.an.instanceOf(Document);
+        expect(preprocessedModel).to.be.an.instanceOf(XMLDocument);
         expect(
             preprocessedModel.getElementsByTagName('instance')
         ).to.have.length(4);
@@ -205,7 +208,7 @@ describe('for incompatible forms that require preprocessing', () => {
 
     it('fn does not correct instances if not necessary', async () =>
         Promise.all([
-            expect(preprocessedForm).to.be.an.instanceOf(Document),
+            expect(preprocessedForm).to.be.an.instanceOf(HTMLDocument),
             expect(preprocessedForm.getElementById('counties')).to.be.null,
         ]));
 });
