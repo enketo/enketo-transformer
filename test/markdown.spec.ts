@@ -1,6 +1,6 @@
 import markdown from '../src/markdown';
 
-describe('markdown', () => {
+describe.shuffle('markdown', () => {
     describe('rendering', () => {
         [
             // correct emphasis

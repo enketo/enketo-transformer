@@ -1,6 +1,6 @@
 import { Language, parseLanguage } from '../src/language';
 
-describe('language', () => {
+describe.shuffle('language', () => {
     describe('parser', () => {
         type ParserTestParameters = [
             name: string,
