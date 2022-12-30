@@ -38,7 +38,7 @@ function findElementsByName(
     );
 }
 
-describe('transformer', () => {
+describe.shuffle('transformer', () => {
     let advancedRequired: TransformedSurvey;
     let autocomplete: TransformedSurvey;
     let autocompleteDoc: Document;
@@ -640,8 +640,8 @@ describe('transformer', () => {
             );
 
             expect(
-                doc.getElementsByTagName('option')[0].getAttribute('disabled')
-            ).to.equal('disabled');
+                doc.getElementsByTagName('option')[0].hasAttribute('disabled')
+            ).to.equal(true);
         });
     });
 
@@ -1021,7 +1021,7 @@ describe('transformer', () => {
             // check location of target inside same label as input[name="/data/state"]
             const parent = target.parentNode;
 
-            expect(parent.nodeName).to.equal('fieldset');
+            expect(parent.nodeName).to.equal('FIELDSET');
             expect(
                 parent.getElementsByTagName('input')[0].getAttribute('name')
             ).to.equal('/data/state');
@@ -1111,7 +1111,7 @@ describe('transformer', () => {
             );
             // It probably wouldn't be an issue if the events and setvalue attributes were added to all radiobuttons (or checkboxes)
             // but this test is to show it is deliberately/lazily only added to the first.
-            expect(sel1[1].getAttribute('data-event')).to.equal('');
+            expect(sel1[1].getAttribute('data-event')).to.equal(null);
         });
 
         it('with a dynamic default repeat question, that also gets its value set by a trigger', async () => {
@@ -1349,7 +1349,7 @@ describe('transformer', () => {
 
             // check location of target inside same label as input[name="/data/state"]
             const parent = target.parentNode;
-            expect(parent.nodeName).to.equal('fieldset');
+            expect(parent.nodeName).to.equal('FIELDSET');
             expect(
                 parent.getElementsByTagName('input')[0].getAttribute('name')
             ).to.equal('/data/state');
@@ -1455,7 +1455,7 @@ describe('transformer', () => {
     });
 });
 
-describe('custom stuff', () => {
+describe.shuffle('custom stuff', () => {
     describe('supports the enk:for attribute', () => {
         it('by turning it into the data-for attribute', async () => {
             const result = await getTransformedForm('for.xml');
