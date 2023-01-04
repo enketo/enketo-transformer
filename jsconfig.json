@@ -1,4 +1,4 @@
 {
     "exclude": ["node_modules"],
-    "include": ["src", "test", "typings"]
+    "include": ["src", "typings"]
 }

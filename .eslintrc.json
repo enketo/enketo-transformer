@@ -7,13 +7,29 @@
     "globals": {
         "Promise": true
     },
-    "extends": ["airbnb", "prettier"],
-    "plugins": ["chai-friendly", "jsdoc", "prettier", "unicorn"],
+    "extends": ["plugin:@typescript-eslint/recommended", "airbnb", "prettier"],
+    "plugins": [
+        "chai-friendly",
+        "jsdoc",
+        "prettier",
+        "unicorn",
+        "@typescript-eslint"
+    ],
+    "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "sourceType": "module",
         "ecmaVersion": 2020
     },
     "settings": {
+        "import/extensions": [".js", ".ts"],
+        "import/parsers": {
+            "@typescript-eslint/parser": [".ts"]
+        },
+        "import/resolver": {
+            "node": {
+                "extensions": [".js", ".ts"]
+            }
+        },
         "jsdoc": {
             "tagNamePreference": {
                 "returns": "return"
@@ -21,10 +37,26 @@
         }
     },
     "rules": {
+        "@typescript-eslint/no-non-null-assertion": "error",
+        "chai-friendly/no-unused-expressions": "error",
         "prettier/prettier": "error",
 
         "guard-for-in": "warn",
         "import/extensions": "warn",
+        "import/no-extraneous-dependencies": [
+            "error",
+            {
+                "devDependencies": ["vite.config.ts", "test/**/*.ts"],
+                "optionalDependencies": false,
+                "peerDependencies": false
+            }
+        ],
+        "import/no-unresolved": [
+            "error",
+            {
+                "ignore": ["vitest/config"]
+            }
+        ],
         "import/order": "warn",
         "no-param-reassign": "warn",
         "no-restricted-syntax": [
@@ -35,6 +67,7 @@
         ],
         "no-shadow": "warn",
         "no-underscore-dangle": "warn",
+        "no-unused-expressions": "off",
         "no-use-before-define": [
             "warn",
             {
@@ -53,9 +86,35 @@
         },
 
         {
-            "files": ["./test/**/*.js"],
-            "env": {
-                "mocha": true
+            "files": ["./**/*.js"],
+            "rules": {
+                "@typescript-eslint/no-var-requires": "off"
+            }
+        },
+
+        {
+            "files": ["./**/*.ts"],
+            "rules": {
+                "@typescript-eslint/no-unused-expressions": "off",
+                "import/extensions": [
+                    "error",
+                    "ignorePackages",
+                    {
+                        "js": "never",
+                        "jsx": "never",
+                        "ts": "never",
+                        "tsx": "never"
+                    }
+                ]
+            }
+        },
+
+        {
+            "files": ["./test/**/*.ts"],
+            "plugins": ["vitest"],
+            "rules": {
+                "@typescript-eslint/no-non-null-assertion": "off",
+                "no-undef": "off"
             }
         }
     ]

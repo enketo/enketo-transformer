@@ -23,9 +23,6 @@ const xslModel = fs.readFileSync(
 );
 /**
  * @constant
- * @static
- * @type {object}
- * @default
  */
 const NAMESPACES = {
     xmlns: 'http://www.w3.org/2002/xforms',
@@ -44,18 +41,19 @@ const version = _getVersion();
  */
 
 /**
- * @typedef {Function} TransformPreprocess
- * @this {typeof libxmljs}
+ * @callback TransformPreprocess
+ * @param {typeof libxmljs} this
  * @param {XMLJSDocument} doc
  */
 
 /**
  * @typedef Survey
  * @property {string} xform
- * @property {string} theme
+ * @property {string} [theme]
  * @property {boolean} [markdown]
  * @property {Record<string, string>} [media]
- * @property {boolean} [openclinica]
+ * @property {boolean | number} [openclinica]
+ * @property {TransformPreprocess} [preprocess]
  */
 
 /**
@@ -63,6 +61,7 @@ const version = _getVersion();
  * @property {string} form
  * @property {string} model
  * @property {string} transformerVersion
+ * @property {Record<string, string>} languageMap
  */
 
 /**

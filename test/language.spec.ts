@@ -1,11 +1,16 @@
-const chai = require('chai');
+import language from '../src/language';
 
-const { expect } = chai;
-const language = require('../src/language');
+import type { LanguageObj } from '../src/language';
 
 describe('language', () => {
     describe('parser', () => {
-        const test = (t) => {
+        type ParserTestParameters = [
+            name: string,
+            sample: string,
+            language: LanguageObj
+        ];
+
+        const test = (t: ParserTestParameters) => {
             const name = t[0];
             const sample = t[1];
             const expected = t[2];
@@ -14,7 +19,7 @@ describe('language', () => {
             });
         };
 
-        [
+        const tests: ParserTestParameters[] = [
             // no lanuage (only inline XForm text)
             [
                 '',
@@ -238,6 +243,8 @@ describe('language', () => {
                     src: 'nonexisting (0a)',
                 },
             ],
-        ].forEach(test);
+        ];
+
+        tests.forEach(test);
     });
 });

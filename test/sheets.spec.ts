@@ -1,8 +1,4 @@
-/* eslint-env mocha */
-const chai = require('chai');
-
-const { expect } = chai;
-const { sheets } = require('../src/transformer');
+import { sheets } from '../src/transformer';
 
 describe('sheets', () => {
     it('should return an xslForm sheet', () => {
