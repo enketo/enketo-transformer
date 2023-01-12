@@ -328,8 +328,12 @@ describe.shuffle('transformer', () => {
                 media,
             });
 
-            expect(result1.form).to.not.contain('<img src="/i/am/logo.png"');
-            expect(result2.form).to.contain('<img src="/i/am/logo.png"');
+            expect(result1.form).to.not.contain(
+                '<img alt="form logo" src="/i/am/logo.png"'
+            );
+            expect(result2.form).to.contain(
+                '<img alt="form logo" src="/i/am/logo.png"'
+            );
         });
 
         // bug https://github.com/enketo/enketo-transformer/issues/149
@@ -724,7 +728,7 @@ describe.shuffle('transformer', () => {
 
         it('leaves namespace prefixes and declarations intact on node attributes', () => {
             expect(modelNamespace.model).to.contain(
-                '<a orx:comment="/data/a_comment"/>'
+                '<a orx:comment="/data/a_comment" />'
             );
         });
     });
@@ -736,10 +740,10 @@ describe.shuffle('transformer', () => {
             result1 = await getTransformedForm('no-instance-id.xml');
         });
         it('adds a /meta/instanceID node', () =>
-            expect(result1.model).to.contain('<meta><instanceID/></meta>'));
+            expect(result1.model).to.contain('<meta><instanceID /></meta>'));
 
         it('does not add it if it contains /meta/instanceID in the OpenRosa namespace', () =>
-            expect(modelNamespace.model).to.not.contain('<instanceID/>'));
+            expect(modelNamespace.model).to.not.contain('<instanceID />'));
     });
 
     describe('converts deprecated', () => {

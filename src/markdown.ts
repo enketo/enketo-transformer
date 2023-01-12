@@ -67,7 +67,9 @@ export const markdownToHTML = (text: string): string => {
         // paragraphs
         .replace(/([^\n]+)\n{2,}/gm, createParagraph)
         // any remaining newline characters
-        .replace(/([^\n]+)\n/gm, '$1<br>');
+        .replace(/([^\n]+)\n/gm, '$1<br>')
+        // output substitution comments
+        .replace(/&lt;!-- output-(\d+) --&gt;/gm, '<!-- output-$1 -->');
 
     return html;
 };
