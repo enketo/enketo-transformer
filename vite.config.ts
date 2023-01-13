@@ -1,7 +1,6 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vitest/config';
-import { VitePluginNode } from 'vite-plugin-node';
-import config from './config/config.json';
+import { config, external } from './config/build.shared';
 
 export default defineConfig({
     assetsInclude: ['**/*.xml', '**/*.xsl'],
@@ -12,19 +11,25 @@ export default defineConfig({
         },
         minify: false,
         outDir: 'dist',
+        rollupOptions: {
+            external,
+            output: {
+                // This suppresses a warning for modules with both named and
+                // default exporrs when building for CommonJS (UMD in our
+                // current build). It's safe to suppress this warning because we
+                // have explicit tests ensuring both the default and named
+                // exports are consistent with the existing public API.
+                exports: 'named',
+            },
+        },
         sourcemap: true,
     },
     esbuild: {
         sourcemap: 'inline',
     },
-    plugins: [
-        ...VitePluginNode({
-            adapter: 'express',
-            appPath: './app.ts',
-            exportName: 'app',
-            tsCompiler: 'esbuild',
-        }),
-    ],
+    optimizeDeps: {
+        disabled: true,
+    },
     server: {
         port: config.port,
     },
@@ -50,6 +55,6 @@ export default defineConfig({
         globals: true,
         include: ['test/**/*.spec.ts'],
         reporters: 'verbose',
-        sequence: { shuffle: true },
+        sequence: { shuffle: false },
     },
 });

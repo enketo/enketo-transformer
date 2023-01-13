@@ -47,6 +47,7 @@
             "error",
             {
                 "devDependencies": [
+                    "app.js",
                     "app.ts",
                     "vite.config.ts",
                     "src/api.ts",
@@ -59,7 +60,7 @@
         "import/no-unresolved": [
             "error",
             {
-                "ignore": ["vitest/config"]
+                "ignore": ["vitest/config", ".*?raw"]
             }
         ],
         "import/order": "warn",

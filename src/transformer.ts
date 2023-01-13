@@ -1,4 +1,3 @@
-import fs from 'fs';
 import crypto from 'crypto';
 import libxslt from 'libxslt';
 import type {
@@ -6,20 +5,13 @@ import type {
     DocumentFragment as XMLJSDocumentFragment,
 } from 'libxmljs';
 import pkg from '../package.json';
+import xslForm from './xsl/openrosa2html5form.xsl?raw';
+import xslModel from './xsl/openrosa2xmlmodel.xsl?raw';
 import language from './language';
 import markdown from './markdown';
 import { escapeURLPath, getMediaPath } from './url';
 
 const { libxmljs } = libxslt;
-
-const getXSL = (fileName: string) => {
-    const { pathname } = new URL(`./xsl/${fileName}`, import.meta.url);
-
-    return fs.readFileSync(pathname, 'utf8');
-};
-
-const xslForm = getXSL('openrosa2html5form.xsl');
-const xslModel = getXSL('openrosa2xmlmodel.xsl');
 
 export const NAMESPACES = {
     xmlns: 'http://www.w3.org/2002/xforms',
@@ -103,12 +95,19 @@ export const transform = (survey: Survey): Promise<TransformedSurvey> => {
 
             const model = docToString(xmlDoc);
 
-            return {
+            // @ts-expect-error - This fails because `xform` is not optional, but this is API-consistent behavior.
+            delete survey.xform;
+            delete survey.media;
+            delete survey.preprocess;
+            delete survey.markdown;
+            delete survey.openclinica;
+
+            return Object.assign(survey, {
                 form,
                 model,
                 languageMap,
                 transformerVersion: PACKAGE_VESION,
-            };
+            });
         });
 };
 
@@ -514,6 +513,8 @@ const md5 = (message: string | Buffer) => {
 const PACKAGE_VESION = pkg.version;
 
 const VERSION = md5(xslForm + xslModel + PACKAGE_VESION);
+
+export { VERSION as version };
 
 export const sheets = {
     xslForm,
