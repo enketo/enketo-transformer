@@ -7,8 +7,8 @@ import type {
 import pkg from '../package.json';
 import xslForm from './xsl/openrosa2html5form.xsl?raw';
 import xslModel from './xsl/openrosa2xmlmodel.xsl?raw';
-import language from './language';
-import markdown from './markdown';
+import { parseLanguage } from './language';
+import { markdownToHTML } from './markdown';
 import { escapeURLPath, getMediaPath } from './url';
 
 const { libxmljs } = libxslt;
@@ -310,12 +310,12 @@ const replaceLanguageTags = (doc: XMLJSDocument) => {
     const languages = languageElements.map((el) => {
         const lang = el.text();
 
-        return language.parse(lang, getLanguageSampleText(doc, lang));
+        return parseLanguage(lang, getLanguageSampleText(doc, lang));
     });
 
     // forms without itext and only one language, still need directionality info
     if (languages.length === 0) {
-        languages.push(language.parse('', getLanguageSampleText(doc, '')));
+        languages.push(parseLanguage('', getLanguageSampleText(doc, '')));
     }
 
     // add or correct dir and value attributes, and amend textcontent of options in language selector
@@ -325,19 +325,19 @@ const replaceLanguageTags = (doc: XMLJSDocument) => {
             map[val] = languages[index].tag;
         }
         el.attr({
-            'data-dir': languages[index].dir,
+            'data-dir': languages[index].directionality,
             value: languages[index].tag,
-        }).text(languages[index].desc);
+        }).text(languages[index].description);
     });
 
     // correct lang attributes
-    languages.forEach((lang) => {
-        if (lang.src === lang.tag) {
+    languages.forEach(({ sourceLanguage, tag }) => {
+        if (sourceLanguage === tag) {
             return;
         }
-        doc.find(`/root/form//*[@lang="${lang.src}"]`).forEach((el) => {
+        doc.find(`/root/form//*[@lang="${sourceLanguage}"]`).forEach((el) => {
             el.attr({
-                lang: lang.tag,
+                lang: tag,
             });
         });
     });
@@ -348,10 +348,10 @@ const replaceLanguageTags = (doc: XMLJSDocument) => {
         const defaultLang = langSelectorElement
             .attr('data-default-lang')
             ?.value();
-        languages.some((lang) => {
-            if (lang.src === defaultLang) {
+        languages.some(({ sourceLanguage, tag }) => {
+            if (sourceLanguage === defaultLang) {
                 langSelectorElement.attr({
-                    'data-default-lang': lang.tag,
+                    'data-default-lang': tag,
                 });
 
                 return true;
@@ -451,7 +451,7 @@ const renderMarkdown = (
                 .text()
                 .replace('<', '&lt;')
                 .replace('>', '&gt;');
-            let rendered = markdown.toHtml(original);
+            let rendered = markdownToHTML(original);
 
             if (original !== rendered) {
                 const fragment = libxmljs.parseHtmlFragment(

@@ -1,4 +1,6 @@
 /**
+ * @package
+ *
  * @param value - a fully qualified URL, or a relative path
  */
 export const escapeURLPath = (value: string): string => {
@@ -18,6 +20,7 @@ export const escapeURLPath = (value: string): string => {
     return `${path}${search}`;
 };
 
+/** @package */
 export const getMediaPath = (
     mediaMap: Record<string, string>,
     mediaURL: string
@@ -32,12 +35,4 @@ export const getMediaPath = (
     const value = mediaMap[path];
 
     return value || escapeURLPath(mediaURL);
-};
-
-/**
- * Exported for backwards compatibility, prefer named imports.
- */
-export default {
-    escapeURLPath,
-    getMediaPath,
 };

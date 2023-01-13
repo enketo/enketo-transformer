@@ -3,37 +3,8 @@ import stringDirection from 'string-direction';
 
 import type { Tag, Subtag } from 'language-tags';
 
-/**
- * @package
- */
+/** @package */
 export class Language {
-    /**
-     * Included for backwards compatibility, prefer:
-     *
-     * @alias description
-     */
-    get desc() {
-        return this.description;
-    }
-
-    /**
-     * Included for backwards compatibility, prefer:
-     *
-     * @alias directionality
-     */
-    get dir() {
-        return this.directionality;
-    }
-
-    /**
-     * Included for backwards compatibility, prefer:
-     *
-     * @alias sourceLanguage
-     */
-    get src() {
-        return this.sourceLanguage;
-    }
-
     constructor(
         readonly sourceLanguage: string,
         readonly description: string,
@@ -42,16 +13,9 @@ export class Language {
     ) {}
 }
 
-export type {
-    /**
-     * Exported for backwards compatibility, prefer:
-     *
-     * @alias Language
-     */
-    Language as LanguageObj,
-};
-
 /**
+ * @package
+ *
  * Parses a language string into a {@link Language}. Guesses missing properties.
  * TODO: this should be refactored (more than it has been since this comment was
  * initially written).
@@ -133,11 +97,4 @@ const getDirectionality = (sample: string) => {
     }
 
     return direction;
-};
-
-/**
- * Exported for backwards compatibility, prefer named imports.
- */
-export default {
-    parse: parseLanguage,
 };

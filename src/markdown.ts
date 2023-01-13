@@ -1,4 +1,6 @@
 /**
+ * @package
+ *
  * Transforms XForm label and hint textnode content with a subset of Markdown into HTML
  *
  * Supported:
@@ -135,11 +137,4 @@ const sanitizeAttributes = (attributes: string) => {
     const style = styleMatches && styleMatches.length ? styleMatches[0] : '';
 
     return style;
-};
-
-/**
- * Exported for backwards compatibility, prefer named imports.
- */
-export default {
-    toHtml: markdownToHTML,
 };

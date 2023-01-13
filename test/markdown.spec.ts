@@ -1,4 +1,4 @@
-import markdown from '../src/markdown';
+import { markdownToHTML } from '../src/markdown';
 
 describe('markdown', () => {
     describe('rendering', () => {
@@ -209,7 +209,7 @@ describe('markdown', () => {
             const source = test[0];
             const expected = typeof test[1] !== 'undefined' ? test[1] : test[0];
             it(`renders "${source}" correctly`, () => {
-                expect(markdown.toHtml(source)).to.equal(expected);
+                expect(markdownToHTML(source)).to.equal(expected);
             });
         });
     });
