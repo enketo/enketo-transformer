@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "allowJs": true,
+        "allowJs": false,
         "allowSyntheticDefaultImports": true,
         "allowUnreachableCode": false,
         "baseUrl": ".",
@@ -12,7 +12,7 @@
         "forceConsistentCasingInFileNames": true,
         "inlineSourceMap": true,
         "lib": ["ES2018"],
-        "module": "amd",
+        "module": "esnext",
         "moduleResolution": "node",
         "noEmit": true,
         "noFallthroughCasesInSwitch": true,
@@ -21,9 +21,7 @@
         "resolveJsonModule": true,
         "skipLibCheck": true,
         "strict": true,
-        "target": "es2018",
+        "target": "es2020",
         "types": ["node"]
-    },
-    "exclude": ["node_modules", "typings/test.d.ts"],
-    "include": ["src", "typings"]
+    }
 }

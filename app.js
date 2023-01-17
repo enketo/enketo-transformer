@@ -1,22 +1,63 @@
-const express = require('express');
+// @ts-check
 
-const app = express();
-const bodyParser = require('body-parser');
-const config = require('./config/config.json');
+import { createServer } from 'vite';
+import { VitePluginNode } from 'vite-plugin-node';
+import {
+    config,
+    external,
+    resolvePath,
+    rootDir,
+} from './config/build.shared.js';
 
-for (const item in config) {
-    app.set(item, config[item]);
-}
+const appPath = resolvePath('./app.ts');
 
-app.use(bodyParser.json());
-app.use(
-    bodyParser.urlencoded({
-        extended: true,
-    })
-);
+const init = async () => {
+    /** @type {import('vite').UserConfig} */
+    const baseOptions = {
+        mode: 'development',
+        build: {
+            rollupOptions: {
+                external,
+            },
+        },
+        optimizeDeps: {
+            disabled: true,
+        },
+        root: rootDir,
+        ssr: {
+            target: 'node',
+        },
+    };
 
-require('./src/api')(app);
+    const servers = await Promise.all([
+        createServer({
+            ...baseOptions,
+            configFile: false,
+            plugins: VitePluginNode({
+                adapter: 'express',
+                appPath,
+                exportName: 'app',
+                tsCompiler: 'esbuild',
+            }),
+            server: {
+                port: config.port,
+            },
+        }),
+        createServer({
+            ...baseOptions,
+            configFile: false,
+            publicDir: resolvePath('./test/forms'),
+            server: {
+                port: 8081,
+            },
+        }),
+    ]);
 
-app.listen(app.get('port'), () => {
-    console.warn(`enketo-transformer running on port ${app.get('port')}!`);
-});
+    await Promise.all(servers.map((server) => server.listen()));
+
+    servers.forEach((server) => {
+        server.printUrls();
+    });
+};
+
+init();

@@ -3,7 +3,17 @@
     "version": "2.1.7",
     "description": "Library/app that transforms ODK-compliant XForms into a format that Enketo can consume",
     "license": "Apache-2.0",
-    "main": "src/transformer.js",
+    "type": "module",
+    "main": "./dist/enketo-transformer.umd.cjs",
+    "module": "./dist/enketo-transformer.js",
+    "types": "./dist/src/transformer.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/enketo-transformer.js",
+            "require": "./dist/enketo-transformer.umd.cjs",
+            "types": "./dist/src/transformer.d.ts"
+        }
+    },
     "bugs": {
         "url": "https://github.com/enketo/enketo-transformer/issues",
         "email": "martijn@enketo.org"
@@ -19,15 +29,15 @@
     },
     "contributors": [],
     "scripts": {
-        "start": "node app.js",
-        "eslint-check": "eslint app.js src/**/*.js vite.config.ts test/**/*.ts",
-        "eslint-fix": "eslint app.js src/**/*.js vite.config.ts test/**/*.ts --fix",
+        "build": "vite build && npm run tsc",
+        "start": "vite",
+        "eslint-check": "eslint app.ts src/**/*.ts vite.config.ts test/**/*.ts",
+        "eslint-fix": "eslint app.ts src/**/*.ts vite.config.ts test/**/*.ts --fix",
         "prettier-fix": "prettier --write .",
-        "test": "vitest run --coverage && npm run prettier-fix && npm run eslint-fix && tsc && node update-readme-with-shield-badge.js",
+        "test": "vitest run --coverage && npm run prettier-fix && npm run eslint-fix && npm run tsc && node update-readme-with-shield-badge.cjs",
         "test:watch": "vitest",
-        "build-docs": "rimraf docs && ./node_modules/.bin/jsdoc -c jsdoc.config.js",
-        "develop": "DEBUG=api,transformer,markdown,language node app.js & http-server test/forms -p 8081",
-        "tsc": "tsc"
+        "develop": "DEBUG=api,transformer,markdown,language node ./app.js",
+        "tsc": "tsc --project ./tsconfig.json && tsc --project ./tsconfig.typedefs.json && tsc --project ./test/tsconfig.json"
     },
     "repository": {
         "type": "git",
@@ -74,13 +84,11 @@
         "grunt": "^1.5.3",
         "http-server": "^13.1.0",
         "istanbul-reporter-shield-badge": "^1.2.1",
-        "jsdoc": "^3.6.11",
-        "jsdoc-plugin-typescript": "^2.2.0",
         "markdown-eslint-parser": "^1.2.1",
         "prettier": "^2.8.1",
-        "rimraf": "^3.0.2",
         "typescript": "^4.9.4",
         "vite": "^4.0.3",
+        "vite-plugin-node": "^1.0.0",
         "vitest": "^0.26.2"
     },
     "volta": {

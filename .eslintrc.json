@@ -21,7 +21,7 @@
         "ecmaVersion": 2020
     },
     "settings": {
-        "import/extensions": [".js", ".ts"],
+        "import/extensions": [".ts"],
         "import/parsers": {
             "@typescript-eslint/parser": [".ts"]
         },
@@ -46,7 +46,13 @@
         "import/no-extraneous-dependencies": [
             "error",
             {
-                "devDependencies": ["vite.config.ts", "test/**/*.ts"],
+                "devDependencies": [
+                    "app.js",
+                    "app.ts",
+                    "vite.config.ts",
+                    "src/api.ts",
+                    "test/**/*.ts"
+                ],
                 "optionalDependencies": false,
                 "peerDependencies": false
             }
@@ -54,10 +60,11 @@
         "import/no-unresolved": [
             "error",
             {
-                "ignore": ["vitest/config"]
+                "ignore": ["vitest/config", ".*?raw"]
             }
         ],
         "import/order": "warn",
+        "import/prefer-default-export": "off",
         "no-param-reassign": "warn",
         "no-restricted-syntax": [
             "warn",
@@ -86,16 +93,15 @@
         },
 
         {
-            "files": ["./**/*.js"],
-            "rules": {
-                "@typescript-eslint/no-var-requires": "off"
-            }
-        },
-
-        {
             "files": ["./**/*.ts"],
             "rules": {
-                "@typescript-eslint/no-unused-expressions": "off",
+                "no-useless-constructor": "off",
+                "@typescript-eslint/no-useless-constructor": "error",
+                "no-unused-vars": "off",
+                "@typescript-eslint/no-unused-vars": "error",
+                "no-empty-function": "off",
+                "@typescript-eslint/no-empty-function": "error",
+
                 "import/extensions": [
                     "error",
                     "ignorePackages",
@@ -106,6 +112,20 @@
                         "tsx": "never"
                     }
                 ]
+            }
+        },
+
+        {
+            "files": ["./test/**/*.ts"],
+            "rules": {
+                "@typescript-eslint/no-unused-expressions": "off"
+            }
+        },
+
+        {
+            "files": ["./**/*.d.ts"],
+            "rules": {
+                "no-unused-vars": "off"
             }
         },
 

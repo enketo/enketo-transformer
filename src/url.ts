@@ -1,8 +1,9 @@
 /**
- * @param {string} value - a fully qualified URL, or a relative path
- * @return {string}
+ * @package
+ *
+ * @param value - a fully qualified URL, or a relative path
  */
-function escapeURLPath(value) {
+export const escapeURLPath = (value: string): string => {
     const isFullyQualified = /^[a-z]+:/i.test(value);
     const urlString = isFullyQualified
         ? value
@@ -17,13 +18,13 @@ function escapeURLPath(value) {
     const path = value.startsWith('/') ? pathname : pathname.replace(/^\//, '');
 
     return `${path}${search}`;
-}
+};
 
-/**
- * @param {Record<string, string>} mediaMap
- * @param {string} mediaURL
- */
-function getMediaPath(mediaMap, mediaURL) {
+/** @package */
+export const getMediaPath = (
+    mediaMap: Record<string, string>,
+    mediaURL: string
+) => {
     const mediaPath = mediaURL.match(/jr:\/\/[\w-]+\/(.+)/);
 
     if (mediaPath == null) {
@@ -34,9 +35,4 @@ function getMediaPath(mediaMap, mediaURL) {
     const value = mediaMap[path];
 
     return value || escapeURLPath(mediaURL);
-}
-
-module.exports = {
-    escapeURLPath,
-    getMediaPath,
 };

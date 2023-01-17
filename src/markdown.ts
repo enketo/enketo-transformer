@@ -1,8 +1,6 @@
 /**
- * @module markdown
- */
-
-/**
+ * @package
+ *
  * Transforms XForm label and hint textnode content with a subset of Markdown into HTML
  *
  * Supported:
@@ -12,12 +10,8 @@
  * - newline characters
  *
  * Also HTML encodes any unsupported HTML tags for safe use inside web-based clients
- *
- * @static
- * @param {string} text - Text content of a textnode.
- * @return {string} transformed text content of a textnode.
  */
-function markdownToHtml(text) {
+export const markdownToHTML = (text: string): string => {
     // note: in JS $ matches end of line as well as end of string, and ^ both beginning of line and string
     const html = text
         // html encoding of < because libXMLJs Element.text() converts html entities
@@ -27,17 +21,17 @@ function markdownToHtml(text) {
         // span
         .replace(
             /&lt;\s?span([^/\n]*)&gt;((?:(?!&lt;\/).)+)&lt;\/\s?span\s?&gt;/gm,
-            _createSpan
+            createSpan
         )
         // sup
         .replace(
-            /&lt;\s?sup([^/\n]*)&gt;((?:(?!&lt;\/).)+)&lt;\/\s?sup\s?&gt;/gm,
-            _createSup
+            /&lt;\s?sup(?:[^/\n]*)&gt;((?:(?!&lt;\/).)+)&lt;\/\s?sup\s?&gt;/gm,
+            createSup
         )
         // sub
         .replace(
-            /&lt;\s?sub([^/\n]*)&gt;((?:(?!&lt;\/).)+)&lt;\/\s?sub\s?&gt;/gm,
-            _createSub
+            /&lt;\s?sub(?:[^/\n]*)&gt;((?:(?!&lt;\/).)+)&lt;\/\s?sub\s?&gt;/gm,
+            createSub
         )
         // "\" will be used as escape character for *, _
         .replace(/&/gm, '&amp;')
@@ -57,11 +51,11 @@ function markdownToHtml(text) {
             '<a href="$2" rel="noopener" target="_blank">$1</a>'
         )
         // headers
-        .replace(/^\s*(#{1,6})\s?([^#][^\n]*)(\n|$)/gm, _createHeader)
+        .replace(/^\s*(#{1,6})\s?([^#][^\n]*)(\n|$)/gm, createHeader)
         // unordered lists
-        .replace(/^((\*|\+|-) (.*)(\n|$))+/gm, _createUnorderedList)
+        .replace(/^((\*|\+|-) (.*)(\n|$))+/gm, createUnorderedList)
         // ordered lists, which have to be preceded by a newline since numbered labels are common
-        .replace(/(\n([0-9]+\.) (.*))+$/gm, _createOrderedList)
+        .replace(/(\n([0-9]+\.) (.*))+$/gm, createOrderedList)
         // newline characters followed by <ul> tag
         .replace(/\n(<ul>)/gm, '$1')
         // reverting escape of special characters
@@ -71,119 +65,76 @@ function markdownToHtml(text) {
         .replace(/&42;/gm, '*')
         .replace(/&amp;/gm, '&')
         // paragraphs
-        .replace(/([^\n]+)\n{2,}/gm, _createParagraph)
+        .replace(/([^\n]+)\n{2,}/gm, createParagraph)
         // any remaining newline characters
         .replace(/([^\n]+)\n/gm, '$1<br>');
 
     return html;
-}
+};
+
+type Matches = [string, ...string[]];
+
+type Replacer<M extends Matches> = (...args: M) => string;
+
+/* eslint-disable -- the default formatting of this was unreadable */
+const ignoreMatch = <M extends Matches>(fn: Replacer<M>) => {
+    return (_match: string, ...args: M) => fn(...args);
+};
+/* eslint-enable */
 
 /**
- * @param {string} match - The matched substring.
- * @param {*} hashtags - Before header text. `#` gives `<h1>`, `####` gives `<h4>`.
- * @param {string} content - Header text.
- * @return {string} HTML string.
+ * @param hashtags - Before header text. `#` gives `<h1>`, `####` gives `<h4>`.
+ * @param content - Header text.
  */
-function _createHeader(match, hashtags, content) {
+const createHeader = ignoreMatch((hashtags: string, content: string) => {
     const level = hashtags.length;
 
     return `<h${level}>${content.replace(/#+$/, '')}</h${level}>`;
-}
+});
 
-/**
- * @param {string} match - The matched substring.
- * @return {string} HTML string.
- */
-function _createUnorderedList(match) {
-    const items = match.replace(/(\*|\+|-)(.*)\n?/gm, _createItem);
+const createUnorderedList = (match: string) => {
+    const items = match.replace(/(?:\*|\+|-)(.*)\n?/gm, createItem);
 
     return `<ul>${items}</ul>`;
-}
+};
 
-/**
- * @param {string} match - The matched substring.
- * @return {string} HTML string.
- */
-function _createOrderedList(match) {
+const createOrderedList = (match: string) => {
     const startMatches = match.match(/^\n?(?<start>[0-9]+)\./);
     const start =
         startMatches && startMatches.groups && startMatches.groups.start !== '1'
             ? ` start="${startMatches.groups.start}"`
             : '';
-    const items = match.replace(/\n?([0-9]+\.)(.*)/gm, _createItem);
+    const items = match.replace(/\n?(?:[0-9]+\.)(.*)/gm, createItem);
 
     return `<ol${start}>${items}</ol>`;
-}
+};
 
-/**
- * @param {string} match - The matched substring.
- * @param {string} bullet - The list item bullet/number.
- * @param {string} content - Item text.
- * @return {string} HTML string.
- */
-function _createItem(match, bullet, content) {
-    return `<li>${content.trim()}</li>`;
-}
+const createItem = ignoreMatch(
+    (content: string) => `<li>${content.trim()}</li>`
+);
 
-/**
- * @param {string} match - The matched substring.
- * @param {string} line - The line.
- * @return {string} HTML string.
- */
-function _createParagraph(match, line) {
+const createParagraph = ignoreMatch((line: string) => {
     const trimmed = line.trim();
     if (/^<\/?(ul|ol|li|h|p|bl)/i.test(trimmed)) {
         return line;
     }
 
     return `<p>${trimmed}</p>`;
-}
+});
 
-/**
- * @param {string} match - The matched substring.
- * @param {string} attributes - Attributes to be added for `<span>`
- * @param {string} content - Span text.
- * @return {string} HTML string.
- */
-function _createSpan(match, attributes, content) {
-    const sanitizedAttributes = _sanitizeAttributes(attributes);
+const createSpan = ignoreMatch((attributes: string, content: string) => {
+    const sanitizedAttributes = sanitizeAttributes(attributes);
 
     return `<span${sanitizedAttributes}>${content}</span>`;
-}
+});
 
-/**
- * @param {string} match - The matched substring.
- * @param {string} attributes - The attributes.
- * @param {string} content - Sup text.
- * @return {string} HTML string.
- */
-function _createSup(match, attributes, content) {
-    // ignore attributes completely
-    return `<sup>${content}</sup>`;
-}
+const createSup = ignoreMatch((content: string) => `<sup>${content}</sup>`);
 
-/**
- * @param {string} match - The matched substring.
- * @param {string} attributes - The attributes.
- * @param {string} content - Sub text.
- * @return {string} HTML string.
- */
-function _createSub(match, attributes, content) {
-    // ignore attributes completely
-    return `<sub>${content}</sub>`;
-}
+const createSub = ignoreMatch((content: string) => `<sub>${content}</sub>`);
 
-/**
- * @param {string} attributes - The attributes.
- * @return {string} style
- */
-function _sanitizeAttributes(attributes) {
+const sanitizeAttributes = (attributes: string) => {
     const styleMatches = attributes.match(/( style=(["'])[^"']*\2)/);
     const style = styleMatches && styleMatches.length ? styleMatches[0] : '';
 
     return style;
-}
-
-module.exports = {
-    toHtml: markdownToHtml,
 };
