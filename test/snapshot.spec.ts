@@ -6,7 +6,6 @@
  * each function used in serialization.
  */
 
-import { basename } from 'path';
 import prettier from 'prettier';
 import { format as prettyFormat } from 'pretty-format';
 import type { Options as PrettierOptions } from 'prettier';
@@ -19,7 +18,11 @@ import {
     serializer,
     DOMMimeType,
     Element,
+    fixturesByOrigin,
 } from './shared';
+
+const it = (description: string, fn: () => any) =>
+    test(description, fn, { timeout: 60_000 });
 
 describe('Snapshots', () => {
     /**
@@ -207,38 +210,7 @@ describe('Snapshots', () => {
         });
     });
 
-    const forms = import.meta.glob('./**/*.xml');
-
-    interface Fixture {
-        fileName: string;
-        formPath: string;
-        origin: string;
-    }
-
-    const fixtures = Object.keys(forms)
-        .map((formPath) => ({
-            fileName: basename(formPath),
-            formPath,
-            origin:
-                formPath.match(/\/external-fixtures\/([^/]+)/)?.[1] ??
-                'enketo-transformer',
-        }))
-        .reduce<Map<string, Fixture[]>>((acc, fixture) => {
-            const { origin } = fixture;
-            let group = acc.get(origin);
-
-            if (group == null) {
-                group = [];
-                acc.set(origin, group);
-            }
-
-            group.push(fixture);
-
-            return acc;
-        }, new Map<string, Fixture[]>())
-        .entries();
-
-    describe.each([...fixtures])('%s', (_origin, cases) => {
+    describe.each([...fixturesByOrigin])('%s', (_origin, cases) => {
         describe.each(cases)('$fileName', ({ fileName, formPath }) => {
             it(`transforms ${fileName} consistently with no options`, async () => {
                 const result = await getTransformedForm(formPath);

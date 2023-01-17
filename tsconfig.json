@@ -1,6 +1,6 @@
 {
     "extends": "./tsconfig.base.json",
     "exclude": ["dist", "node_modules", "./typings/test.d.ts"],
-    "include": ["app.ts", "config", "src", "typings"],
+    "include": ["app.ts", "config", "src", "tools", "typings"],
     "files": ["./typings/env.d.ts"]
 }

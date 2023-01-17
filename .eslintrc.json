@@ -49,9 +49,12 @@
                 "devDependencies": [
                     "app.js",
                     "app.ts",
-                    "vite.config.ts",
+                    "*.config.js",
+                    "*.config.ts",
+                    "vite.*.ts",
                     "src/api.ts",
-                    "test/**/*.ts"
+                    "test/**/*.ts",
+                    "tools/**/*"
                 ],
                 "optionalDependencies": false,
                 "peerDependencies": false

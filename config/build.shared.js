@@ -40,3 +40,33 @@ export const resolvePath = (path) => resolve(rootDir, path);
  * @param {string} path
  */
 export const readFile = (path) => fs.readFileSync(resolvePath(path), 'utf-8');
+
+/**
+ * @type {import('vitest/config').UserConfig}
+ */
+export const baseConfig = {
+    assetsInclude: ['**/*.xml', '**/*.xsl'],
+    build: {
+        minify: false,
+        rollupOptions: {
+            external,
+            output: {
+                // This suppresses a warning for modules with both named and
+                // default exporrs when building for CommonJS (UMD in our
+                // current build). It's safe to suppress this warning because we
+                // have explicit tests ensuring both the default and named
+                // exports are consistent with the existing public API.
+                exports: 'named',
+            },
+        },
+        sourcemap: true,
+    },
+    esbuild: {
+        minifyIdentifiers: false,
+        minifySyntax: false,
+        minifyWhitespace: false,
+    },
+    server: {
+        port: config.port,
+    },
+};
