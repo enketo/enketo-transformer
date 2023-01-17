@@ -32,6 +32,7 @@
         "build": "npm run tsc && vite build && tsc --project ./tsconfig.typedefs.json",
         "benchmarks": "vite-node ./test/benchmarks.ts",
         "start": "vite",
+        "start:web": "vite --config ./vite.web.ts",
         "eslint-check": "eslint app.ts src/**/*.ts vite.config.ts test/**/*.ts",
         "eslint-fix": "eslint app.ts src/**/*.ts vite.config.ts test/**/*.ts --fix",
         "prettier-fix": "prettier --write .",
@@ -59,9 +60,13 @@
         "language-tags": "1.0.5",
         "libxslt": "0.10.0",
         "linkedom": "^0.14.21",
+        "playwright": "^1.29.2",
         "prettier": "^2.8.1",
         "string-direction": "0.1.x",
         "undici": "^5.13.0",
+        "vite": "^4.0.3",
+        "vite-node": "^0.27.2",
+        "vite-plugin-node": "^1.0.0",
         "xpath-to-css": "^1.1.0"
     },
     "devDependencies": {
@@ -96,9 +101,6 @@
         "pretty-format": "^29.3.1",
         "rimraf": "^3.0.2",
         "typescript": "^4.9.4",
-        "vite": "^4.0.3",
-        "vite-node": "^0.27.2",
-        "vite-plugin-node": "^1.0.0",
         "vitest": "^0.26.2"
     },
     "volta": {

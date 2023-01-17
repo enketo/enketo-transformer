@@ -41,6 +41,12 @@ export const resolvePath = (path) => resolve(rootDir, path);
  */
 export const readFile = (path) => fs.readFileSync(resolvePath(path), 'utf-8');
 
+export const ENV = process.env.NODE_ENV ?? 'production';
+
+export const define = {
+    ENV: JSON.stringify(ENV),
+};
+
 /**
  * @type {import('vitest/config').UserConfig}
  */
@@ -61,11 +67,14 @@ export const baseConfig = {
         },
         sourcemap: true,
     },
+    define,
     esbuild: {
+        define,
         minifyIdentifiers: false,
         minifySyntax: false,
         minifyWhitespace: false,
     },
+    root: rootDir,
     server: {
         port: config.port,
     },
