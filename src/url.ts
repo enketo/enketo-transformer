@@ -4,20 +4,24 @@
  * @param value - a fully qualified URL, or a relative path
  */
 export const escapeURLPath = (value: string): string => {
-    const isFullyQualified = /^[a-z]+:/i.test(value);
+    if (value === 'form_logo.png') {
+        return value;
+    }
+
+    const [scheme] = value.match(/^[a-z]+:/) ?? [];
+    const isFullyQualified = scheme != null;
     const urlString = isFullyQualified
-        ? value
-        : `file:///${value.replace(/^\//, '')}`;
+        ? value.replace(/^jr:\/*/, 'http://')
+        : `http://example.com/${value.replace(/^\//, '')}`;
     const url = new URL(urlString);
 
     if (isFullyQualified) {
-        return url.href;
+        return url.href.replace('http:', scheme);
     }
 
     const { pathname, search } = url;
-    const path = value.startsWith('/') ? pathname : pathname.replace(/^\//, '');
 
-    return `${path}${search}`;
+    return `${pathname}${search}`;
 };
 
 /** @package */
@@ -34,5 +38,5 @@ export const getMediaPath = (
     const path = escapeURLPath(mediaPath[1]);
     const value = mediaMap[path];
 
-    return value || escapeURLPath(mediaURL);
+    return escapeURLPath(value || mediaURL);
 };
