@@ -32,9 +32,19 @@ Edit with care!
     <xsl:template match="xf:instance">
         <instance>
             <xsl:apply-templates select="@*"/>
-            <!-- 
-            This forces namespace declarations on the child of instance, which makes it easier to
-            serialize that child for a submission without duplications of namespace declarations.
+
+            <!-- This copies the children of each instance node.
+
+            This was also intended to add namespace declarations on the child of
+            instance...
+
+            Previous commentary added: ...which makes it easier to serialize
+            that child for a submission without duplications of namespace
+            declarations.
+
+            That refers to implementation details in Enketo Core, namely how it
+            expects to namespaces in XPath expressions. See further discussion
+            in transformer.ts `correctModelNamespaces`.
             -->
             <xsl:copy-of select="node()" />
         </instance>
