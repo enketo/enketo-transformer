@@ -1,6 +1,7 @@
+import { expect } from '@esm-bundle/chai';
 import { Language, parseLanguage } from '../src/language';
 
-describe.shuffle('language', () => {
+describe('language', () => {
     describe('parser', () => {
         type ParserTestParameters = [
             name: string,

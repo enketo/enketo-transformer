@@ -1,13 +1,16 @@
+/// <reference lib="dom" />
+
+import { expect } from '@esm-bundle/chai';
 import { transform } from '../src/transformer';
 import {
     getTransformedForm,
     getTransformedFormDocument,
     getXForm,
-    parser,
 } from './shared';
 
 import type { TransformedSurvey } from '../src/transformer';
-import type { Document } from './shared';
+
+const parser = new DOMParser();
 
 function findElementByName(
     htmlDoc: Document,
@@ -38,7 +41,7 @@ function findElementsByName(
     );
 }
 
-describe.shuffle('transformer', () => {
+describe('transformer', () => {
     let advancedRequired: TransformedSurvey;
     let autocomplete: TransformedSurvey;
     let autocompleteDoc: Document;
@@ -50,7 +53,7 @@ describe.shuffle('transformer', () => {
     let widgetsXForm: string;
     let widgets: TransformedSurvey;
 
-    beforeAll(async () => {
+    before(async () => {
         advancedRequired = await getTransformedForm('advanced-required.xml');
         autocomplete = await getTransformedForm('autocomplete.xml');
         autocompleteDoc = parser.parseFromString(
@@ -83,11 +86,13 @@ describe.shuffle('transformer', () => {
         const invalidXForms = [undefined, null, '', '<data>'];
 
         invalidXForms.forEach((xform) => {
-            it.fails('with a parse error', async () => {
-                await transform({
+            it('with a parse error', async () => {
+                const rejected = await transform({
                     // @ts-expect-error: this is specifically testing invalid values
                     xform,
-                });
+                }).catch((error) => error);
+
+                expect(rejected).to.be.an.instanceOf(Error);
             });
         });
     });
@@ -299,7 +304,7 @@ describe.shuffle('transformer', () => {
         });
 
         it(`in the model for binary questions that contain a default value by copying to a
-            src attribute and resolving the URL according to a provided map`, async () => {
+                src attribute and resolving the URL according to a provided map`, async () => {
             const media = {
                 'happy.jpg': 'https://feelings/happy.jpg',
                 'unhappy.jpg': 'https://feelings/unhappy.jpg',
@@ -430,7 +435,7 @@ describe.shuffle('transformer', () => {
                 },
             ];
 
-            beforeAll(async () => {
+            before(async () => {
                 xform = await getXForm('jr-url-space.xml');
                 results = await Promise.all(
                     mediaMaps.map(({ media }) =>
@@ -680,7 +685,7 @@ describe.shuffle('transformer', () => {
 
     describe('processes autocomplete questions by producing <datalist> elements', () => {
         it('and outputs <datalist> elements', () => {
-            expect(autocompleteDoc).to.be.an('object');
+            expect(autocompleteDoc).to.be.an.instanceOf(Document);
             expect(
                 autocompleteDoc.getElementsByTagName('select')
             ).to.have.length(4);
@@ -728,7 +733,7 @@ describe.shuffle('transformer', () => {
 
         it('leaves namespace prefixes and declarations intact on node attributes', () => {
             expect(modelNamespace.model).to.contain(
-                '<a orx:comment="/data/a_comment" />'
+                '<a orx:comment="/data/a_comment"/>'
             );
         });
     });
@@ -736,14 +741,14 @@ describe.shuffle('transformer', () => {
     describe('for backwards compatibility of forms without a /meta/instanceID node', () => {
         let result1: TransformedSurvey;
 
-        beforeAll(async () => {
+        before(async () => {
             result1 = await getTransformedForm('no-instance-id.xml');
         });
         it('adds a /meta/instanceID node', () =>
-            expect(result1.model).to.contain('<meta><instanceID /></meta>'));
+            expect(result1.model).to.contain('<meta><instanceID/></meta>'));
 
         it('does not add it if it contains /meta/instanceID in the OpenRosa namespace', () =>
-            expect(modelNamespace.model).to.not.contain('<instanceID />'));
+            expect(modelNamespace.model).to.not.contain('<instanceID/>'));
     });
 
     describe('converts deprecated', () => {
@@ -760,7 +765,7 @@ describe.shuffle('transformer', () => {
 
         let xform: string;
 
-        beforeAll(async () => {
+        before(async () => {
             xform = await getXForm('rank.xml');
         });
 
@@ -814,14 +819,14 @@ describe.shuffle('transformer', () => {
             // eliminate some acceptable differences:
             const modifiedSelectMinimalResult = results[0].form
                 .replace('or-appearance-minimal', '')
-                .replace(/data-type-xml=".+" /, '')
-                .replace(/data-name=".+" /, '');
+                .replace(/data-type-xml="[^"]+"[ >]/, '')
+                .replace(/data-name="[^"]+"[ >]/, '');
             const modifiedRangePickerResult = results[1].form
                 .replace('or-appearance-picker', '')
-                .replace(/data-type-xml=".+" /, '')
-                .replace(/min=".+" /, '')
-                .replace(/max=".+" /, '')
-                .replace(/step=".+" /, '');
+                .replace(/data-type-xml="[^"]+" /, '')
+                .replace(/min="[^"]+"[ >]/, '')
+                .replace(/max="[^"]+"[ >]/, '')
+                .replace(/step="[^"]+"[ >]/, '');
 
             expect(modifiedSelectMinimalResult).to.equal(
                 modifiedRangePickerResult
@@ -833,7 +838,7 @@ describe.shuffle('transformer', () => {
         let xform: string;
         let doc: Document;
 
-        beforeAll(async () => {
+        before(async () => {
             xform = await getXForm('setvalue.xml');
             doc = await getTransformedFormDocument('setvalue.xml');
         });
@@ -982,7 +987,6 @@ describe.shuffle('transformer', () => {
             const { form } = await transform({
                 xform: xform2,
             });
-            // console.log('form', form);
             const doc = parser.parseFromString(form, 'text/html');
             const target = findElementByName(
                 doc,
@@ -1149,7 +1153,7 @@ describe.shuffle('transformer', () => {
         let xform: string;
         let doc: Document;
 
-        beforeAll(async () => {
+        before(async () => {
             xform = await getXForm('setgeopoint.xml');
             doc = await getTransformedFormDocument('setgeopoint.xml');
         });
@@ -1459,7 +1463,7 @@ describe.shuffle('transformer', () => {
     });
 });
 
-describe.shuffle('custom stuff', () => {
+describe('custom stuff', () => {
     describe('supports the enk:for attribute', () => {
         it('by turning it into the data-for attribute', async () => {
             const result = await getTransformedForm('for.xml');
@@ -1521,7 +1525,7 @@ describe.shuffle('custom stuff', () => {
         describe('if openclinica=1', () => {
             let result: TransformedSurvey;
 
-            beforeAll(async () => {
+            before(async () => {
                 result = await getTransformedForm(
                     'oc-custom-multiple-constraints.xml',
                     {
@@ -1575,7 +1579,7 @@ describe.shuffle('custom stuff', () => {
         describe('are ignored by default', () => {
             let result: TransformedSurvey;
 
-            beforeAll(async () => {
+            before(async () => {
                 result = await getTransformedForm(
                     'oc-custom-multiple-constraints.xml'
                 );

@@ -1,91 +1,37 @@
-import crypto from 'crypto';
-import libxslt from 'libxslt';
-import type { Document as XMLJSDocument } from 'libxmljs';
-import xpathToCSS from 'xpath-to-css';
-import pkg from '../package.json';
-import xslForm from './xsl/openrosa2html5form.xsl?raw';
-import xslModel from './xsl/openrosa2xmlmodel.xsl?raw';
+import { parseHTML, parseXML, serializeHTML, serializeXML } from './dom';
 import { parseLanguage } from './language';
-import { CSS, NodeFilterType, parser, serializer } from './dom';
-import type {
-    Attr,
-    Comment,
-    Document,
-    DocumentFromMimeType,
-    DOMMimeType,
-    Element,
-    HTMLElement,
-} from './dom';
 import { markdownToHTML } from './markdown';
+import { NAMESPACES, sheets, version } from './shared';
+import type { TransformedSurvey } from './shared';
 import { escapeURLPath, getMediaPath } from './url';
 
-const { libxmljs } = libxslt;
+export * from './shared';
 
-export const NAMESPACES = {
-    xmlns: 'http://www.w3.org/2002/xforms',
-    orx: 'http://openrosa.org/xforms',
-    h: 'http://www.w3.org/1999/xhtml',
-} as const;
-
-type LibXMLJS = typeof libxmljs;
-
-/**
- * This function **is temporary!** It works around a few bugs in the `linkedom`
- * library's sanitization and serialization behavior. We can file those bugs,
- * but we won't need to live with them for long.
- */
-const fixAttributes = (domDocument: Document) => {
-    const fixAttributesTreeWalker = domDocument.createTreeWalker(
-        domDocument.documentElement,
-        NodeFilterType.SHOW_ELEMENT
-    );
-
-    while (fixAttributesTreeWalker.nextNode() != null) {
-        const attributes = Array.from<Attr>(
-            (fixAttributesTreeWalker.currentNode as HTMLElement).attributes
-        );
-
-        attributes.forEach((attr) => {
-            const { value } = attr;
-
-            attr.value = value
-                .replace(/&(\w+)\b(?!;)/g, '&amp;$1')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;');
-        });
-    }
-};
-
-const xmljsToDOM = <T extends DOMMimeType>(
-    document: XMLJSDocument,
-    mimeType: T
-): DocumentFromMimeType<T> => {
-    const domDocument = parser.parseFromString<T>(
-        document.toString(false),
-        mimeType
-    );
-
-    fixAttributes(domDocument);
-
-    return domDocument as DocumentFromMimeType<T>;
-};
-
-const domToXMLJS = async (document: Document): Promise<XMLJSDocument> => {
-    fixAttributes(document);
-
-    return parseXMLJS(document.toString());
-};
-
-export type TransformPreprocess = (
-    this: LibXMLJS,
-    doc: XMLJSDocument
-) => XMLJSDocument;
+type PreprocessXForm = (xform: string) => string;
 
 export interface TransformOptions {
     markdown?: boolean;
     media?: Record<string, string>;
     openclinica?: boolean | number;
-    preprocess?: TransformPreprocess;
+
+    /**
+     * @deprecated - Historically there was a `preprocess` option, allowing
+     * users to alter or correct their XForms before transformation. This option
+     * unfortunately leaked an implementation detail, namely that transforms
+     * were then performed with the `libxslt` library and its transitive
+     * dependency, `node1-libxmljsmt-myh` (a fork of `libxmljs`). Those
+     * dependencies can't be run on the web.
+     *
+     * @see {@link preprocessXForm}
+     * @see {@link import('./node').Survey}
+     */
+    preprocess?: never;
+
+    /**
+     * This option replaces `preprocess`, but it isn't especially useful. It's functionally equivalent to calling the same function before calling {@link transform}.
+     */
+    preprocessXForm?: PreprocessXForm;
+
     theme?: string;
 }
 
@@ -95,18 +41,20 @@ interface BaseSurvey {
 
 export type Survey = BaseSurvey & TransformOptions;
 
-export interface TransformedSurvey {
-    form: string;
-    languageMap: Record<string, string>;
-    model: string;
-    transformerVersion: string;
-}
-
 /**
  * Performs XSLT transformation on XForm and process the result.
  */
 export const transform = async (survey: Survey): Promise<TransformedSurvey> => {
-    const { xform, markdown, media, openclinica, preprocess, theme } = survey;
+    const xslFormDocument = parseXML(sheets.xslForm);
+    const xslModelDocument = parseXML(sheets.xslModel);
+    const {
+        xform,
+        markdown,
+        media,
+        openclinica,
+        preprocessXForm = (value) => value,
+        theme,
+    } = survey;
 
     const xsltParams = openclinica
         ? {
@@ -118,17 +66,12 @@ export const transform = async (survey: Survey): Promise<TransformedSurvey> => {
         Object.entries(media || {}).map((entry) => entry.map(escapeURLPath))
     );
 
-    const doc = await parseXMLJS(xform);
-    const preprocessed =
-        typeof preprocess === 'function' ? preprocess.call(libxmljs, doc) : doc;
-    const xformDoc = xmljsToDOM(preprocessed, 'text/xml');
+    const preprocessed = preprocessXForm(xform);
+    const xformDoc = parseXML(preprocessed);
 
     processBinaryDefaults(xformDoc, mediaMap);
 
-    const htmlDoc = xmljsToDOM(
-        await xslTransform(xslForm, xformDoc, xsltParams),
-        'text/html'
-    );
+    const htmlDoc = xslTransform(xslFormDocument, xformDoc, xsltParams);
 
     correctAction(htmlDoc, 'setgeopoint');
     correctAction(htmlDoc, 'setvalue');
@@ -145,39 +88,20 @@ export const transform = async (survey: Survey): Promise<TransformedSurvey> => {
         renderMarkdown(htmlDoc, mediaMap);
     }
 
-    fixAttributes(htmlDoc);
-
-    const form = serializer.serializeToString(
-        htmlDoc.querySelector(':root > *')
-    );
-    const xmlDoc = xmljsToDOM(
-        await xslTransform(xslModel, xformDoc),
-        'text/xml'
-    );
+    const form = serializeHTML(htmlDoc);
+    const xmlDoc = xslTransform(xslModelDocument, xformDoc);
 
     replaceMediaSources(xmlDoc, mediaMap);
     addInstanceIDNodeIfMissing(xmlDoc);
 
-    fixAttributes(xmlDoc);
+    const model = serializeXML(xmlDoc);
 
-    const model = serializer
-        .serializeToString(xmlDoc.querySelector(':root > *'))
-        .trim()
-        .replace(/^<\?xml .*?\?>/, '');
-
-    // @ts-expect-error - This fails because `xform` is not optional, but this is API-consistent behavior.
-    delete survey.xform;
-    delete survey.media;
-    delete survey.preprocess;
-    delete survey.markdown;
-    delete survey.openclinica;
-
-    return Object.assign(survey, {
+    return {
         form,
         model,
         languageMap,
-        transformerVersion: PACKAGE_VESION,
-    });
+        transformerVersion: PACKAGE_VERSION,
+    };
 };
 
 interface XSLTParams {
@@ -185,64 +109,138 @@ interface XSLTParams {
 }
 
 const xslTransform = (
-    xslStr: string,
-    xmlDoc: Document,
+    xsl: XMLDocument,
+    xform: XMLDocument,
     xsltParams: XSLTParams = {} as XSLTParams
-) =>
-    new Promise<XMLJSDocument>((resolve, reject) => {
-        libxslt.parse(xslStr, async (error, stylesheet) => {
-            if (stylesheet == null) {
-                reject(error);
-            } else {
-                const xmljsDocument = await domToXMLJS(xmlDoc);
+) => {
+    const processor = new XSLTProcessor();
 
-                stylesheet.apply(xmljsDocument, xsltParams, (error, result) => {
-                    if (result == null) {
-                        reject(error);
-                    } else {
-                        resolve(result);
-                    }
-                });
-            }
-        });
+    processor.importStylesheet(xsl);
+
+    Object.entries(xsltParams).forEach(([parameter, value]) => {
+        processor.setParameter(null, parameter, value);
     });
+
+    const targetDocument = document.implementation.createDocument(
+        NAMESPACES.xmlns,
+        `root`
+    );
+    const transformed = processor.transformToFragment(xform, targetDocument);
+
+    targetDocument.documentElement.replaceWith(transformed);
+
+    return targetDocument;
+};
+
+/**
+ * For some odd reason, the typings for `createNSResolver` suggest that it may return a function, but it never does.
+ */
+type NamespaceResolver = Exclude<XPathNSResolver, (prefix: any) => any>;
+
+const namespaceResolverCache = new WeakMap<Document, NamespaceResolver>();
+
+/**
+ * Provides an XML namespace resolver for evaluating XPath expressions with the
+ * provided {@link doc}. We attempt to defer to the native namespace resolver
+ * where possible, then fall back to hard-coded {@link NAMESPACES} mapping for
+ * expressions using namespaces not explicitly defined on the document (most
+ * commonly `xmlns`).
+ *
+ * TODO (2023-01-18): this logic may be useful downstream, particularly to
+ * address issues with the behavior of {@link correctModelNamespaces}. I'm
+ * exporting it now, as an opportunity to explore that after this is merged.
+ * Maybe we should also document it?
+ */
+export const getNamespaceResolver = (doc: Document) => {
+    const cached = namespaceResolverCache.get(doc);
+
+    if (cached != null) {
+        return cached;
+    }
+
+    const baseResolver = doc.createNSResolver(doc) as NamespaceResolver;
+    const defaultPrefix = doc.lookupPrefix(NAMESPACES.xmlns);
+    const resolver = {
+        lookupNamespaceURI(prefix: string) {
+            if (
+                prefix === defaultPrefix ||
+                (defaultPrefix == null && prefix === 'xmlns')
+            ) {
+                return NAMESPACES.xmlns;
+            }
+
+            return (
+                baseResolver.lookupNamespaceURI(prefix) ??
+                NAMESPACES[prefix as keyof typeof NAMESPACES]
+            );
+        },
+    };
+
+    namespaceResolverCache.set(doc, resolver);
+
+    return resolver;
+};
+
+const getNodesByXPathExpression = <T extends Node = Element>(
+    doc: XMLDocument,
+    expression: string,
+    context: Element = doc.documentElement
+): T[] => {
+    const results: T[] = [];
+    const namespaceResolver = getNamespaceResolver(doc);
+    const result = doc.evaluate(
+        expression,
+        context,
+        namespaceResolver,
+        XPathResult.ORDERED_NODE_SNAPSHOT_TYPE
+    );
+
+    for (let i = 0; i < result.snapshotLength; i += 1) {
+        results.push(result.snapshotItem(i) as T);
+    }
+
+    return results;
+};
 
 const processBinaryDefaults = (
     doc: Document,
     mediaMap: Record<string, string>
 ) => {
     const binaryBindings = Array.from(
-        doc.querySelectorAll(':root > h\\:head > model > bind[type="binary"]')
+        doc.querySelectorAll(':root > head > model > bind[type="binary"]')
     );
 
     binaryBindings.forEach((bind) => {
         const nodeset = bind.getAttribute('nodeset');
 
         if (nodeset) {
-            // This is probably not safe! But it shouldn't last too long ;)
-            const relativePath = nodeset.replace(/^\/(?!\/)/, './');
-            const query = `:root > h\\:head > model > instance ${xpathToCSS(
-                relativePath
-            )}`;
-            const dataNode = doc.querySelector(query);
+            const expression = `/h:html/h:head/xmlns:model/xmlns:instance/xmlns:${nodeset
+                .trim()
+                .replace(/^\//, '')
+                .replace(/\//g, `/xmlns:`)}`;
+            const dataNodes = getNodesByXPathExpression(doc, expression);
 
-            if (dataNode) {
-                const text = dataNode.textContent ?? '';
+            dataNodes.forEach((dataNode) => {
+                if (dataNode instanceof Element) {
+                    const text = dataNode.textContent?.trim() ?? '';
 
-                // TODO (2022-12-30): The comment below is concerning! Why would
-                // we not make the pattern more restrictive if we know what we
-                // do expect to match?
+                    // TODO (2022-12-30): The comment below is concerning! Why would
+                    // we not make the pattern more restrictive if we know what we
+                    // do expect to match?
 
-                // Very crude URL checker which is fine for now,
-                // because at this point we don't expect anything other than jr://
-                if (/^[a-zA-Z]+:\/\//.test(text)) {
-                    const value = getMediaPath(mediaMap, text);
-                    const src = value.replace(/&(\w+)=/g, '&amp;$1=');
+                    // Very crude URL checker which is fine for now,
+                    // because at this point we don't expect anything other than jr://
+                    if (/^[a-zA-Z]+:\/\//.test(text)) {
+                        const src = getMediaPath(mediaMap, text);
 
-                    dataNode.setAttribute('src', src);
-                    dataNode.textContent = escapeURLPath(text);
+                        dataNode.setAttribute('src', src);
+                        dataNode.textContent = escapeURLPath(text);
+                    } else if (text !== '') {
+                        dataNode.setAttribute('src', escapeURLPath(text));
+                        dataNode.textContent = escapeURLPath(text);
+                    }
                 }
-            }
+            });
         }
     });
 };
@@ -317,18 +315,6 @@ const correctAction = (
     });
 };
 
-const parseXMLJS = (xmlStr: string) =>
-    new Promise<XMLJSDocument>((resolve, reject) => {
-        try {
-            const doc = libxmljs.parseXml(xmlStr);
-
-            resolve(doc);
-        } catch (e) {
-            console.log('wat', xmlStr);
-            reject(e);
-        }
-    });
-
 const replaceTheme = (doc: Document, theme: string) => {
     const form = doc.querySelector<HTMLElement>(':root > form');
 
@@ -383,10 +369,10 @@ const replaceMediaSources = (
     const formLogoEl = doc.querySelector('.form-logo');
 
     if (formLogo && formLogoEl) {
-        const img = doc.createElement('img');
+        const img = doc.createElementNS(NAMESPACES.h, 'img');
 
-        img.setAttribute('src', formLogo);
         img.setAttribute('alt', 'form logo');
+        img.setAttribute('src', formLogo);
 
         formLogoEl.append(img);
     }
@@ -510,13 +496,12 @@ const getLanguageSampleText = (doc: Document, language: string) => {
  * This used to be done in enketo-xslt but was removed when support for namespaces was added.
  */
 const addInstanceIDNodeIfMissing = (doc: Document) => {
+    const rootEl = doc.querySelector(':root > model > instance > *');
     let instanceIDEl = doc.querySelector(
-        ':root > model > instance meta > instanceID, :root > model > instance orx\\:meta > orx\\:instanceID'
+        ':root > model > instance meta > instanceID'
     );
 
     if (instanceIDEl == null) {
-        const rootEl = doc.querySelector(':root > model > instance > *');
-
         if (rootEl == null) {
             throw new Error('Missing primary instance root');
         }
@@ -524,11 +509,11 @@ const addInstanceIDNodeIfMissing = (doc: Document) => {
         let metaEl: Element | null = rootEl.querySelector('meta');
 
         if (metaEl == null) {
-            metaEl = doc.createElement('meta');
+            metaEl = doc.createElementNS(NAMESPACES.xmlns, 'meta');
             rootEl.append(metaEl);
         }
 
-        instanceIDEl = doc.createElement('instanceID');
+        instanceIDEl = doc.createElementNS(NAMESPACES.xmlns, 'instanceID');
 
         metaEl.append(instanceIDEl);
     }
@@ -575,24 +560,29 @@ const renderMarkdown = (
             .replace(/>/g, '&gt;');
 
         const rendered = markdownToHTML(original);
-
-        const parsed = parser.parseFromString(
-            `<!DOCTYPE html><html><body><div class="temporary-root">${rendered}</div></body></html>`,
-            'text/html'
+        const parsed = parseHTML(
+            `<!DOCTYPE html><html><body><div class="temporary-root">${rendered}</div></body></html>`
         );
 
-        replaceMediaSources(parsed.documentElement, mediaMap);
+        replaceMediaSources(parsed, mediaMap);
 
         const root = parsed.documentElement.querySelector(
             '.temporary-root'
         ) as Element;
         const treeWalker = htmlDoc.createTreeWalker(
             root,
-            NodeFilterType.SHOW_COMMENT
+            NodeFilter.SHOW_COMMENT
         );
+
+        const comments: Comment[] = [];
 
         while (treeWalker.nextNode() != null) {
             const comment = treeWalker.currentNode as Comment;
+
+            comments.push(comment);
+        }
+
+        comments.forEach((comment) => {
             const { nodeValue } = comment;
             const [, outputIndex] =
                 nodeValue?.trim().match(/^output-(\d+)$/) ?? [];
@@ -603,7 +593,7 @@ const renderMarkdown = (
 
                 comment.replaceWith(output);
             }
-        }
+        });
 
         const children = Array.from(root.childNodes);
 
@@ -611,32 +601,12 @@ const renderMarkdown = (
     });
 };
 
-const md5 = (message: string | Buffer) => {
-    const hash = crypto.createHash('md5');
-    hash.update(message);
-
-    return hash.digest('hex');
-};
-
-const PACKAGE_VESION = pkg.version;
-
-const VERSION = md5(xslForm + xslModel + PACKAGE_VESION);
-
-export { VERSION as version };
-
-export const sheets = {
-    xslForm,
-    xslModel,
-};
-
-export { escapeURLPath };
-
 /**
  * Exported for backwards compatibility, prefer named imports from enketo-transformer's index module.
  */
 export default {
     transform,
-    version: VERSION,
+    version,
     NAMESPACES,
     sheets,
     escapeURLPath,

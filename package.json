@@ -29,17 +29,19 @@
     },
     "contributors": [],
     "scripts": {
-        "build": "npm run tsc && vite build && tsc --project ./tsconfig.typedefs.json",
+        "build": "npm run tsc && vite build && npm run typedefs",
         "benchmarks": "vite-node ./test/benchmarks.ts",
         "start": "vite",
-        "start:web": "vite --config ./vite.web.ts",
+        "start:web": "vite --config vite.web.ts",
         "eslint-check": "eslint app.ts src/**/*.ts vite.config.ts test/**/*.ts",
         "eslint-fix": "eslint app.ts src/**/*.ts vite.config.ts test/**/*.ts --fix",
         "prettier-fix": "prettier --write .",
-        "test": "vitest run --coverage && npm run prettier-fix && npm run eslint-fix && npm run tsc && node update-readme-with-shield-badge.cjs",
-        "test:watch": "vitest",
+        "test": "wtr && vitest run --coverage && npm run prettier-fix && npm run eslint-fix && npm run tsc && node update-readme-with-shield-badge.cjs",
+        "test:server:watch": "vitest",
+        "test:web:watch": "wtr --watch",
         "develop": "DEBUG=api,transformer,markdown,language node ./app.js",
-        "tsc": "tsc --project ./tsconfig.json && tsc --project ./test/tsconfig.json"
+        "tsc": "tsc --project ./tsconfig.json && tsc --project ./test/tsconfig.json",
+        "typedefs": "tsc --project ./tsconfig.typedefs.json"
     },
     "repository": {
         "type": "git",
@@ -55,12 +57,9 @@
     ],
     "dependencies": {
         "body-parser": "^1.20.1",
-        "css.escape": "^1.5.1",
         "express": "^4.18.2",
         "language-tags": "1.0.5",
-        "libxslt": "0.10.0",
-        "linkedom": "^0.14.21",
-        "playwright": "^1.29.2",
+        "playwright": "^1.29.1",
         "prettier": "^2.8.1",
         "string-direction": "0.1.x",
         "undici": "^5.13.0",
@@ -69,8 +68,21 @@
         "vite-plugin-node": "^1.0.0",
         "xpath-to-css": "^1.1.0"
     },
+    "peerDependencies": {
+        "libxmljs": "0.19.10",
+        "node1-libxmljsmt-myh": "1.0.4"
+    },
+    "peerDependenciesMeta": {
+        "node1-libxmljsmt-myh": {
+            "optional": true
+        },
+        "libxmljs": {
+            "optional": true
+        }
+    },
     "devDependencies": {
         "@actions/core": "^1.10.0",
+        "@esm-bundle/chai": "^4.3.4-fix.0",
         "@prettier/plugin-xml": "^2.2.0",
         "@types/css.escape": "^1.5.0",
         "@types/express": "^4.17.14",
@@ -79,6 +91,8 @@
         "@typescript-eslint/eslint-plugin": "^5.47.0",
         "@typescript-eslint/parser": "^5.47.0",
         "@vitest/coverage-istanbul": "^0.26.2",
+        "@web/test-runner": "^0.15.0",
+        "@web/test-runner-playwright": "^0.9.0",
         "chai": "^4.3.7",
         "chai-as-promised": "^7.1.1",
         "docdash": "^1.2.0",
@@ -97,10 +111,13 @@
         "grunt": "^1.5.3",
         "http-server": "^13.1.0",
         "istanbul-reporter-shield-badge": "^1.2.1",
+        "libxmljs": "0.19.10",
+        "linkedom": "^0.14.21",
         "markdown-eslint-parser": "^1.2.1",
         "pretty-format": "^29.3.1",
         "rimraf": "^3.0.2",
         "typescript": "^4.9.4",
+        "vite-plugin-istanbul": "^4.0.0",
         "vitest": "^0.26.2"
     },
     "volta": {

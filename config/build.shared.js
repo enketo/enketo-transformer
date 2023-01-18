@@ -1,5 +1,6 @@
 // @ts-check
 
+import crypto from 'crypto';
 import fs from 'fs';
 import { createRequire } from 'module';
 import { dirname, resolve } from 'path';
@@ -12,18 +13,19 @@ export const config = require('./config.json');
 export const external = [
     'body-parser',
     'crypto',
-    'css.escape',
     'express',
     'fs',
-    'language-tags',
     'libxslt',
+    'libxmljs',
+    'module',
     'node1-libxmljsmt-myh',
     'path',
-    'string-direction',
+    'playwright',
     'undici',
     'url',
     'vite-node',
     'vite',
+    'vitest',
 ];
 
 export const rootDir = dirname(fileURLToPath(import.meta.url)).replace(
@@ -41,10 +43,31 @@ export const resolvePath = (path) => resolve(rootDir, path);
  */
 export const readFile = (path) => fs.readFileSync(resolvePath(path), 'utf-8');
 
-export const ENV = process.env.NODE_ENV ?? 'production';
+const { version } = require('../package.json');
+
+export const PACKAGE_VERSION = version;
+
+const xslForm = readFile('./src/xsl/openrosa2html5form.xsl');
+const xslModel = readFile('./src/xsl/openrosa2xmlmodel.xsl');
+
+/**
+ * @param {string | Buffer} message
+ */
+const md5 = (message) => {
+    const hash = crypto.createHash('md5');
+    hash.update(message);
+
+    return hash.digest('hex');
+};
+
+const HASHED_VERSION = md5(`${xslForm}${xslModel}${PACKAGE_VERSION}`);
+
+export const SERVER_PORT = config.port;
 
 export const define = {
-    ENV: JSON.stringify(ENV),
+    PACKAGE_VERSION: JSON.stringify(PACKAGE_VERSION),
+    HASHED_VERSION: JSON.stringify(HASHED_VERSION),
+    SERVER_PORT: JSON.stringify(SERVER_PORT),
 };
 
 /**
@@ -54,17 +77,7 @@ export const baseConfig = {
     assetsInclude: ['**/*.xml', '**/*.xsl'],
     build: {
         minify: false,
-        rollupOptions: {
-            external,
-            output: {
-                // This suppresses a warning for modules with both named and
-                // default exporrs when building for CommonJS (UMD in our
-                // current build). It's safe to suppress this warning because we
-                // have explicit tests ensuring both the default and named
-                // exports are consistent with the existing public API.
-                exports: 'named',
-            },
-        },
+        outDir: 'dist',
         sourcemap: true,
     },
     define,
@@ -74,8 +87,7 @@ export const baseConfig = {
         minifySyntax: false,
         minifyWhitespace: false,
     },
-    root: rootDir,
     server: {
-        port: config.port,
+        port: SERVER_PORT,
     },
 };

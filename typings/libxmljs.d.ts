@@ -61,3 +61,7 @@ declare module 'libxmljs' {
 
     export const parseHtmlFragment: (html: string) => DocumentFragment;
 }
+
+declare module 'node1-libxmljsmt-myh' {
+    export * from 'libxmljs';
+}

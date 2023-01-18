@@ -1,8 +1,8 @@
 /* eslint-disable max-classes-per-file */
 import * as core from '@actions/core';
 import { performance } from 'perf_hooks';
-import { transform } from '../src/transformer';
-import { fixtures } from './shared';
+import { transform } from '../../src/node';
+import { fixtures } from '../shared';
 
 const benchmarkStart = performance.now();
 

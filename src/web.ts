@@ -1,6 +1,4 @@
-const transform = async () => {
-    throw new Error('Not implemented (yet).');
-};
+import { transform } from './transformer';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const setGlobal = (key: string, value: any) => {

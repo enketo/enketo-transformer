@@ -1,11 +1,11 @@
-import basePrettier, { Plugin, RequiredOptions } from 'prettier';
+import type basePrettier from 'prettier';
+import type { Plugin, RequiredOptions } from 'prettier';
 
 declare module 'prettier' {
     import type {
         PrettierPluginXML,
         PrettierPluginXMLOptions,
     } from '@prettier/plugin-xml';
-
     import prettier from '@types/prettier';
 
     interface BaseXMLOptions

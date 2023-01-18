@@ -1,24 +1,26 @@
-import { NAMESPACES } from '../src/transformer';
-import {
-    Document,
-    HTMLDocument,
-    getTransformedForm,
-    getTransformedModelDocument,
-    parser,
-    XMLDocument,
-} from './shared';
+/// <reference no-default-lib="true" />
 
-import type {
-    TransformedSurvey,
-    TransformPreprocess,
-} from '../src/transformer';
-import type { Element } from './shared';
+import { beforeAll, expect, describe, it } from 'vitest';
+import { DOMParser } from 'linkedom';
+import { NAMESPACES } from '../../src/transformer';
+import xform from '../forms/bad-external.xml?raw';
 
-describe.shuffle('for incompatible forms that require preprocessing', () => {
+import { PreprocessFunction, transform } from '../../src/node';
+import type { TransformedSurvey } from '../../src/transformer';
+
+const parser = new DOMParser();
+
+const htmlDocument = parser.parseFromString('<p>', 'text/html');
+const HTMLDocument = htmlDocument.constructor;
+const XMLDocument = parser.parseFromString('<x/>', 'text/xml').constructor;
+
+type Document = typeof htmlDocument;
+
+describe('for incompatible forms that require preprocessing', () => {
     let preprocessed: TransformedSurvey;
     let preprocessedForm: Document;
 
-    const preprocess: TransformPreprocess = function (doc) {
+    const preprocess: PreprocessFunction = function (doc) {
         const model = doc.get('/h:html/h:head/xmlns:model', NAMESPACES);
 
         if (!model) {
@@ -119,7 +121,8 @@ describe.shuffle('for incompatible forms that require preprocessing', () => {
     };
 
     beforeAll(async () => {
-        preprocessed = await getTransformedForm('bad-external.xml', {
+        preprocessed = await transform({
+            xform,
             preprocess,
         });
         preprocessedForm = parser.parseFromString(
@@ -129,7 +132,8 @@ describe.shuffle('for incompatible forms that require preprocessing', () => {
     });
 
     it('preprocess fn does nothing if not provided...', async () => {
-        const doc = await getTransformedModelDocument('bad-external.xml');
+        const form = await transform({ xform });
+        const doc = parser.parseFromString(form.model, 'text/xml');
 
         expect(doc).to.be.an.instanceOf(XMLDocument);
         expect(doc.getElementsByTagName('instance')).to.have.length(2);
@@ -189,17 +193,15 @@ describe.shuffle('for incompatible forms that require preprocessing', () => {
                 "instance('cities')/root/item[state= /select_one_external/state  and county= /select_one_external/county ]"
             ),
             expect(
-                (selects[1].nextSibling!.nextSibling! as Element).getAttribute(
-                    'class'
-                )
+                selects[1].nextSibling!.nextSibling!.getAttribute('class')
             ).to.equal('itemset-labels'),
             expect(
-                (selects[1].nextSibling!.nextSibling! as Element).getAttribute(
+                selects[1].nextSibling!.nextSibling!.getAttribute(
                     'data-label-ref'
                 )
             ).to.equal('translate(label)'),
             expect(
-                (selects[1].nextSibling!.nextSibling! as Element).getAttribute(
+                selects[1].nextSibling!.nextSibling!.getAttribute(
                     'data-value-ref'
                 )
             ).to.equal('name'),

@@ -1,6 +1,7 @@
+import { expect } from '@esm-bundle/chai';
 import { markdownToHTML } from '../src/markdown';
 
-describe.shuffle('markdown', () => {
+describe('markdown', () => {
     describe('rendering', () => {
         [
             // correct emphasis

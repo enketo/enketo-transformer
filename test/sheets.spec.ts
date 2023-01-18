@@ -1,6 +1,7 @@
+import { expect } from '@esm-bundle/chai';
 import { sheets } from '../src/transformer';
 
-describe.shuffle('sheets', () => {
+describe('sheets', () => {
     it('should return an xslForm sheet', () => {
         expect(typeof sheets.xslForm).to.equal('string');
         expect(sheets.xslForm.length > 0).to.equal(true);

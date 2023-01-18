@@ -1,0 +1,10 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "lib": ["ES2018", "DOM", "DOM.Iterable"],
+        "types": ["node", "vite/client", "vitest/globals"]
+    },
+    "exclude": ["../../node_modules"],
+    "include": ["."],
+    "files": ["../../typings/test.d.ts"]
+}

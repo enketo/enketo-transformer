@@ -1,13 +1,18 @@
+/* eslint-disable @typescript-eslint/triple-slash-reference */
+/// <reference path="../typings/libxmljs.d.ts" />
+
+import type libxmljs from 'libxmljs';
+import type { Document as XMLJSDocument } from 'libxmljs';
 import { firefox as headless } from 'playwright';
 import type { Page } from 'playwright';
 import { createServer } from 'vite';
-import {
-    baseConfig,
-    define,
-    resolvePath,
-    rootDir,
-} from '../config/build.shared';
-import '../index.html?raw';
+import { pathToFileURL } from 'url';
+import { define } from '../config/build.shared';
+import { resolvePath, rootDir } from '../tools/shared';
+import type { TransformedSurvey } from './shared';
+import type { Survey as BaseSurvey } from './transformer';
+
+const isProduction = ENV === 'production';
 
 /**
  * @private
@@ -15,7 +20,11 @@ import '../index.html?raw';
  * There is no need to call this function, but it ensures that changes during
  * development are detected in dev/test watch mode
  */
-export const recognizeDependencies = () => import.meta.glob('./**/*.{xsl,ts}');
+export const recognizeDependencies = () => {
+    if (isProduction) {
+        import.meta.glob('./**/*.{xsl,ts}');
+    }
+};
 
 let pagePromise: Promise<Page> | null = null;
 let currentPage: Page | null = null;
@@ -32,39 +41,45 @@ const getPage = async () => {
     }
 
     const configFile = resolvePath('./vite.web.ts');
+    const mode = isProduction ? 'production' : 'development';
+    const useServer = !isProduction;
 
     try {
         const [browser, server] = await Promise.all([
             headless.launch({
                 headless: true,
             }),
-            createServer({
-                configFile,
-                mode: 'development',
-                build: {
-                    target: 'modules',
-                },
-                define,
-                plugins: [...(baseConfig.plugins ?? [])],
-                root: rootDir,
-            }),
+            useServer
+                ? createServer({
+                      configFile,
+                      mode,
+                      build: {
+                          target: 'modules',
+                      },
+                      define,
+                      root: rootDir,
+                  })
+                : null,
         ]);
 
         const [page] = await Promise.all([
             browser.newPage({
                 bypassCSP: true,
-                deviceScaleFactor: 0.01,
             }),
-            server.listen(),
+            server?.listen(),
         ]);
 
-        server.printUrls();
+        server?.printUrls();
 
         process.once('beforeExit', async () =>
-            Promise.all([browser.close(), server.close()])
+            Promise.all([browser.close(), server?.close()])
         );
 
-        if (server.resolvedUrls == null) {
+        const url =
+            server?.resolvedUrls?.local[0] ??
+            pathToFileURL(resolvePath('./dist/index.html')).href;
+
+        if (url == null) {
             throw new Error('Server startup failed');
         }
 
@@ -72,7 +87,7 @@ const getPage = async () => {
             console.log(message.text());
         });
 
-        await page.goto(server.resolvedUrls.local[0], {
+        await page.goto(url, {
             waitUntil: 'load',
         });
 
@@ -82,14 +97,14 @@ const getPage = async () => {
 
         const content = await page.content();
 
-        await page.waitForFunction(() => enketo != null);
+        await page.waitForFunction(() => typeof enketo !== 'undefined');
 
         if (!content.includes('Enketo Transformer')) {
             console.error(
                 'Launching the browser bridge failed, got page content',
                 content,
-                'urls',
-                server.resolvedUrls
+                'url',
+                url
             );
             process.exit(1);
         }
@@ -104,44 +119,92 @@ const getPage = async () => {
 
 pagePromise = getPage();
 
+type LibXMLJS = typeof libxmljs;
+
+export type PreprocessFunction = (
+    this: LibXMLJS,
+    doc: XMLJSDocument
+) => XMLJSDocument;
+
+const legacyPreprocess = async (
+    xform: string,
+    preprocess: PreprocessFunction
+) => {
+    let libxmljs: LibXMLJS | null = null;
+
+    try {
+        libxmljs = await import('node1-libxmljsmt-myh');
+    } catch {
+        try {
+            libxmljs = await import('libxmljs');
+        } catch {
+            throw new Error(
+                'You must install `libxmljs` to use the `preprocess` option.'
+            );
+        }
+    }
+
+    const doc = libxmljs.parseXml(xform);
+    const preprocessed = preprocess.call(libxmljs, doc);
+
+    return preprocessed.toString(false);
+};
+
+export interface Survey extends Omit<BaseSurvey, 'preprocess'> {
+    preprocess?: PreprocessFunction;
+}
+
 declare const enketo: {
     transformer: {
-        transform: (survey: any) => Promise<any>;
+        transform: (survey: Survey) => Promise<TransformedSurvey>;
     };
 };
 
-export const transform = async (survey: any) => {
+export const transform = async (survey: Survey) => {
+    const {
+        preprocess,
+        preprocessXForm,
+        xform: baseXForm,
+        ...options
+    } = survey;
+
+    let xform = baseXForm;
+
+    if (typeof preprocess === 'function') {
+        xform = await legacyPreprocess(xform, preprocess);
+    }
+
     const page = await getPage();
 
-    const [error, result] = await page.evaluate(
+    const result = await page.evaluate(
         /* eslint-disable @typescript-eslint/no-shadow */
-        async ([input]) => {
-            let transformed: any = null;
-            let caught: any = null;
+        async ([input, preprocess]) => {
+            const preprocessXForm =
+                typeof preprocess === 'string'
+                    ? (new Function(preprocess) as (xform: string) => any) // eslint-disable-line
+                    : undefined;
 
-            try {
-                transformed = await enketo.transformer.transform(input);
-            } catch (error) {
-                const { message, stack } = error as Error;
+            const browserResult = await enketo.transformer.transform({
+                ...input,
+                preprocessXForm,
+            });
 
-                caught = {
-                    message,
-                    stack,
-                };
-
-                console.log('caught', caught);
-            }
-
-            return [caught, transformed];
+            return browserResult;
         },
         /* eslint-enable @typescript-eslint/no-shadow */
 
-        [survey] as const
+        [
+            {
+                ...options,
+                xform,
+            },
+            typeof preprocessXForm === 'function'
+                ? String(preprocessXForm)
+                : null,
+        ] as const
     );
 
-    if (error == null) {
-        return result;
-    }
-
-    throw Object.assign(new Error(error.message), error);
+    return result;
 };
+
+export * from './shared';

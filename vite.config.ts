@@ -39,8 +39,10 @@ export default defineConfig({
         },
 
         globals: true,
-        include: ['test/**/*.spec.ts'],
+        include: ['./test/node/**/*.spec.ts'],
         reporters: 'verbose',
-        sequence: { shuffle: false },
+        sequence: { shuffle: true },
+        resolveSnapshotPath: (testPath, snapExtension) =>
+            `${testPath.replace('/node/', '/__snapshots__/')}${snapExtension}`,
     },
 });

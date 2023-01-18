@@ -40,6 +40,8 @@
         "@typescript-eslint/no-non-null-assertion": "error",
         "chai-friendly/no-unused-expressions": "error",
         "prettier/prettier": "error",
+        "no-shadow": "off",
+        "@typescript-eslint/no-shadow": "warn",
 
         "guard-for-in": "warn",
         "import/extensions": "warn",
@@ -52,12 +54,13 @@
                     "*.config.js",
                     "*.config.ts",
                     "vite.*.ts",
+                    "config/*",
                     "src/api.ts",
                     "test/**/*.ts",
                     "tools/**/*"
                 ],
                 "optionalDependencies": false,
-                "peerDependencies": false
+                "peerDependencies": ["src/node.ts", "typings/libxmljs.d.ts"]
             }
         ],
         "import/no-unresolved": [
@@ -75,7 +78,6 @@
             "LabeledStatement",
             "WithStatement"
         ],
-        "no-shadow": "warn",
         "no-underscore-dangle": "warn",
         "no-unused-expressions": "off",
         "no-use-before-define": [
@@ -92,6 +94,19 @@
             "parser": "markdown-eslint-parser",
             "rules": {
                 "prettier/prettier": ["error", { "parser": "markdown" }]
+            }
+        },
+
+        {
+            "files": ["./**/*.js"],
+            "rules": {
+                "import/extensions": [
+                    "error",
+                    "ignorePackages",
+                    {
+                        "js": "always"
+                    }
+                ]
             }
         },
 
