@@ -28,10 +28,7 @@ export const external = [
     'vitest',
 ];
 
-export const rootDir = dirname(fileURLToPath(import.meta.url)).replace(
-    /(\/enketo-transformer)(\/.*$)/,
-    '$1'
-);
+export const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 /**
  * @param {string} path
