@@ -21,13 +21,13 @@
         "ecmaVersion": 2020
     },
     "settings": {
-        "import/extensions": [".ts"],
+        "import/extensions": [".ts", ".tsx"],
         "import/parsers": {
-            "@typescript-eslint/parser": [".ts"]
+            "@typescript-eslint/parser": [".ts", ".tsx"]
         },
         "import/resolver": {
             "node": {
-                "extensions": [".js", ".ts"]
+                "extensions": [".js", ".ts", ".tsx"]
             }
         },
         "jsdoc": {
@@ -111,7 +111,7 @@
         },
 
         {
-            "files": ["./**/*.ts"],
+            "files": ["./**/*.ts", "./demo/**/*.tsx"],
             "rules": {
                 "consistent-return": "off",
                 "no-useless-constructor": "off",
@@ -135,6 +135,23 @@
                         "tsx": "never"
                     }
                 ]
+            }
+        },
+
+        {
+            "env": {
+                "browser": true,
+                "node": false
+            },
+            "files": ["./demo/**/*"],
+            "rules": {
+                "react/destructuring-assignment": "off",
+                "react/jsx-filename-extension": [
+                    "error",
+                    { "extensions": [".jsx", ".tsx"] }
+                ],
+                "react/no-unknown-property": "off",
+                "react/react-in-jsx-scope": "off"
             }
         },
 
