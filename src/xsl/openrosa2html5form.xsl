@@ -1383,10 +1383,19 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
     </xsl:template>
 
     <xsl:template name="text-content">
-        <xsl:if test="string-length(.) = 0">
-            <xsl:text><!-- avoids self-closing tags on empty elements --> </xsl:text>
-        </xsl:if>
-        <xsl:apply-templates /><!-- call xf:output template if output is present -->
+        <xsl:choose>
+            <xsl:when test="string-length(.) = 0">
+                <xsl:text><!-- avoids self-closing tags on empty elements --> </xsl:text>
+                <xsl:apply-templates />
+            </xsl:when>
+            <!-- Firefox does not apply templates to these attributes -->
+            <xsl:when test="name() = 'jr:constraintMsg' or name() = 'jr:requiredMsg' or ($openclinica = 1 and starts-with(name(), 'oc:') and substring(name(), string-length(name()) - string-length('Msg') + 1) = 'Msg' )">
+                <xsl:value-of select="." />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:apply-templates />
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template name="translations">
