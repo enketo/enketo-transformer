@@ -70,6 +70,7 @@ export const transform = async (survey: Survey): Promise<TransformedSurvey> => {
     const xformDoc = parseXML(preprocessed);
 
     processBinaryDefaults(xformDoc, mediaMap);
+    injectItemsetTemplateCalls(xslFormDocument, xformDoc);
 
     const htmlDoc = xslTransform(xslFormDocument, xformDoc, xsltParams);
 
@@ -376,6 +377,184 @@ const correctModelNamespaces = (
             }
         });
     });
+};
+
+const getAttrValueByXPathExpression = (
+    doc: Document,
+    context: Element,
+    expression: string
+) => {
+    const [attr] = getNodesByXPathExpression<Attr>(doc, expression, context);
+
+    return attr?.value;
+};
+
+const attrSpecialCharacters = [
+    [/</g, '&lt;'],
+    [/>/g, '&gt;'],
+    [/'/g, '&apos;'],
+    [/"/g, '&quot;'],
+] as const;
+
+const escapeAttrValue = (value: string) => {
+    let result = value;
+
+    attrSpecialCharacters.forEach(([pattern, replacement]) => {
+        result = result.replace(pattern, replacement);
+    });
+
+    return result;
+};
+
+/** @see {@link injectItemsetTemplateCalls} */
+const substringBefore = (haystack: string, needle: string) =>
+    haystack.split(needle, 1)[0];
+
+/** @see {@link injectItemsetTemplateCalls} */
+const substringAfter = (haystack: string, needle: string) =>
+    haystack.substring(haystack.indexOf(needle) + needle.length);
+
+/**
+ * This is a replacement for the XSL template named `strip-filter`. The original
+ * XSL commentary follows:
+ *
+ * ----------------------------------------------------------------------------
+ * turns: /path/to/node[value=/some/other/node] into: /path/to/node this
+ * function is probably way too aggressive but will work for xls-form generated
+ * forms to do this properly a regexp:replace is required, but not supported in
+ * libXML kept the recursion in, even though it is not being used right now
+ * ----------------------------------------------------------------------------
+ *
+ * Contrary to the JSDoc comment for @see {@link injectItemsetTemplateCalls},
+ * this implementation deviates from the original XSL logic, which uses
+ * substrings and recursion, because it's (hopefully) much easier to understand
+ * this way.
+ *
+ * It is *also* worth noting that in the process of migrating to browser DOM,
+ * the original commentary was found to be wrong! The recursion was certainly in
+ * use, and without it some snapshot tests failed.
+ */
+const stripFilter = (expression: string) => expression.replace(/\[.*?\]/g, '');
+
+/**
+ * This is a replacement for the dynamic logic in the XSL template
+ * `match="xf:itemset" mode="labels"`. Moving it to DOM code allows us to drop
+ * our reliance on the unsupported `dyn` extension. The intent is to match the
+ * naming and semantics of the original XSL logic to ensure there is no
+ * potential for regressions.
+ */
+
+const injectItemsetTemplateCalls = (
+    xslDoc: XMLDocument,
+    xformDoc: XMLDocument
+) => {
+    const [template] = getNodesByXPathExpression(
+        xslDoc,
+        '/xsl:stylesheet/xsl:template[@name = "itemset-itext-labels"]'
+    );
+    const itemsets = getNodesByXPathExpression(xformDoc, '//xmlns:itemset');
+
+    const itemsetParameters = itemsets.map((itemset) => {
+        const valueRef = getAttrValueByXPathExpression(
+            xformDoc,
+            itemset,
+            './xmlns:value/@ref'
+        );
+        const labelRef = getAttrValueByXPathExpression(
+            xformDoc,
+            itemset,
+            './xmlns:label/@ref'
+        );
+        const nodeset = getAttrValueByXPathExpression(
+            xformDoc,
+            itemset,
+            '@nodeset'
+        );
+        const iwq = substringBefore(substringAfter(nodeset, 'instance('), ')');
+        // const [, iwq = ''] = nodeset.match(/instance\((.*?)\)\//) ?? [];
+
+        // TODO (2023-01-15): The following comment is directly from the
+        // previous XSL implementation. But because we *do* now implement this
+        // in a general purpose language, we can address these limitations.
+
+        // Needs to also deal with randomize(instance("id")/path/to/node), randomize(instance("id")/path/to/node, 3)
+        // Super inelegant and not robust without regexp:match
+        let instancePathTemp: string;
+
+        const nodesetIncludesRandomize = nodeset.includes('randomize(');
+
+        if (nodesetIncludesRandomize && nodeset.includes(',')) {
+            instancePathTemp = substringBefore(
+                substringAfter(nodeset, ')'),
+                ','
+            );
+        } else if (nodesetIncludesRandomize) {
+            instancePathTemp = substringBefore(
+                substringAfter(nodeset, ')'),
+                ')'
+            );
+        } else {
+            instancePathTemp = substringAfter(nodeset, ')');
+        }
+
+        const instancePath = instancePathTemp.replace(/\//g, '/xf:');
+        const instancePathNoFilter = stripFilter(instancePath);
+        const instanceId = iwq.substring(1, iwq.length - 1);
+        const itextPath = `/h:html/h:head/xf:model/xf:instance[@id="${instanceId}"]${instancePathNoFilter}`;
+
+        return {
+            valueRef,
+            labelRef,
+            itextPath,
+        };
+    });
+
+    const ids: string[] = [];
+
+    itemsets.forEach((itemset, index) => {
+        let id = itemset.getAttributeNS(null, 'id');
+
+        if (id == null) {
+            id = `itemset-${index}`;
+        }
+
+        itemset.setAttributeNS(null, 'id', id);
+        ids.push(id);
+    });
+
+    const templateCalls = itemsetParameters
+        .map((parameters, index) => {
+            const id = ids[index];
+            const match = escapeAttrValue(`xf:itemset[@id = "${id}"]`);
+
+            return /* xsl */ `<xsl:template
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                match="${match}"
+                mode="labels">
+                <xsl:call-template name="itemset-itext-labels">
+                    ${Object.entries(parameters)
+                        .map(([name, value]) => {
+                            const paramName = escapeAttrValue(name);
+
+                            let paramValue = `${escapeAttrValue(value)}`;
+
+                            if (paramName !== 'itextPath') {
+                                paramValue = `'${paramValue}'`;
+                            }
+
+                            return /* xsl */ `
+                    <xsl:with-param
+                        name="${paramName}"
+                        select="${paramValue}" />
+                                `;
+                        })
+                        .join('\n')}
+                </xsl:call-template>
+            </xsl:template>`;
+        })
+        .join('\n\n');
+
+    template.insertAdjacentHTML('afterend', templateCalls);
 };
 
 /**

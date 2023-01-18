@@ -662,47 +662,35 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="xf:itemset" mode="labels">
-        <xsl:variable name="value-ref" select="./xf:value/@ref" />
-        <xsl:variable name="label-ref" select="./xf:label/@ref" />
-        <xsl:variable name="iwq" select="substring-before(substring-after(@nodeset, 'instance('),')/')" />
-        <!-- Needs to also deal with randomize(instance("id")/path/to/node), randomize(instance("id")/path/to/node, 3) -->
-        <!-- Super inelegant and not robust without regexp:match -->
-        <xsl:variable name="instance-path-temp">
-            <xsl:choose>
-                <xsl:when test="contains(@nodeset, 'randomize(') and contains(@nodeset, ',')">
-                    <xsl:value-of select="substring-before(substring-after(@nodeset, ')'), ',')"/>
-                </xsl:when>
-                <xsl:when test="contains(@nodeset, 'randomize(')">
-                    <xsl:value-of select="substring-before(substring-after(@nodeset, ')'), ')')"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="substring-after(@nodeset, ')')"/>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
-        <xsl:variable name="instance-path" select="str:replace($instance-path-temp, '/', '/xf:')" />
-        <xsl:variable name="instance-path-nofilter">
-            <xsl:call-template name="strip-filter">
-                <xsl:with-param name="string" select="$instance-path"/>
-            </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="instance-id" select="substring($iwq, 2, string-length($iwq)-2)" />
+    <!-- Calls to this template will be injected by transformer.ts based on the itemsets in a given XForm -->
+    <xsl:template name="itemset-itext-labels">
+        <xsl:param name="valueRef" />
+        <xsl:param name="labelRef" />
+        <xsl:param name="itextPath" />
+
         <span class="itemset-labels">
             <xsl:attribute name="data-value-ref">
-                <xsl:value-of select="$value-ref"/>
+                <xsl:value-of select="$valueRef"/>
             </xsl:attribute>
             <xsl:choose>
-                <xsl:when test="contains($label-ref, 'jr:itext(')">
+                <!-- <xsl:when test="true()">
+                    <span class="dbg">
+                        valueRef: <xsl:value-of select="$valueRef" />
+                        labelRef: <xsl:value-of select="$labelRef" />
+                        itextPath: <xsl:value-of select="$itextPath" />
+                    </span>
+                </xsl:when> -->
+                <xsl:when test="contains($labelRef, 'jr:itext(')">
                     <xsl:attribute name="data-label-type">
                         <xsl:value-of select="'itext'"/>
                     </xsl:attribute>
                     <xsl:variable name="label-node-name"
-                        select="substring(substring-after($label-ref, 'itext('),1,string-length(substring-after($label-ref, 'itext('))-1)"/>
+                        select="substring(substring-after($labelRef, 'itext('),1,string-length(substring-after($labelRef, 'itext('))-1)"/>
                     <xsl:attribute name="data-label-ref">
                         <xsl:value-of select="$label-node-name"/>
                     </xsl:attribute>
-                    <xsl:for-each select="dyn:evaluate(concat('/h:html/h:head/xf:model/xf:instance[@id=&quot;', $instance-id, '&quot;]', $instance-path-nofilter))">
+
+                    <xsl:for-each select="exsl:node-set($itextPath)">
                         <!-- so this is support for itext(node) (not itext(path/to/node)), but only 'ad-hoc' for itemset labels for now -->
                         <xsl:variable name="id" select="./*[name()=$label-node-name]" />
                         <xsl:call-template name="translations">
@@ -713,36 +701,12 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:attribute name="data-label-ref">
-                        <xsl:value-of select="$label-ref"/>
+                        <xsl:value-of select="$labelRef"/>
                     </xsl:attribute>
                 </xsl:otherwise>
             </xsl:choose>
-            <xsl:text>
-            </xsl:text>
+            <xsl:text> <!-- This preserves whitespace which affects snapshot tests. --></xsl:text>
         </span>
-    </xsl:template>
-
-    <!--
-        turns: /path/to/node[value=/some/other/node] into: /path/to/node
-        this function is probably way too aggressive but will work for xls-form generated forms
-        to do this properly a regexp:replace is required, but not supported in libXML
-        kept the recursion in, even though it is not being used right now
-    -->
-    <xsl:template name="strip-filter">
-        <xsl:param name="string"/>
-        <xsl:choose>
-            <xsl:when test="contains($string, '[') and contains($string, ']')">
-                <xsl:value-of select="substring-before($string, '[')"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="$string"/>
-            </xsl:otherwise>
-        </xsl:choose>
-        <xsl:if test="string-length(substring-after($string, ']')) > 0">
-            <xsl:call-template name="strip-filter">
-                <xsl:with-param name="string" select="substring-after($string,']')"/>
-            </xsl:call-template>
-        </xsl:if>
     </xsl:template>
 
     <!--
