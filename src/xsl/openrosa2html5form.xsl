@@ -20,9 +20,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:jr="http://openrosa.org/javarosa"
     xmlns:exsl="http://exslt.org/common"
-    xmlns:str="http://exslt.org/strings"
-    xmlns:dyn="http://exslt.org/dynamic"
-    extension-element-prefixes="exsl str dyn"
+    extension-element-prefixes="exsl"
     version="1.0"
     >
     <xsl:param name="openclinica"/>
@@ -66,15 +64,6 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
     <xsl:template match="/">
         <xsl:if test="not(function-available('exsl:node-set'))">
             <xsl:message terminate="yes">FATAL ERROR: exsl:node-set function is not available in this XSLT processor</xsl:message>
-        </xsl:if>
-        <xsl:if test="not(function-available('str:replace'))">
-            <xsl:message terminate="yes">FATAL ERROR: str:replace function is not available in this XSLT processor</xsl:message>
-        </xsl:if>
-        <xsl:if test="not(function-available('dyn:evaluate'))">
-            <xsl:message terminate="yes">FATAL ERROR: dyn:evaluate function is not available in this XSLT processor</xsl:message>
-        </xsl:if>
-        <xsl:if test="not(function-available('str:tokenize'))">
-            <xsl:message terminate="yes">FATAL ERROR: str:tokenize function is not available in this XSLT processor</xsl:message>
         </xsl:if>
         <xsl:for-each select="/h:html/h:head/xf:model/xf:bind">
             <xsl:if test="not(substring(./@nodeset, 1, 1) = '/')">
