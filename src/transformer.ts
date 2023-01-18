@@ -75,6 +75,7 @@ export const transform = async (survey: Survey): Promise<TransformedSurvey> => {
 
     correctAction(htmlDoc, 'setgeopoint');
     correctAction(htmlDoc, 'setvalue');
+    transformAppearances(htmlDoc);
 
     if (typeof theme === 'string' && theme.trim() !== '') {
         replaceTheme(htmlDoc, theme);
@@ -243,6 +244,66 @@ const processBinaryDefaults = (
                 }
             });
         }
+    });
+};
+
+/**
+ *
+ * @param doc
+ */
+const transformAppearances = (doc: Document) => {
+    const appearanceElements =
+        doc.querySelectorAll<HTMLElement>('[data-appearances]');
+
+    appearanceElements.forEach((element) => {
+        const appearances =
+            element.dataset.appearances?.trim().toLowerCase().split(/\s+/) ??
+            [];
+        const classes = appearances.flatMap((appearance) => {
+            const results = [`or-appearance-${appearance}`];
+
+            // Convert deprecated appearances, but leave the deprecated ones.
+            if (appearance === 'horizontal') {
+                results.push('or-appearance-columns');
+            }
+
+            if (appearance === 'horizontal-compact') {
+                results.push('or-appearance-columns-pack');
+            }
+
+            if (appearance === 'compact') {
+                results.push(
+                    'or-appearance-columns-pack',
+                    'or-appearance-no-buttons'
+                );
+            }
+
+            if (appearance.startsWith('compact-')) {
+                results.push(
+                    appearance.replace('compact-', ''),
+                    'or-appearance-no-buttons'
+                );
+            }
+
+            return results;
+        });
+
+        /**
+         * In some cases, appearance classes are expected to occur before other
+         * classes. By adding a placeholder in the XSL, we're able to identify
+         * where they should be added. If no plaeholder is present, it's safe to
+         * assume that they're expected to be last.
+         */
+        if (element.classList.contains('or-appearances-placeholder')) {
+            element.className = element.className.replace(
+                ' or-appearances-placeholder ',
+                ` ${classes.join(' ')} `
+            );
+        } else {
+            element.classList.add(...classes);
+        }
+
+        element.removeAttribute('data-appearances');
     });
 };
 
