@@ -15,18 +15,12 @@ jobs:
                 node: ['14', '16']
         steps:
             - uses: actions/checkout@v2
-            - uses: actions/cache@v2
-              id: cache
-              with:
-                  path: node_modules
-                  key: ${{ matrix.node }}-${{ hashFiles('**/package-lock.json') }}
             - uses: actions/setup-node@v2
               with:
                   node-version: ${{ matrix.node }}
                   registry-url: https://registry.npmjs.org/
             - run: npm install -g npm@^6
-            - if: steps.cache.outputs.cache-hit != 'true'
-              run: npm ci
+            - run: npm ci
             - run: npm test
             - run: npm run benchmarks
             - if: github.event_name == 'release' && github.event.action == 'published' && matrix.node == '16'
