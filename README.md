@@ -18,6 +18,8 @@ npm install enketo-transformer --save
 
 ### Use as module
 
+#### Node
+
 ```ts
 import { transform } from 'enketo-transformer';
 
@@ -46,16 +48,54 @@ const result = await transform({
 // ... do something with result
 ```
 
-### Install as app (web API)
+#### Web
 
-1. clone repo
-2. install dependencies with `npm install`
+Enketo Transformer may also be used on the web as an ESM module. It is exported in releases as `enketo-transformer/web`. There's one minor API difference, `preprocess` is named `preprocessXForm`, which accepts and may return a string, i.e.:
 
-### Use as app (web API)
+```ts
+import { transform } from 'enketo-transformer/web';
 
-1. start with `npm start`
-2. limited use with `GET /transform` with xform parameter (required, **xform URL**), or
-3. full-featured use with: `POST /transform` with URL-encoded body including `xform` (required, **full XForm as a string**), `theme` (optional, string), and `media` (optional, map) parameters
+const xformResponse = await fetch('https://url/to/xform.xml');
+const xform = await xformResponse.text();
+const result = await transform({
+    xform,
+    preprocessXForm: (doc) => doc,
+    // ...
+});
+```
+
+### Development/local usage
+
+#### Install
+
+```sh
+npm install
+```
+
+#### Interactive web demo
+
+Enketo Transformer provides a simple web demo which allows you to select any of the XForms used as fixtures in its test suites to view their transformed output, as well as toggling several of the available transform options to see how they affect the transform. To run the demo:
+
+```sh
+cd ./demo
+npm install
+npm run demo
+```
+
+This will print out the demo URL (typically `http://localhost:3000`, unless that port is already in use).
+
+#### Test/dev server
+
+Enketo Transformer provides a simple server API. It may be used for testing locally, but isn't a robust or secure server implementation so it should not be used in production. You can start it in a local dev environment by running:
+
+```sh
+npm start
+```
+
+It provides two endpoints:
+
+-   limited use with `GET /transform` with xform parameter (required, **xform URL**), or
+-   full-featured use with: `POST /transform` with URL-encoded body including `xform` (required, **full XForm as a string**), `theme` (optional, string), and `media` (optional, map) parameters
 
 sample GET request:
 
@@ -69,7 +109,7 @@ sample POST request:
 curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.png&media[this]=that" http://localhost:8085/transform
 ```
 
-### Response format
+##### Response format
 
 ```json
 {
@@ -80,7 +120,7 @@ curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.
 }
 ```
 
-### Test
+#### Test
 
 -   run tests with `npm test`
 -   run tests in watch mode with `npm run test:watch`
