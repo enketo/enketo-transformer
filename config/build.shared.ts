@@ -2,13 +2,8 @@
 
 import crypto from 'crypto';
 import fs from 'fs';
-import { createRequire } from 'module';
-import { dirname, resolve } from 'path';
-import { fileURLToPath } from 'url';
-
-const require = createRequire(import.meta.url);
-
-export const config = require('./config.json');
+import type { UserConfig } from 'vitest/config';
+import { resolvePath } from '../tools/shared';
 
 export const external = [
     'body-parser',
@@ -18,9 +13,11 @@ export const external = [
     'libxslt',
     'libxmljs',
     'module',
+    'node:*',
     'node1-libxmljsmt-myh',
     'path',
     'playwright',
+    'perf_hooks',
     'undici',
     'url',
     'vite-node',
@@ -28,29 +25,25 @@ export const external = [
     'vitest',
 ];
 
-export const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+export const readFile = (path: string) =>
+    fs.readFileSync(resolvePath(path), 'utf-8');
 
-/**
- * @param {string} path
- */
-export const resolvePath = (path) => resolve(rootDir, path);
+export const readJSON = (path: string) => {
+    const json = readFile(path);
 
-/**
- * @param {string} path
- */
-export const readFile = (path) => fs.readFileSync(resolvePath(path), 'utf-8');
+    return JSON.parse(json);
+};
 
-const { version } = require('../package.json');
+export const config = readJSON('./config/config.json');
+
+const { version } = readJSON('./package.json');
 
 export const PACKAGE_VERSION = version;
 
 const xslForm = readFile('./src/xsl/openrosa2html5form.xsl');
 const xslModel = readFile('./src/xsl/openrosa2xmlmodel.xsl');
 
-/**
- * @param {string | Buffer} message
- */
-const md5 = (message) => {
+const md5 = (message: string | Buffer) => {
     const hash = crypto.createHash('md5');
     hash.update(message);
 
@@ -62,19 +55,19 @@ const HASHED_VERSION = md5(`${xslForm}${xslModel}${PACKAGE_VERSION}`);
 export const SERVER_PORT = config.port;
 
 export const define = {
-    PACKAGE_VERSION: JSON.stringify(PACKAGE_VERSION),
-    HASHED_VERSION: JSON.stringify(HASHED_VERSION),
-    SERVER_PORT: JSON.stringify(SERVER_PORT),
+    [`PACKAGE${'_'}VERSION`]: JSON.stringify(PACKAGE_VERSION),
+    [`HASHED${'_'}VERSION`]: JSON.stringify(HASHED_VERSION),
+    [`SERVER${'_'}PORT`]: JSON.stringify(SERVER_PORT),
 };
 
-/**
- * @type {import('vitest/config').UserConfig}
- */
 export const baseConfig = {
     assetsInclude: ['**/*.xml', '**/*.xsl'],
     build: {
         minify: false,
         outDir: 'dist',
+        rollupOptions: {
+            external,
+        },
         sourcemap: true,
     },
     define,
@@ -84,7 +77,7 @@ export const baseConfig = {
         minifySyntax: false,
         minifyWhitespace: false,
     },
-    server: {
-        port: SERVER_PORT,
+    optimizeDeps: {
+        exclude: external,
     },
-};
+} satisfies UserConfig;

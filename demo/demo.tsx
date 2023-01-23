@@ -6,7 +6,7 @@ import {
     useIsRouting,
     useSearchParams,
 } from '@solidjs/router';
-import { NAMESPACES, transform } from 'enketo-transformer';
+import { NAMESPACES, transform } from 'enketo-transformer/web';
 import { createEffect, createResource, createSignal, on, Show } from 'solid-js';
 import { For, render } from 'solid-js/web';
 import { fixtures as baseFixtures } from '../test/shared';

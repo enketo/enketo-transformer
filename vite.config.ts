@@ -1,26 +1,39 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vitest/config';
-import { baseConfig } from './config/build.shared';
+import { baseConfig, define as baseDefine } from './config/build.shared';
+
+const ENV = process.env.NODE_ENV ?? 'development';
+
+const define = {
+    ...baseDefine,
+    ENV: JSON.stringify(ENV),
+};
 
 export default defineConfig({
     ...baseConfig,
 
+    assetsInclude: ['config/config.json', '**/*.xsl'],
     build: {
         ...baseConfig.build,
 
         lib: {
-            entry: resolve(__dirname, './src/transformer.ts'),
-            name: 'enketo-transformer',
+            entry: resolve(__dirname, './src/node.ts'),
+            fileName: 'node',
+            formats: ['cjs'],
+            name: 'node',
         },
         minify: false,
         outDir: 'dist',
         sourcemap: true,
     },
+    define,
+    esbuild: {
+        ...baseConfig.esbuild,
+
+        define,
+    },
     optimizeDeps: {
         disabled: true,
-    },
-    ssr: {
-        target: 'node',
     },
     test: {
         // Vitest uses thread-based concurrency by defualt.
@@ -31,12 +44,10 @@ export default defineConfig({
         // functionality which depends on libxmljs/libxslt.
         threads: false,
 
-        coverage: {
-            provider: 'istanbul',
-            include: ['src/**/*.ts'],
-            reporter: ['html', 'text-summary', 'json'],
-            reportsDirectory: './test-coverage',
-        },
+        // Coverage is now checked in `@web/test-runner`
+        // with the tests which originally existed before
+        // the web transition.
+        // coverage: {},
 
         globals: true,
         include: ['./test/node/**/*.spec.ts'],

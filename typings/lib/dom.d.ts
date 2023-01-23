@@ -1,9 +1,9 @@
 // These types *should* be more specific in the base `dom` lib.
 interface DOMParser {
-    parseFromString<T extends DOMMimeType>(
+    parseFromString<T extends string>(
         string: string,
-        type: DOMMimeType
-    ): DocumentFromMimeType<T>;
+        type: T
+    ): T extends 'text/html' ? Document : XMLDocument;
 }
 
 interface Node {

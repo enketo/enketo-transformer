@@ -1,5 +1,5 @@
-import { defineConfig } from 'vitest/config';
-import type { UserConfig } from 'vitest/config';
+import { defineConfig } from 'vite';
+import type { UserConfig } from 'vite';
 import { resolve } from 'path';
 import {
     baseConfig,

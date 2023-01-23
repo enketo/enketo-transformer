@@ -4,14 +4,23 @@
     "description": "Library/app that transforms ODK-compliant XForms into a format that Enketo can consume",
     "license": "Apache-2.0",
     "type": "module",
-    "main": "./dist/enketo-transformer.umd.cjs",
-    "module": "./dist/enketo-transformer.js",
-    "types": "./dist/src/transformer.d.ts",
+    "types": "./dist/src/node.d.ts",
     "exports": {
         ".": {
-            "import": "./dist/enketo-transformer.js",
-            "require": "./dist/enketo-transformer.umd.cjs",
+            "import": "./dist/transformer.js",
+            "require": "./dist/node.cjs"
+        },
+        "./web": {
+            "default": "./dist/transformer.js",
+            "import": "./dist/transformer.js",
             "types": "./dist/src/transformer.d.ts"
+        }
+    },
+    "typesVersions": {
+        "*": {
+            "web": [
+                "./dist/src/transformer.d.ts"
+            ]
         }
     },
     "bugs": {
@@ -29,15 +38,17 @@
     },
     "contributors": [],
     "scripts": {
-        "build": "npm run tsc && vite build && npm run typedefs",
-        "benchmarks": "vite-node ./test/benchmarks.ts",
-        "start": "vite",
-        "start:web": "vite --config vite.web.ts",
-        "eslint-check": "eslint app.ts src/**/*.ts vite.config.ts test/**/*.ts",
-        "eslint-fix": "eslint app.ts src/**/*.ts vite.config.ts test/**/*.ts --fix",
+        "build": "NODE_ENV='production' npm run tsc && vite build && vite build --config ./vite.web.ts --emptyOutDir false && vite build --config ./vite.app.ts --emptyOutDir false && NODE_ENV='lib' vite build --config ./vite.web.ts --emptyOutDir false && npm run typedefs",
+        "preinstall": "npm run build",
+        "benchmarks": "vite-node ./test/node/benchmarks.ts",
+        "start": "vite --config ./vite.app.ts & http-server test/forms -p 8081",
+        "eslint-check": "eslint src/**/*.ts vite.config.ts test/**/*.ts",
+        "eslint-fix": "eslint src/**/*.ts vite.config.ts test/**/*.ts --fix",
         "prettier-fix": "prettier --write .",
-        "test": "wtr && vitest run --coverage && npm run prettier-fix && npm run eslint-fix && npm run tsc && node update-readme-with-shield-badge.cjs",
+        "test": "wtr && vitest run && npm run prettier-fix && npm run eslint-fix && npm run tsc && node update-readme-with-shield-badge.cjs",
+        "test:server": "vitest run",
         "test:server:watch": "vitest",
+        "test:web": "vite-node ./tools/wtr.ts --config ./web-test-runner.vite-node.ts",
         "test:web:watch": "wtr --watch",
         "develop": "DEBUG=api,transformer,markdown,language node ./app.js",
         "tsc": "tsc --project ./tsconfig.json && tsc --project ./test/tsconfig.json",
