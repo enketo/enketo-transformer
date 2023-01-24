@@ -131,14 +131,18 @@ curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.
 Basic usage:
 
 1. Go to VSCode's "Run and Debug" panel
-2. Select "Test (watch + debug)"
+2. Select either "Test server (watch + debug)" or "Test client (watch + debug)"
 3. Click the play button
+
+Server tests will launch Node in debug mode directly in VSCode.
+
+Client tests will launch `@web/test-runner` in a browser, where you can select a test suite and debug in the browser's dev tools.
 
 Optionally, you can add a keyboard shortcut to select launch tasks:
 
 1. Open the keyboard shortcuts settings (cmd+k cmd+s on Mac, ctrl+k ctrl+s on other OSes)
 2. Search for `workbench.action.debug.selectandstart`
-3. Click the + button to add your preferred keybinding keybinding
+3. Click the + button to add your preferred keybinding
 
 ### Develop
 

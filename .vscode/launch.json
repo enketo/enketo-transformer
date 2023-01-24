@@ -1,14 +1,25 @@
 {
     "configurations": [
         {
-            "name": "Test (watch + debug)",
+            "name": "Test server (watch + debug)",
             "request": "launch",
-            "runtimeArgs": ["run-script", "test:watch"],
+            "runtimeArgs": ["run-script", "test:server:watch"],
             "runtimeExecutable": "npm",
             "skipFiles": ["<node_internals>/**"],
-            "type": "pwa-node",
+            "type": "node",
             "sourceMaps": true,
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Test client (watch + debug)",
+            "request": "launch",
+            "runtimeArgs": ["wtr", "--manual", "--open"],
+            "runtimeExecutable": "npx",
+            "skipFiles": ["<node_internals>/**"],
+            "type": "node",
+            "sourceMaps": true,
+            "console": "integratedTerminal",
+            "autoAttachChildProcesses": false
         }
     ]
 }
