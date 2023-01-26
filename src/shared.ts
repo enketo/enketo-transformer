@@ -16,9 +16,12 @@ export { escapeURLPath } from './url';
 
 export const version = HASHED_VERSION;
 
-export interface TransformedSurvey {
+interface BaseTransformedSurvey {
     form: string;
     languageMap: Record<string, string>;
     model: string;
     transformerVersion: string;
 }
+
+export type TransformedSurvey<T = any> = Omit<T, keyof BaseTransformedSurvey> &
+    BaseTransformedSurvey;

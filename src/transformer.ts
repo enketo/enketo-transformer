@@ -36,7 +36,9 @@ export type Survey = BaseSurvey & TransformOptions;
 /**
  * Performs XSLT transformation on XForm and process the result.
  */
-export const transform = async (survey: Survey): Promise<TransformedSurvey> => {
+export const transform = async <T extends Survey>(
+    survey: T
+): Promise<TransformedSurvey<Omit<T, keyof Survey>>> => {
     const xslFormDocument = parseXML(sheets.xslForm);
     const xslModelDocument = parseXML(sheets.xslModel);
     const { xform, markdown, media, openclinica, theme } = survey;
@@ -83,12 +85,18 @@ export const transform = async (survey: Survey): Promise<TransformedSurvey> => {
 
     const model = serializeXML(xmlDoc);
 
-    return {
+    // @ts-expect-error - This fails because `xform` is not optional, but this is API-consistent behavior.
+    delete survey.xform;
+    delete survey.media;
+    delete survey.markdown;
+    delete survey.openclinica;
+
+    return Object.assign(survey, {
         form,
         model,
         languageMap,
         transformerVersion: PACKAGE_VERSION,
-    };
+    });
 };
 
 interface XSLTParams {

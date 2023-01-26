@@ -159,11 +159,13 @@ export interface Survey extends Omit<BaseSurvey, 'preprocess'> {
 
 declare const enketo: {
     transformer: {
-        transform: (survey: Survey) => Promise<TransformedSurvey>;
+        transform: <T>(
+            survey: Survey & T
+        ) => Promise<TransformedSurvey<Omit<T, keyof Survey>>>;
     };
 };
 
-export const transform = async (survey: Survey) => {
+export const transform = async <T extends Survey>(survey: T) => {
     const { preprocess, xform: baseXForm, ...options } = survey;
 
     let xform = baseXForm;
@@ -177,15 +179,15 @@ export const transform = async (survey: Survey) => {
     const result = await page.evaluate(
         /* eslint-disable @typescript-eslint/no-shadow */
         async ([input]) => {
-            const browserResult = await enketo.transformer.transform({
-                ...input,
-            });
+            const browserResult = await enketo.transformer.transform(
+                input as Survey & T
+            );
 
             return browserResult;
         },
         /* eslint-enable @typescript-eslint/no-shadow */
 
-        [{ ...options, xform }] as const
+        [{ ...options, xform }]
     );
 
     return result;

@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 import { expect } from '@esm-bundle/chai';
-import { transform } from '../src/transformer';
+import { Survey, transform } from '../src/transformer';
 import {
     getTransformedForm,
     getTransformedFormDocument,
@@ -67,6 +67,37 @@ describe('transformer', () => {
         modelNamespace = await getTransformedForm('model-namespace.xml');
         widgetsXForm = await getXForm('widgets.xml');
         widgets = await getTransformedForm('widgets.xml');
+    });
+
+    describe('API stability', () => {
+        interface ExtraneousProperty {
+            extraneous: string;
+        }
+
+        interface Input extends Survey, ExtraneousProperty {}
+
+        type Transformed = TransformedSurvey<ExtraneousProperty>;
+
+        let input: Input;
+        let transformed: Transformed;
+
+        before(async () => {
+            input = {
+                xform: externalXForm,
+                extraneous: 'property',
+            };
+            transformed = await transform(input);
+        });
+
+        it('preserves extraneous properties on the input object', async () => {
+            expect(transformed.extraneous).to.equal('property');
+        });
+
+        it('returns a reference to the input object', async () => {
+            // @ts-expect-error - This *should* error because the types don't
+            // match, but this is the expected behavior.
+            expect(transformed === input).to.be.true;
+        });
     });
 
     describe('transforms valid XForms', () => {
