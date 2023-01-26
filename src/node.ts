@@ -161,12 +161,7 @@ declare const enketo: {
 };
 
 export const transform = async (survey: Survey) => {
-    const {
-        preprocess,
-        preprocessXForm,
-        xform: baseXForm,
-        ...options
-    } = survey;
+    const { preprocess, xform: baseXForm, ...options } = survey;
 
     let xform = baseXForm;
 
@@ -174,34 +169,20 @@ export const transform = async (survey: Survey) => {
         xform = await legacyPreprocess(xform, preprocess);
     }
 
-    const page = await getPage();
+    const page = await pagePromise;
 
     const result = await page.evaluate(
         /* eslint-disable @typescript-eslint/no-shadow */
-        async ([input, preprocess]) => {
-            const preprocessXForm =
-                typeof preprocess === 'string'
-                    ? (new Function(preprocess) as (xform: string) => any) // eslint-disable-line
-                    : undefined;
-
+        async ([input]) => {
             const browserResult = await enketo.transformer.transform({
                 ...input,
-                preprocessXForm,
             });
 
             return browserResult;
         },
         /* eslint-enable @typescript-eslint/no-shadow */
 
-        [
-            {
-                ...options,
-                xform,
-            },
-            typeof preprocessXForm === 'function'
-                ? String(preprocessXForm)
-                : null,
-        ] as const
+        [{ ...options, xform }] as const
     );
 
     return result;

@@ -6,11 +6,10 @@ import {
     useIsRouting,
     useSearchParams,
 } from '@solidjs/router';
-import { NAMESPACES, transform } from 'enketo-transformer/web';
+import { transform } from 'enketo-transformer/web';
 import { createEffect, createResource, createSignal, on, Show } from 'solid-js';
 import { For, render } from 'solid-js/web';
 import { fixtures as baseFixtures } from '../test/shared';
-import { parseXML, serializeXML } from '../src/dom';
 
 const fixtures = baseFixtures.sort((A, B) => {
     const a = A.fileName.toLowerCase().replace(/.*\/([^/]+)$/, '$1');
@@ -38,21 +37,6 @@ function Demo() {
     const markdown = () => params.markdown !== 'false';
     const preprocess = () => params.preprocess === 'true';
     const theme = () => params.theme === 'true';
-    const preprocessXForm = (xform: string) => {
-        const doc = parseXML(xform);
-        const prefix = doc.lookupPrefix(NAMESPACES.xmlns);
-        // eslint-disable-next-line -- for some reason the auto-formatting thinks this is JSX
-        const instanceTagName = `${ prefix }:instance`;
-        const el = doc.createElementNS(NAMESPACES.xmlns, instanceTagName);
-
-        el.id = 'preprocessed';
-
-        doc.querySelector(
-            ':root > head > model > instance'
-        )?.insertAdjacentElement('afterend', el);
-
-        return serializeXML(doc);
-    };
     const [duration, setDuration] = createSignal<number | null>(null);
     const [transformed, setTransformed] = createResource(async () => {
         const selected = xform();
@@ -67,7 +51,6 @@ function Demo() {
             media: logo() ? { 'form_logo.png': '/icon.png' } : {},
             openclinica: openclinica() ? 1 : 0,
             markdown: markdown(),
-            preprocessXForm: preprocess() ? preprocessXForm : undefined,
             theme: theme() ? 'mytheme' : undefined,
         });
 

@@ -50,7 +50,7 @@ const result = await transform({
 
 #### Web
 
-Enketo Transformer may also be used on the web as an ESM module. It is exported in releases as `enketo-transformer/web`. There's one minor API difference, `preprocess` is named `preprocessXForm`, which accepts and may return a string, i.e.:
+Enketo Transformer may also be used on the web as an ESM module. It is exported in releases as `enketo-transformer/web`. The web API is the same as the Node API, except that `preprocess` is not supported.
 
 ```ts
 import { transform } from 'enketo-transformer/web';
@@ -59,7 +59,6 @@ const xformResponse = await fetch('https://url/to/xform.xml');
 const xform = await xformResponse.text();
 const result = await transform({
     xform,
-    preprocessXForm: (doc) => doc,
     // ...
 });
 ```

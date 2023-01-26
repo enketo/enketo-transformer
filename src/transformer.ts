@@ -7,8 +7,6 @@ import { escapeURLPath, getMediaPath } from './url';
 
 export * from './shared';
 
-type PreprocessXForm = (xform: string) => string;
-
 export interface TransformOptions {
     markdown?: boolean;
     media?: Record<string, string>;
@@ -22,15 +20,9 @@ export interface TransformOptions {
      * dependency, `node1-libxmljsmt-myh` (a fork of `libxmljs`). Those
      * dependencies can't be run on the web.
      *
-     * @see {@link preprocessXForm}
      * @see {@link import('./node').Survey}
      */
     preprocess?: never;
-
-    /**
-     * This option replaces `preprocess`, but it isn't especially useful. It's functionally equivalent to calling the same function before calling {@link transform}.
-     */
-    preprocessXForm?: PreprocessXForm;
 
     theme?: string;
 }
@@ -47,14 +39,7 @@ export type Survey = BaseSurvey & TransformOptions;
 export const transform = async (survey: Survey): Promise<TransformedSurvey> => {
     const xslFormDocument = parseXML(sheets.xslForm);
     const xslModelDocument = parseXML(sheets.xslModel);
-    const {
-        xform,
-        markdown,
-        media,
-        openclinica,
-        preprocessXForm = (value) => value,
-        theme,
-    } = survey;
+    const { xform, markdown, media, openclinica, theme } = survey;
 
     const xsltParams = openclinica
         ? {
@@ -66,8 +51,7 @@ export const transform = async (survey: Survey): Promise<TransformedSurvey> => {
         Object.entries(media || {}).map((entry) => entry.map(escapeURLPath))
     );
 
-    const preprocessed = preprocessXForm(xform);
-    const xformDoc = parseXML(preprocessed);
+    const xformDoc = parseXML(xform);
 
     processBinaryDefaults(xformDoc, mediaMap);
     injectItemsetTemplateCalls(xslFormDocument, xformDoc);
