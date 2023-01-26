@@ -20,8 +20,9 @@ export const escapeURLPath = (value: string): string => {
     }
 
     const { pathname, search } = url;
+    const path = value.startsWith('/') ? pathname : pathname.replace(/^\//, '');
 
-    return `${pathname}${search}`;
+    return `${path}${search}`;
 };
 
 /** @package */
