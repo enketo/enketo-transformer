@@ -4,7 +4,6 @@
 import type libxmljs from 'libxmljs';
 import type { Document as XMLJSDocument } from 'libxmljs';
 import { firefox as headless } from 'playwright';
-import type { Page } from 'playwright';
 import { createServer } from 'vite';
 import { pathToFileURL } from 'url';
 import { define } from '../config/build.shared';
@@ -26,20 +25,42 @@ export const recognizeDependencies = () => {
     }
 };
 
-let pagePromise: Promise<Page> | null = null;
-let currentPage: Page | null = null;
+const firefoxUserPrefs = {
+    'browser.cache.memory.capacity': 65536,
+    'browser.chrome.toolbar_style': 1,
+    'browser.display.show_image_placeholders': false,
+    'browser.display.use_document_colors': false,
+    'browser.display.use_document_fonts': 0,
+    'browser.display.use_system_colors': true,
+    'browser.formfill.enable': false,
+    'browser.helperApps.deleteTempFileOnExit': true,
+    'browser.pocket.enabled': false,
+    'browser.shell.checkDefaultBrowser': false,
+    'browser.startup.homepage': 'about:blank',
+    'browser.startup.page': 0,
+    'browser.tabs.forceHide': true,
+    'browser.urlbar.autocomplete.enabled': false,
+    'browser.urlbar.autoFill': false,
+    'browser.urlbar.showPopup': false,
+    'browser.urlbar.showSearch': false,
+    'content.notify.interval': 500000,
+    'content.notify.ontimer': true,
+    'content.switch.threshold': 250000,
+    'extensions.checkCompatibility': false,
+    'extensions.checkUpdateSecurity': false,
+    'extensions.update.autoUpdateEnabled': false,
+    'extensions.update.enabled': false,
+    'general.startup.browser': false,
+    'loop.enabled': false,
+    'network.http.pipelining.maxrequests': 8,
+    'network.http.pipelining': true,
+    'network.http.proxy.pipelining': true,
+    'permissions.default.image': 2,
+    'plugin.default_plugin_disabled': false,
+    'reader.parse-on-load.enabled': false,
+};
 
 const getPage = async () => {
-    if (pagePromise != null) {
-        currentPage = await pagePromise;
-
-        return currentPage;
-    }
-
-    if (currentPage != null) {
-        return currentPage;
-    }
-
     const configFile = resolvePath('./vite.web.ts');
     const mode = isProduction ? 'production' : 'development';
     const useServer = !isProduction;
@@ -48,6 +69,7 @@ const getPage = async () => {
         const [browser, server] = await Promise.all([
             headless.launch({
                 headless: true,
+                firefoxUserPrefs,
             }),
             useServer
                 ? createServer({
@@ -62,12 +84,7 @@ const getPage = async () => {
                 : null,
         ]);
 
-        const [page] = await Promise.all([
-            browser.newPage({
-                bypassCSP: true,
-            }),
-            server?.listen(),
-        ]);
+        const [page] = await Promise.all([browser.newPage(), server?.listen()]);
 
         server?.printUrls();
 
@@ -87,37 +104,23 @@ const getPage = async () => {
             console.log(message.text());
         });
 
-        await page.goto(url, {
-            waitUntil: 'load',
-        });
-
-        currentPage = page;
-
-        await page.waitForLoadState('networkidle');
-
-        const content = await page.content();
-
+        await page.goto(url);
         await page.waitForFunction(() => typeof enketo !== 'undefined');
 
-        if (!content.includes('Enketo Transformer')) {
-            console.error(
-                'Launching the browser bridge failed, got page content',
-                content,
-                'url',
-                url
-            );
-            process.exit(1);
-        }
-
-        return currentPage;
+        return page;
     } catch (error) {
         console.error('Launching the browser bridge failed, got error', error);
+
+        // Wait for stdout to flush.
+        await new Promise((resolve) => {
+            setTimeout(resolve, 100);
+        });
 
         process.exit(1);
     }
 };
 
-pagePromise = getPage();
+const pagePromise = getPage();
 
 type LibXMLJS = typeof libxmljs;
 
