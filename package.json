@@ -39,7 +39,7 @@
     "contributors": [],
     "scripts": {
         "build": "NODE_ENV='production' npm run tsc && vite build && vite build --config ./vite.web.ts --emptyOutDir false && vite build --config ./vite.app.ts --emptyOutDir false && NODE_ENV='lib' vite build --config ./vite.web.ts --emptyOutDir false && npm run typedefs",
-        "prepack": "npm run build",
+        "prepublishOnly": "npm run build",
         "benchmarks": "vite-node ./test/node/benchmarks.ts",
         "start": "vite --config ./vite.app.ts & http-server test/forms -p 8081",
         "eslint-check": "eslint src/**/*.ts vite.config.ts test/**/*.ts",
