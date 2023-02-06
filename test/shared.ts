@@ -2,26 +2,68 @@ import { DOMParser } from 'linkedom';
 import type { Attr } from 'linkedom/types/interface/attr';
 import type { Element as BaseElement } from 'linkedom/types/interface/element';
 import type { Node } from 'linkedom/types/interface/node';
+import { basename } from 'path';
 import { transform } from '../src/transformer';
 
 import type { Survey } from '../src/transformer';
 
-export const getXForm = async (filePath: string) => {
-    const fixturePath = filePath.includes('/')
-        ? filePath
-        : `./test/forms/${filePath}`;
-    const { default: fixture } = await import(`${fixturePath}?raw`);
+interface Fixture {
+    fileName: string;
+    origin: string;
+    fixturePath: string;
+    xform: string;
+}
 
-    return fixture;
-};
+export const fixtures = (
+    await Promise.all(
+        Object.entries(
+            import.meta.glob('./**/*.xml', {
+                as: 'raw',
+                eager: false,
+            })
+        ).map(async ([fixturePath, importXForm]): Promise<Fixture> => {
+            const xform = await importXForm();
+            const origin =
+                fixturePath.match(/\/external-fixtures\/([^/]+)/)?.[1] ??
+                'enketo-transformer';
+            const fileName = basename(fixturePath);
+
+            return {
+                fileName,
+                origin,
+                fixturePath,
+                xform,
+            };
+        })
+    )
+).sort((A, B) => {
+    const a = A.fileName.toLowerCase().replace(/.*\/([^/]+)$/, '$1');
+    const b = B.fileName.toLowerCase().replace(/.*\/([^/]+)$/, '$1');
+
+    if (a > b) {
+        return 1;
+    }
+
+    return b > a ? -1 : 0;
+});
+
+const xformsByPath = Object.fromEntries(
+    fixtures.flatMap(({ fileName, fixturePath, xform }) => [
+        [fileName, xform],
+        [fixturePath, xform],
+    ])
+);
+
+export const getXForm = async (fixturePath: string) =>
+    xformsByPath[fixturePath];
 
 type GetTransformedFormOptions = Omit<Survey, 'xform'>;
 
 export const getTransformedForm = async (
-    filePath: string,
+    fixturePath: string,
     options?: GetTransformedFormOptions
 ) => {
-    const xform = await getXForm(filePath);
+    const xform = await getXForm(fixturePath);
 
     return transform({
         ...options,
@@ -32,19 +74,19 @@ export const getTransformedForm = async (
 export const parser = new DOMParser();
 
 export const getTransformedFormDocument = async (
-    filePath: string,
+    fixturePath: string,
     options?: GetTransformedFormOptions
 ) => {
-    const { form } = await getTransformedForm(filePath, options);
+    const { form } = await getTransformedForm(fixturePath, options);
 
     return parser.parseFromString(form, 'text/html');
 };
 
 export const getTransformedModelDocument = async (
-    filePath: string,
+    fixturePath: string,
     options?: GetTransformedFormOptions
 ) => {
-    const { model } = await getTransformedForm(filePath, options);
+    const { model } = await getTransformedForm(fixturePath, options);
 
     return parser.parseFromString(model, 'text/xml');
 };
