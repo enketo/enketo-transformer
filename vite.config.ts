@@ -55,6 +55,6 @@ export default defineConfig({
         globals: true,
         include: ['test/**/*.spec.ts'],
         reporters: 'verbose',
-        sequence: { shuffle: false },
+        sequence: { shuffle: true },
     },
 });

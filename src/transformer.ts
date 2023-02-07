@@ -106,7 +106,7 @@ export const transform = (survey: Survey): Promise<TransformedSurvey> => {
                 form,
                 model,
                 languageMap,
-                transformerVersion: PACKAGE_VESION,
+                transformerVersion: PACKAGE_VERSION,
             });
         });
 };
@@ -510,9 +510,10 @@ const md5 = (message: string | Buffer) => {
     return hash.digest('hex');
 };
 
-const PACKAGE_VESION = pkg.version;
+/** @package */
+export const PACKAGE_VERSION = pkg.version;
 
-const VERSION = md5(xslForm + xslModel + PACKAGE_VESION);
+const VERSION = md5(xslForm + xslModel + PACKAGE_VERSION);
 
 export { VERSION as version };
 

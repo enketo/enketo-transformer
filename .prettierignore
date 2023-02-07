@@ -5,3 +5,5 @@
 dist/*
 docs/*
 test-coverage/*
+src/xsl/**
+test/**/*.xml

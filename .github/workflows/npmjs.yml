@@ -28,6 +28,7 @@ jobs:
             - if: steps.cache.outputs.cache-hit != 'true'
               run: npm ci
             - run: npm test
+            - run: npm run benchmarks
             - if: github.event_name == 'release' && github.event.action == 'published' && matrix.node == '16'
               run: npm publish
               env:
