@@ -11,7 +11,7 @@ import prettier from 'prettier';
 import { format as prettyFormat } from 'pretty-format';
 import type { Options as PrettierOptions } from 'prettier';
 import prettierPluginXML from '@prettier/plugin-xml';
-import { NAMESPACES, transform } from '../src/transformer';
+import { NAMESPACES, PACKAGE_VERSION, transform } from '../src/transformer';
 import type { TransformedSurvey } from '../src/transformer';
 import {
     getTransformedForm,
@@ -138,13 +138,15 @@ describe('Snapshots', () => {
         const form = serializeDocument(transformed.form, 'text/html');
         const model = serializeDocument(transformed.model, 'text/xml');
         const { languageMap, transformerVersion } = transformed;
+        const transformerVersionMatchesCurrent =
+            transformerVersion === PACKAGE_VERSION;
 
         return prettyFormat(
             {
                 form,
                 model,
                 languageMap,
-                transformerVersion,
+                transformerVersionMatchesCurrent,
             },
             {
                 printBasicPrototype: false,
