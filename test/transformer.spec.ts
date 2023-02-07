@@ -1453,45 +1453,6 @@ describe('transformer', () => {
             expect(ageHidden.hasAttribute('data-setgeopoint')).to.equal(true);
         });
     });
-
-    describe('Optimization regression tests', () => {
-        // These tests are meant to exercise the second condition for defining
-        // `data-form-id`. The XSL seems to suggest that when an explicit `id`
-        // is not present, the value of `xmlns` will be copied instead. That
-        // behavior would be quite odd! Nonetheless, these tests ensure that the
-        // behavior doeesn't change.
-        describe('Potentially surprising behavior: data-form-id', () => {
-            it(`does not copy an explicit xmlns declaration value as a form id when an explicit id is not present`, async () => {
-                const xform = widgetsXForm.replace(
-                    '<widgets id="widgets">',
-                    '<widgets xmlns="https://example.org/does/not-matter">'
-                );
-                const result = await transform({
-                    xform,
-                });
-
-                expect(result.form).not.to.include(
-                    'https://example.org/does/not-matter'
-                );
-                expect(result.form).to.match(/<form\s[^>]+ data-form-id="_">/);
-            });
-
-            it(`does not copy an implicit xmlns declaration value as a form id when an explicit id is not present`, async () => {
-                const xform = widgetsXForm.replace(
-                    '<instance>',
-                    '<instance xmlns="https://example.org/does/not-matter">'
-                );
-                const result = await transform({
-                    xform,
-                });
-
-                expect(result.form).not.to.include(
-                    'https://example.org/does/not-matter'
-                );
-                expect(result.form).to.match(/<form\s[^>]+ data-form-id="_">/);
-            });
-        });
-    });
 });
 
 describe('custom stuff', () => {

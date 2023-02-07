@@ -152,15 +152,6 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                             <xsl:when test="key('primary-instance-root', true())/@id">
                                 <xsl:value-of select="key('primary-instance-root', true())/@id" />
                             </xsl:when>
-
-                            <!-- This is a no-op and should either be removed or
-                            corrected to behave according to the original
-                            intent. See regression tests for additional
-                            commentary. -->
-                            <xsl:when test="key('instances', true())/child::node()/@xmlns">
-                                <xsl:value-of select="key('instances', true())/child::node()/@xmlns" />
-                            </xsl:when>
-
                             <xsl:otherwise>
                                 <xsl:text>_</xsl:text>
                             </xsl:otherwise>
