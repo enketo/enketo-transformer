@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.2.0] - 2023-02-07
+
+##### Changed
+
+-   Type checking and simplification of tests (#157)
+-   Convert remainder of library to TypeScript, Vite build, include type checking in CI (#158)
+-   Optimize expensive XPath expressions in HTML transform (#165)
+
 ## [2.1.7] - 2022-12-14
 
 ##### Changed
