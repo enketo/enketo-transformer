@@ -32,6 +32,7 @@
         "benchmarks": "vite-node ./test/benchmarks.ts",
         "build": "vite build && npm run tsc",
         "prepare": "npm run build",
+        "prepublishOnly": "sed -i '' -e 's/dist/_dist/' .gitignore",
         "start": "vite",
         "eslint-check": "eslint app.ts src/**/*.ts vite.config.ts test/**/*.ts",
         "eslint-fix": "eslint app.ts src/**/*.ts vite.config.ts test/**/*.ts --fix",
