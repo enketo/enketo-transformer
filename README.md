@@ -3,7 +3,21 @@
 
 # Enketo Transformer
 
-NodeJS library that transforms OpenRosa/ODK XForms into a format the Enketo understands. It works both as a library module, as well as a standalone app.
+NodeJS library that transforms [ODK forms](https://docs.getodk.org/form-design-intro/) for use by [Enketo Core](https://github.com/enketo/enketo-core). Both Transformer and Core are most commonly used as part of [Enketo Express](https://github.com/enketo/enketo-express). Transformer can also be embedded into different backend web applications (e.g. a form server) or wrapped by a robust API to make a standalone service. A simple testing server API is provided in this repository.
+
+### Project status
+
+Enketo Transformer is maintained by [the ODK team](https://getodk.org/about/team.html) (primarily [Trevor Schmidt](https://github.com/eyelidlessness/)). Broader context is available in [the Enketo Express repository](https://github.com/enketo/enketo-express#project-status).
+
+ODK XForms are based off of [W3C XForms](https://en.wikipedia.org/wiki/XForms) which were originally intended to be supported natively by web browsers. Browser support did not happen and the ODK standard drifted too far from the W3C standard to have used it anyway. Enketo chose to transform XForms to HTML5 forms before rendering them. Enketo Transformer performs this work by applying an XSL transform followed by a few post-processing steps in Javascript. This was time-consuming for forms with certain characteristics so the transformation was designed to happen on the backend so it could be cached across client requests.
+
+Historically, forms with many questions or many translations were prohibitively slow to transform. Starting in Enketo Transformer v2.2.1 (Feb 2023), they are much faster.
+
+Our current primary goals are:
+-   Using standard DOM APIs so the transformation can be performed client-side.
+-   Identifying and addressing remaining performance bottlenecks to remove the need for server-side caching.
+
+Longer term, we intend to rethink transformation to be as minimal as possible, ideally without XSLT.
 
 ### Prerequisites
 
@@ -46,16 +60,17 @@ const result = await transform({
 // ... do something with result
 ```
 
-### Install as app (web API)
+### Development/local usage
+Enketo Transformer provides a simple server API. It may be used for testing locally, but isn't a robust or secure server implementation so it should not be used in production. You can start it in a local dev environment by running:
 
-1. clone repo
-2. install dependencies with `npm install`
+```sh
+npm start
+```
 
-### Use as app (web API)
+It provides two endpoints:
 
-1. start with `npm start`
-2. limited use with `GET /transform` with xform parameter (required, **xform URL**), or
-3. full-featured use with: `POST /transform` with URL-encoded body including `xform` (required, **full XForm as a string**), `theme` (optional, string), and `media` (optional, map) parameters
+-   limited use with `GET /transform` with xform parameter (required, **xform URL**), or
+-   full-featured use with: `POST /transform` with URL-encoded body including `xform` (required, **full XForm as a string**), `theme` (optional, string), and `media` (optional, map) parameters
 
 sample GET request:
 
@@ -69,7 +84,7 @@ sample POST request:
 curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.png&media[this]=that" http://localhost:8085/transform
 ```
 
-### Response format
+#### Response format
 
 ```json
 {
