@@ -84,6 +84,7 @@ export const transform: Transform = async (survey) => {
     const xslModelDoc = domParser.parseFromString(xslModel, 'text/xml');
     const xmlDoc = xslTransform(xslModelDoc, xformDoc);
 
+    correctModelNamespaces(xslModelDoc, xformDoc, xmlDoc);
     replaceMediaSources(xmlDoc, mediaMap);
     addInstanceIdNodeIfMissing(xmlDoc);
 
@@ -560,3 +561,81 @@ const correctHTMLDocHierarchy = (doc: DOM.Document) => {
     }
 };
 
+const XMLNS_URI = 'http://www.w3.org/2000/xmlns/';
+
+declare const document: DOM.Document | undefined;
+
+/**
+ * This addresses a difference in how Firefox treats XML namespace declarations
+ * versus other browsers, as well as `libxslt`. In `openrosa2xmlmodel.xsl`, it's
+ * expected that `xmlns` and `xmlns:*` are treated as attributes, but evidently
+ * this is not the case in Firefox. So for consistency we copy the namespace
+ * declarations in the browser DOM.
+ *
+ * An important note: understanding what the actual behavior originally was
+ * turned out to be rather difficult, so this is the current behavior (which may
+ * not exactly be *expected* e.g. by Enketo Core):
+ *
+ * For each namespace declaration defined on the XForm's root `html` element,
+ * assign them to the transformed model's primary `instance` element, **except if**:
+ *
+ * - The namespace is also defined on the `model`.
+ * - The namespace prefix is used on any of the `model`'s attributes.
+ * - The namespace is also defined in `openrosa2xmlmodel.xsl`.
+ *
+ * TODO (2023-01-16):
+ *
+ * - All of the exceptions described above are either known bugs or likely to be.
+ *
+ * - This leaves very little remaining responsibilities of
+ *   `openrosa2xmlmodel.xsl`. We should seriously consider moving the remainder
+ *   to DOM code.
+ */
+const correctModelNamespaces = (
+    xslDoc: DOM.Document,
+    xformDoc: DOM.Document,
+    modelDoc: DOM.Document
+) => {
+    if (typeof document === 'undefined') {
+        return;
+    }
+
+    const { documentElement: xslRoot } = xslDoc;
+    const instanceRoots = getNodesByXPathExpression(
+        modelDoc,
+        '/xmlns:root/xmlns:model/xmlns:instance/*',
+        NAMESPACES
+    );
+    const model = instanceRoots[0].parentElement?.parentElement;
+    const [xformModel] = getNodesByXPathExpression(
+        xformDoc,
+        '/h:html/h:head/xmlns:model',
+        NAMESPACES
+    );
+
+    if (model == null || xformModel == null) {
+        throw new Error('XForm is missing a model element.');
+    }
+
+    instanceRoots.forEach((instanceRoot) => {
+        const xformModelAttrNamespaces = [...xformModel.attributes]
+            .filter(
+                ({ name }) => name !== 'xmlns' && !name.startsWith('xmlns:')
+            )
+            .map(({ namespaceURI }) => namespaceURI);
+
+        const missingNamespaceAttrs = [
+            ...xformDoc.documentElement.attributes,
+        ].filter(
+            ({ name, value }) =>
+                (name === 'xmlns' || name.startsWith('xmlns:')) &&
+                !xslRoot.hasAttribute(name) &&
+                !xformModelAttrNamespaces.includes(value) &&
+                !instanceRoot.hasAttribute(name)
+        );
+
+        missingNamespaceAttrs.forEach(({ name, value }) => {
+            instanceRoot.setAttributeNS(XMLNS_URI, name, value);
+        });
+    });
+};
