@@ -67,6 +67,7 @@ export const transform: Transform = async (survey) => {
     }
 
     processBinaryDefaults(xformDoc, mediaMap);
+    injectItemsetTemplateCalls(xslFormDoc, xformDoc);
 
     const htmlDoc = xslTransform(xslFormDoc, xformDoc, xsltParams);
 
@@ -559,6 +560,172 @@ const correctHTMLDocHierarchy = (doc: DOM.Document) => {
 
         documentElement.replaceWith(root);
     }
+};
+
+/** @see {@link injectItemsetTemplateCalls} */
+const substringBefore = (haystack: string, needle: string) =>
+    haystack.split(needle, 1)[0];
+
+/** @see {@link injectItemsetTemplateCalls} */
+const substringAfter = (haystack: string, needle: string) =>
+    haystack.substring(haystack.indexOf(needle) + needle.length);
+
+/**
+ * This is a replacement for the XSL template named `strip-filter`. The original
+ * XSL commentary follows:
+ *
+ * ----------------------------------------------------------------------------
+ * turns: /path/to/node[value=/some/other/node] into: /path/to/node this
+ * function is probably way too aggressive but will work for xls-form generated
+ * forms to do this properly a regexp:replace is required, but not supported in
+ * libXML kept the recursion in, even though it is not being used right now
+ * ----------------------------------------------------------------------------
+ *
+ * Contrary to the JSDoc comment for @see {@link injectItemsetTemplateCalls},
+ * this implementation deviates from the original XSL logic, which uses
+ * substrings and recursion, because it's (hopefully) much easier to understand
+ * this way.
+ *
+ * It is *also* worth noting that in the process of migrating to browser DOM,
+ * the original commentary was found to be wrong! The recursion was certainly in
+ * use, and without it some snapshot tests failed.
+ */
+const stripFilter = (expression: string) => expression.replace(/\[.*?\]/g, '');
+
+/**
+ * This is a replacement for the dynamic logic in the XSL template
+ * `match="xf:itemset" mode="labels"`. Moving it to DOM code allows us to drop
+ * our reliance on the unsupported `dyn` extension. The intent is to match the
+ * naming and semantics of the original XSL logic to ensure there is no
+ * potential for regressions.
+ */
+const injectItemsetTemplateCalls = (
+    xslDoc: DOM.Document,
+    xformDoc: DOM.Document
+) => {
+    const itemsets = getNodesByXPathExpression(
+        xformDoc,
+        '//xmlns:itemset',
+        NAMESPACES
+    );
+
+    if (itemsets.length === 0) {
+        return;
+    }
+
+    const itemsetParameters = itemsets.map((itemset) => {
+        const [valueEl] = getNodesByXPathExpression(
+            itemset,
+            './xmlns:value',
+            NAMESPACES
+        );
+        const valueRef = valueEl.getAttribute('ref') ?? '';
+        const [labelEl] = getNodesByXPathExpression(
+            itemset,
+            './xmlns:label',
+            NAMESPACES
+        );
+        const labelRef = labelEl.getAttribute('ref') ?? '';
+        const nodeset = itemset.getAttribute('nodeset') ?? '';
+        const iwq = substringBefore(substringAfter(nodeset, 'instance('), ')');
+
+        // TODO (2023-01-15): The following comment is directly from the
+        // previous XSL implementation. But because we *do* now implement this
+        // in a general purpose language, we can address these limitations.
+
+        // Needs to also deal with randomize(instance("id")/path/to/node), randomize(instance("id")/path/to/node, 3)
+        // Super inelegant and not robust without regexp:match
+        let instancePathTemp: string;
+
+        const nodesetIncludesRandomize = nodeset.includes('randomize(');
+
+        if (nodesetIncludesRandomize && nodeset.includes(',')) {
+            instancePathTemp = substringBefore(
+                substringAfter(nodeset, ')'),
+                ','
+            );
+        } else if (nodesetIncludesRandomize) {
+            instancePathTemp = substringBefore(
+                substringAfter(nodeset, ')'),
+                ')'
+            );
+        } else {
+            instancePathTemp = substringAfter(nodeset, ')');
+        }
+
+        const instancePath = instancePathTemp.replace(/\//g, '/xf:');
+        const instancePathNoFilter = stripFilter(instancePath);
+        const instanceId = iwq.substring(1, iwq.length - 1);
+        const itextPath = `/h:html/h:head/xf:model/xf:instance[@id="${instanceId}"]${instancePathNoFilter}`;
+
+        return {
+            valueRef,
+            labelRef,
+            itextPath,
+        };
+    });
+
+    const ids: string[] = [];
+
+    itemsets.forEach((itemset, index) => {
+        let id = itemset.getAttribute('id');
+
+        if (id == null) {
+            id = `itemset-${index}`;
+        }
+
+        itemset.setAttributeNS(null, 'id', id);
+        ids.push(id);
+    });
+
+    const templateCalls = itemsetParameters.map((parameters, index) => {
+        const id = ids[index];
+        const match = `xf:itemset[@id = '${id}']`;
+
+        const template = xslDoc.createElementNS(NAMESPACES.xsl, 'xsl:template');
+
+        template.setAttribute('match', match);
+        template.setAttribute('mode', 'labels');
+
+        const callTemplate = xslDoc.createElementNS(
+            NAMESPACES.xsl,
+            'xsl:call-template'
+        );
+
+        callTemplate.setAttribute('name', 'itemset-itext-labels');
+
+        const withValueRef = xslDoc.createElementNS(
+            NAMESPACES.xsl,
+            'xsl:with-param'
+        );
+
+        withValueRef.setAttribute('name', 'valueRef');
+        withValueRef.setAttribute('select', `'${parameters.valueRef}'`);
+
+        const withLabelRef = xslDoc.createElementNS(
+            NAMESPACES.xsl,
+            'xsl:with-param'
+        );
+
+        withLabelRef.setAttribute('name', 'labelRef');
+        withLabelRef.setAttribute('select', `'${parameters.labelRef}'`);
+
+        const withItextPath = xslDoc.createElementNS(
+            NAMESPACES.xsl,
+            'xsl:with-param'
+        );
+
+        withItextPath.setAttribute('name', 'itextPath');
+        withItextPath.setAttribute('select', parameters.itextPath);
+
+        callTemplate.append(withValueRef, withLabelRef, withItextPath);
+
+        template.append(callTemplate);
+
+        return template;
+    });
+
+    xslDoc.documentElement.append(...templateCalls);
 };
 
 const XMLNS_URI = 'http://www.w3.org/2000/xmlns/';
