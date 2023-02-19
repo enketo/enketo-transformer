@@ -70,6 +70,7 @@ export const transform: Transform = async (survey) => {
 
     const htmlDoc = xslTransform(xslFormDoc, xformDoc, xsltParams);
 
+    correctHTMLDocHierarchy(htmlDoc);
     correctAction(htmlDoc, 'setgeopoint');
     correctAction(htmlDoc, 'setvalue');
     replaceTheme(htmlDoc, theme);
@@ -548,3 +549,14 @@ export default {
     sheets,
     escapeURLPath,
 };
+
+const correctHTMLDocHierarchy = (doc: DOM.Document) => {
+    const { documentElement } = doc;
+
+    if (documentElement.nodeName.toLowerCase() === 'html') {
+        const [root] = getNodesByXPathExpression(doc, '/html/body/root');
+
+        documentElement.replaceWith(root);
+    }
+};
+
