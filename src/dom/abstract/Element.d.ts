@@ -10,6 +10,7 @@ export interface Element extends Node {
     readonly attributes: NamedNodeMap;
     readonly firstChild: Node | null;
     readonly firstElementChild: Element | null;
+    readonly localName: string;
     readonly nodeName: string;
     readonly outerHTML: string;
     append(...nodes: Array<string | Node>): void;

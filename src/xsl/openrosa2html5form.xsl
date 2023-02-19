@@ -295,7 +295,9 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                 <xsl:if test="$binding/@relevant">
                     <xsl:value-of select="'or-branch pre-init '"/>
                 </xsl:if>
-                <xsl:call-template name="appearance" />
+                <xsl:if test="@appearance or @rows">
+                    <xsl:value-of select="'or-appearances-placeholder '"></xsl:value-of>
+                </xsl:if>
                 <!-- Workaround for XLSForm limitation: add "compact" to group if the immediate repeat child has this appearance -->
                 <!-- This should actually be fixed in pyxform instead -->
                 <xsl:if test="contains(./xf:repeat/@appearance, 'compact')">
@@ -306,6 +308,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                     <xsl:value-of select="'or-appearance-no-collapse '"/>
                 </xsl:if>
             </xsl:attribute>
+            <xsl:call-template name="appearance" />
 
             <xsl:if test="string($nodeset)">
                 <!--<xsl:variable name="nodeset" select="@ref" />-->
@@ -366,8 +369,11 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                 <!--<xsl:if test="$binding/@relevant">
                     <xsl:value-of select="'or-branch pre-init '"/>
                 </xsl:if>-->
-                <xsl:call-template name="appearance" />
+                <xsl:if test="@appearance or @rows">
+                    <xsl:value-of select="'or-appearances-placeholder '"></xsl:value-of>
+                </xsl:if>
             </xsl:attribute>
+            <xsl:call-template name="appearance" />
             <xsl:attribute name="name">
                 <xsl:value-of select="$nodeset"/>
             </xsl:attribute>
@@ -403,38 +409,18 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
     </xsl:template>
 
     <xsl:template name="appearance">
-        <xsl:variable name="select-type">
-            <xsl:if test="local-name() = 'select' or local-name() = 'select1'">
-                <xsl:value-of select="'true'"/>
-            </xsl:if>
-        </xsl:variable>
-        <xsl:if test="@appearance">
-            <xsl:variable name="appearances" select="str:tokenize(@appearance)" />
-            <xsl:for-each select="exsl:node-set($appearances)">
-                <xsl:variable name="appearance">
-                    <xsl:value-of select="normalize-space(translate(., $upper-case, $lower-case))"/>
-                </xsl:variable>
-                <xsl:value-of select="concat('or-appearance-', $appearance, ' ')"/>
-                <!-- convert deprecated appearances, but leave the deprecated ones -->
-                <xsl:if test="$select-type = 'true'">
-                    <xsl:if test="$appearance = 'horizontal'">
-                        <xsl:value-of select="'or-appearance-columns '" />
-                    </xsl:if>
-                    <xsl:if test="$appearance = 'horizontal-compact'">
-                        <xsl:value-of select="'or-appearance-columns-pack '" />
-                    </xsl:if>
-                    <xsl:if test="$appearance = 'compact'">
-                        <xsl:value-of select="'or-appearance-columns-pack or-appearance-no-buttons '" />
-                    </xsl:if>
-                    <xsl:if test="starts-with($appearance, 'compact-')">
-                        <xsl:value-of select="concat('or-appearance-columns-', substring-after($appearance, '-'), ' or-appearance-no-buttons ')" />
-                    </xsl:if>
-                </xsl:if>
-            </xsl:for-each>
+        <xsl:variable name="rows" select="./@rows" />
+        <xsl:if test="local-name() = 'select' or local-name() = 'select1'">
+            <xsl:attribute name="data-appearances-select-type" />
         </xsl:if>
-        <!-- turn rows attribute into an appearance (which is what it should have been in the first place imho)-->
-        <xsl:if test="./@rows">
-            <xsl:value-of select="concat('or-appearance-rows-', ./@rows, ' ')" />
+        <xsl:if test="@appearance or @rows">
+            <xsl:attribute name="data-appearances">
+                <xsl:value-of select="@appearance" />
+                <!-- turn rows attribute into an appearance (which is what it should have been in the first place imho) -->
+                <xsl:if test="$rows">
+                    <xsl:value-of select="concat(' rows-', $rows)" />
+                </xsl:if>
+            </xsl:attribute>
         </xsl:if>
     </xsl:template>
 
@@ -497,8 +483,11 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                             <xsl:if test="local-name() != 'item'">
                                 <xsl:value-of select="'non-select '"/>
                             </xsl:if>
-                            <xsl:call-template name="appearance" />
+                            <xsl:if test="@appearance or @rows">
+                                <xsl:value-of select="'or-appearances-placeholder '"></xsl:value-of>
+                            </xsl:if>
                         </xsl:attribute>
+                        <xsl:call-template name="appearance" />
 
                         <xsl:apply-templates select="./@kb:image-customization"/>
 
@@ -823,13 +812,14 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
         <label>
             <xsl:attribute name="class">
                 <xsl:value-of select="'question '"/>
-                <xsl:if test="./@appearance">
-                    <xsl:call-template name="appearance" />
+                <xsl:if test="./@appearance or ./@rows">
+                    <xsl:value-of select="'or-appearances-placeholder '" />
                 </xsl:if>
                 <xsl:if test="$binding/@relevant">
                     <xsl:value-of select="' or-branch pre-init '"/>
                 </xsl:if>
             </xsl:attribute>
+            <xsl:call-template name="appearance" />
             <xsl:apply-templates select="./@kb:image-customization"/>
             <xsl:apply-templates select="xf:label" />
             <xsl:apply-templates select="$binding/@required"/>
@@ -923,9 +913,12 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                     <xsl:value-of select="'or-branch pre-init '"/>
                 </xsl:if>
                 <xsl:if test="@appearance">
-                    <xsl:call-template name="appearance" />
+                    <xsl:value-of select="'or-appearances-placeholder '"></xsl:value-of>
                 </xsl:if>
             </xsl:attribute>
+            <xsl:if test="@appearance">
+                <xsl:call-template name="appearance" />
+            </xsl:if>
             <xsl:apply-templates select="./@kb:image-customization"/>
             <xsl:apply-templates select="./@kb:flash"/>
             <fieldset>

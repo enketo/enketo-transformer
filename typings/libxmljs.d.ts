@@ -56,6 +56,7 @@ declare module 'libxmljs' {
         attr(name: string, value: string): Element;
         attr(attributes: Record<string, string>): Element;
         defineNamespace(namespceURI: string, prefix: string): Namespace;
+        namespace(): Namespace | null;
         namespace(uri: string): this;
         namespace(namespace: Namespace): Element;
     }

@@ -31,6 +31,16 @@ export class DOMExtendedElement implements DOM.Element {
         return (this as any as DOMExtendedElement & Element).get('*') ?? null;
     }
 
+    get localName() {
+        const prefix = (this as any as Element).namespace()?.prefix();
+
+        if (prefix == null) {
+            return this.nodeName;
+        }
+
+        return this.nodeName.replace(`${prefix}:`, '');
+    }
+
     get nodeName() {
         return (this as any as Element).name();
     }

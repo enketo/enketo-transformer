@@ -74,6 +74,7 @@ export const transform: Transform = async (survey) => {
     correctHTMLDocHierarchy(htmlDoc);
     correctAction(htmlDoc, 'setgeopoint');
     correctAction(htmlDoc, 'setvalue');
+    transformAppearances(htmlDoc);
     replaceTheme(htmlDoc, theme);
     replaceMediaSources(htmlDoc, mediaMap);
 
@@ -726,6 +727,79 @@ const injectItemsetTemplateCalls = (
     });
 
     xslDoc.documentElement.append(...templateCalls);
+};
+
+/**
+ * This is a replacement for the logic previously implemented in the
+ * `appearance` template in `openrosa2html5form.xsl`. That template now
+ * transforms existing appearance values directly to a `data-appearance`
+ * attribute, and the previous logic is applied here based on those values.
+ */
+const transformAppearances = (doc: DOM.Document) => {
+    const appearanceElements = getNodesByXPathExpression(
+        doc,
+        '//*[@data-appearances]'
+    );
+
+    appearanceElements.forEach((element) => {
+        const selectType = element.hasAttribute('data-appearances-select-type');
+
+        if (selectType) {
+            element.removeAttribute('data-appearances-select-type');
+        }
+
+        const appearances =
+            element
+                .getAttribute('data-appearances')
+                ?.trim()
+                .toLowerCase()
+                .split(/\s+/) ?? [];
+
+        const appearanceClasses = appearances.flatMap((appearance) => {
+            const results = [`or-appearance-${appearance}`];
+
+            // Convert deprecated appearances, but leave the deprecated ones.
+            if (selectType) {
+                if (appearance === 'horizontal') {
+                    results.push('or-appearance-columns');
+                }
+
+                if (appearance === 'horizontal-compact') {
+                    results.push('or-appearance-columns-pack');
+                }
+
+                if (appearance === 'compact') {
+                    results.push(
+                        'or-appearance-columns-pack',
+                        'or-appearance-no-buttons'
+                    );
+                }
+
+                if (appearance.startsWith('compact-')) {
+                    results.push(
+                        appearance.replace('compact-', ''),
+                        'or-appearance-no-buttons'
+                    );
+                }
+            }
+
+            return results;
+        });
+
+        const classes =
+            element.getAttribute('class')?.trim()?.split(/\s+/) ?? [];
+
+        const className = classes
+            .flatMap((className) =>
+                className === 'or-appearances-placeholder'
+                    ? appearanceClasses
+                    : className
+            )
+            .join(' ');
+
+        element.setAttribute('class', className);
+        element.removeAttribute('data-appearances');
+    });
 };
 
 const XMLNS_URI = 'http://www.w3.org/2000/xmlns/';
