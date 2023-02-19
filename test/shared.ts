@@ -2,10 +2,125 @@ import { DOMParser } from 'linkedom';
 import type { Attr } from 'linkedom/types/interface/attr';
 import type { Element as BaseElement } from 'linkedom/types/interface/element';
 import type { Node } from 'linkedom/types/interface/node';
-import { basename } from 'path';
-import { transform } from '../src/transformer';
+import { basename, resolve } from 'path';
+import { fileURLToPath } from 'url';
+import type { Survey, Transform, TransformedSurvey } from '../src/transformer';
 
-import type { Survey } from '../src/transformer';
+// eslint-disable-next-line import/no-mutable-exports
+let reload: () => Promise<void>;
+
+// eslint-disable-next-line import/no-mutable-exports
+let transform: Transform;
+
+declare const enketo: {
+    transformer: {
+        transform: Transform;
+    };
+};
+
+if (ENV === 'node') {
+    reload = () => Promise.resolve();
+    transform = (await import('../src/transformer')).transform;
+} else {
+    const { createServer } = await import('vite');
+    const root = fileURLToPath(new URL('..', import.meta.url));
+    const configFile = resolve(root, './vite.config.ts');
+    const server = await createServer({
+        configFile,
+        define: {
+            PACKAGE_VERSION: JSON.stringify(PACKAGE_VERSION),
+            VERSION: JSON.stringify(VERSION),
+            ENV: JSON.stringify(ENV),
+            BROWSER: JSON.stringify(BROWSER),
+        },
+        root,
+    });
+
+    await server.listen();
+
+    server.printUrls();
+
+    const playwright = await import('playwright');
+    const browserType = playwright[BROWSER];
+    const browser = await browserType.launch();
+
+    let page = await browser.newPage();
+
+    let isLoading = false;
+
+    page.on('console', async (message) => {
+        if (!isLoading) {
+            console.log(
+                ...(await Promise.all(
+                    message.args().map((arg) => arg.jsonValue())
+                ))
+            );
+        }
+    });
+
+    let isFirstLoad = true;
+
+    reload = async () => {
+        isLoading = true;
+        const url = 'http://localhost:8085';
+
+        if (isFirstLoad) {
+            await page.goto(url);
+            isFirstLoad = false;
+        } else {
+            await page.close();
+
+            const context = await browser.newContext();
+
+            page = await context.newPage();
+            await page.goto(url);
+        }
+
+        await page.waitForFunction(() => typeof enketo !== 'undefined');
+
+        isLoading = false;
+    };
+
+    await reload();
+
+    transform = async <T extends Survey>(
+        survey: T
+    ): Promise<TransformedSurvey<T>> => {
+        delete survey.preprocess;
+
+        const { error, result } = await page.evaluate(
+            async ([input]) => {
+                try {
+                    const result = await enketo.transformer.transform(input);
+
+                    return { result };
+                } catch (error) {
+                    const { message, stack } =
+                        error instanceof Error
+                            ? error
+                            : new Error(String(error));
+
+                    return { error: { message, stack } };
+                }
+            },
+            [survey]
+        );
+
+        if (error == null) {
+            Object.keys(survey).forEach((key) => {
+                if (!Object.prototype.hasOwnProperty.call(result, key)) {
+                    delete survey[key as keyof Survey];
+                }
+            });
+
+            return Object.assign(survey, result);
+        }
+
+        throw error;
+    };
+}
+
+export { reload, transform };
 
 interface Fixture {
     fileName: string;

@@ -1,6 +1,11 @@
 {
     "extends": "../tsconfig.base.json",
-    "exclude": ["../node_modules"],
-    "include": [".", "..src", "../typings"],
+    "compilerOptions": {
+        "paths": {
+            "enketo-transformer/dom": ["src/dom/node/index.ts"]
+        }
+    },
+    "exclude": ["../node_modules", "../src/dom/web"],
+    "include": [".", "../src", "../typings"],
     "files": ["../typings/test.d.ts"]
 }

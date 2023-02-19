@@ -4,18 +4,26 @@
     "description": "Library/app that transforms ODK-compliant XForms into a format that Enketo can consume",
     "license": "Apache-2.0",
     "type": "module",
-    "main": "./dist/enketo-transformer.umd.cjs",
-    "module": "./dist/enketo-transformer.js",
-    "types": "./dist/src/transformer.d.ts",
+    "main": "./dist/enketo-transformer/transformer.cjs",
+    "module": "./dist/enketo-transformer/enketo-transformer.js",
+    "browser": "./dist/@enketo/transformer-web/transformer.js",
+    "types": "./dist/types/transformer.d.ts",
     "files": [
         "app.js",
         "dist/**/*"
     ],
     "exports": {
         ".": {
-            "import": "./dist/enketo-transformer.js",
-            "require": "./dist/enketo-transformer.umd.cjs",
-            "types": "./dist/src/transformer.d.ts"
+            "import": "./dist/enketo-transformer/enketo-transformer.js",
+            "require": "./dist/enketo-transformer/transformer.cjs",
+            "browser": "./dist/@enketo/transformer-web/transformer.js",
+            "types": "./dist/types/transformer.d.ts"
+        },
+        "./dom": {
+            "import": "./dist/enketo-transformer/dom/node/index.js",
+            "require": "./dist/enketo-transformer/dom/node/index.cjs",
+            "browser": "./dist/@enketo/transformer-web/dom/web/index.js",
+            "types": "./dist/types/dom/node/index.d.ts"
         }
     },
     "bugs": {
@@ -34,16 +42,17 @@
     "contributors": [],
     "scripts": {
         "benchmarks": "vite-node ./test/benchmarks.ts",
-        "build": "vite build && npm run tsc",
+        "build": "EMPTY_OUT_DIR=true vite build && ENV=web vite build && npm run tsc",
         "prepare": "npm run build",
-        "start": "vite",
-        "eslint-check": "eslint app.ts src/**/*.ts vite.config.ts test/**/*.ts",
-        "eslint-fix": "eslint app.ts src/**/*.ts vite.config.ts test/**/*.ts --fix",
+        "start": "vite-node ./src/app.ts",
+        "eslint-check": "eslint src/**/*.ts vite.config.ts test/**/*.ts",
+        "eslint-fix": "eslint src/**/*.ts vite.config.ts test/**/*.ts --fix",
         "prettier-fix": "prettier --write .",
         "test": "vitest run --coverage && npm run prettier-fix && npm run eslint-fix && npm run tsc && node update-readme-with-shield-badge.cjs",
         "test:watch": "vitest",
-        "develop": "DEBUG=api,transformer,markdown,language node ./app.js",
-        "tsc": "tsc --project ./tsconfig.json && tsc --project ./tsconfig.typedefs.json && tsc --project ./test/tsconfig.json"
+        "test:watch:web": "ENV=web vitest",
+        "develop": "DEBUG=api,transformer,markdown,language vite-node ./src/app.ts & http-server test/forms -p 8081",
+        "tsc": "tsc --project ./tsconfig.json && tsc --project ./tsconfig.web.json && tsc --project ./tsconfig.typedefs.json && tsc --project ./test/tsconfig.json"
     },
     "repository": {
         "type": "git",
@@ -100,6 +109,7 @@
         "istanbul-reporter-shield-badge": "^1.2.1",
         "markdown-eslint-parser": "^1.2.1",
         "microtime": "^3.1.1",
+        "playwright": "1.25.0",
         "pretty-format": "^29.4.2",
         "rimraf": "^3.0.2",
         "typescript": "^4.9.5",

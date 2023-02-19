@@ -3,8 +3,11 @@
         "declaration": true,
         "emitDeclarationOnly": true,
         "noEmit": false,
-        "outDir": "./dist"
+        "outDir": "./dist/types",
+        "paths": {
+            "enketo-transformer/dom": ["src/dom/node/index.ts"]
+        }
     },
     "extends": "./tsconfig.json",
-    "include": ["./src/transformer.ts", "./typings"]
+    "include": ["./src", "./typings"]
 }

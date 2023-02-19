@@ -1,12 +1,12 @@
-import { Survey, transform } from '../src/transformer';
+import type { Survey, TransformedSurvey } from '../src/transformer';
 import {
     getTransformedForm,
     getTransformedFormDocument,
     getXForm,
     parser,
+    transform,
 } from './shared';
 
-import type { TransformedSurvey } from '../src/transformer';
 import type { Document } from './shared';
 
 function findElementByName(
@@ -75,7 +75,7 @@ describe('transformer', () => {
         }
 
         let survey: ExtraneousProperty & Survey;
-        let transformed: ExtraneousProperty & TransformedSurvey;
+        let transformed: TransformedSurvey<ExtraneousProperty>;
 
         beforeAll(async () => {
             survey = {
@@ -864,14 +864,14 @@ describe('transformer', () => {
             // eliminate some acceptable differences:
             const modifiedSelectMinimalResult = results[0].form
                 .replace('or-appearance-minimal', '')
-                .replace(/data-type-xml=".+" /, '')
-                .replace(/data-name=".+" /, '');
+                .replace(/data-type-xml=".+"[ >]/, '')
+                .replace(/data-name=".+"[ >]/, '');
             const modifiedRangePickerResult = results[1].form
                 .replace('or-appearance-picker', '')
-                .replace(/data-type-xml=".+" /, '')
-                .replace(/min=".+" /, '')
-                .replace(/max=".+" /, '')
-                .replace(/step=".+" /, '');
+                .replace(/data-type-xml=".+"[ >]/, '')
+                .replace(/min=".+"[ >]/, '')
+                .replace(/max=".+"[ >]/, '')
+                .replace(/step=".+"[ >]/, '');
 
             expect(modifiedSelectMinimalResult).to.equal(
                 modifiedRangePickerResult
@@ -1032,7 +1032,6 @@ describe('transformer', () => {
             const { form } = await transform({
                 xform: xform2,
             });
-            // console.log('form', form);
             const doc = parser.parseFromString(form, 'text/html');
             const target = findElementByName(
                 doc,

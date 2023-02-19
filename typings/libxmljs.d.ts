@@ -1,24 +1,41 @@
+/* eslint-disable max-classes-per-file */
 declare module 'libxmljs' {
-    export interface Node {
+    export interface Namespace {
+        href(): string;
+        prefix(): string;
+    }
+
+    export class Node {
+        addNextSibling(sibling: Node): this;
+        addPrevSibling(sibling: Node): this;
+
+        /**
+         * @param deep defaults to `true`
+         */
+        clone(deep?: boolean): this;
+
+        doc(): Document;
+        name(): string;
+        namespaces(): Namespace[];
+        parent(): Node | null;
+        remove(): this;
         replace(node: Node): unknown;
+        text(): string;
+        text(value: string): this;
+        toString(format?: boolean): string;
+        type(): 'attribute' | 'comment' | 'document' | 'element' | 'text';
     }
 
-    export interface NamedNode extends Node {
-        name(): string;
-        namespace(uri: string): this;
-    }
-
-    export interface Attr extends NamedNode {
-        name(): string;
+    export class Attr extends Node {
         value(): string | null;
         value(value: string): this;
     }
 
-    interface ParentNode extends NamedNode {
-        addChild(child: this): this;
-        addNextSibling(sibling: this): this;
+    class ParentNode extends Node {
+        addChild(child: Node): this;
         attrs(): Attr[];
-        childNodes(): Element[];
+        child(index: number): Node;
+        childNodes(): Node[];
 
         get(
             expression: string,
@@ -31,33 +48,23 @@ declare module 'libxmljs' {
         ): Element[];
 
         node(localName: string): this;
-        toString(unknownOption?: boolean): string;
     }
 
-    export class Element {
+    export class Element extends ParentNode {
         constructor(document: Document, name: string);
-    }
-
-    export interface Element extends ParentNode {
         attr(name: string): Attr | null;
         attr(name: string, value: string): Element;
         attr(attributes: Record<string, string>): Element;
-        clone(): this;
-        parent(): this | null; // Maybe `Element | Document | null`?
-        remove(): unknown; // Probably `boolean`?
-        text(): string;
-        text(value: string): this;
+        defineNamespace(namespceURI: string, prefix: string): Namespace;
+        namespace(uri: string): this;
+        namespace(namespace: Namespace): Element;
     }
 
-    export interface Document extends ParentNode {
+    export class Document extends ParentNode {
         root(): Element;
     }
 
     export const parseXml: (xml: string) => Document;
 
-    export interface DocumentFragment extends ParentNode {
-        root(): ParentNode;
-    }
-
-    export const parseHtmlFragment: (html: string) => DocumentFragment;
+    export const parseHtmlFragment: (html: string) => Document;
 }

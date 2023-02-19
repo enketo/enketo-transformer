@@ -48,9 +48,9 @@
             {
                 "devDependencies": [
                     "app.js",
-                    "app.ts",
                     "vite.config.ts",
                     "src/api.ts",
+                    "src/app.ts",
                     "test/**/*.ts"
                 ],
                 "optionalDependencies": false,
@@ -95,10 +95,19 @@
         {
             "files": ["./**/*.ts"],
             "rules": {
+                "consistent-return": "off",
                 "no-useless-constructor": "off",
                 "@typescript-eslint/no-useless-constructor": "error",
                 "no-unused-vars": "off",
-                "@typescript-eslint/no-unused-vars": "error",
+                "@typescript-eslint/no-unused-vars": [
+                    "error",
+                    {
+                        "argsIgnorePattern": "^_",
+                        "varsIgnorePattern": "^_"
+                    }
+                ],
+                "no-dupe-class-members": "off",
+                "@typescript-eslint/no-dupe-class-members": "error",
                 "no-empty-function": "off",
                 "@typescript-eslint/no-empty-function": "error",
                 "no-undef": "off",
@@ -129,6 +138,7 @@
         {
             "files": ["./**/*.d.ts"],
             "rules": {
+                "lines-between-class-members": "off",
                 "no-unused-vars": "off"
             }
         },

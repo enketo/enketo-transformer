@@ -3,8 +3,7 @@ import type Benchmark from 'benchmark';
 import { setFlagsFromString } from 'v8';
 import { runInNewContext } from 'vm';
 import { writeFileSync } from 'fs';
-import { transform } from '../src/transformer';
-import { fixtures } from './shared';
+import { fixtures, reload, transform } from './shared';
 
 /**
  * @see {@link https://stackoverflow.com/a/75007985}
@@ -26,6 +25,8 @@ const suites = new Map<string, Suite>(
 
 const expectedOutliersPattern = /SOAR|va_who/i;
 
+const RELOAD_WORKAROUND = 'RELOAD WORKAROUND';
+
 fixtures.forEach(({ fileName, origin, xform }) => {
     const suite = suites.get(origin)!;
     const outlierMultiplier = expectedOutliersPattern.test(fileName) ? 5 : 1;
@@ -44,19 +45,53 @@ fixtures.forEach(({ fileName, origin, xform }) => {
             minSamples: 5,
             minTime: 0.25 * outlierMultiplier,
             onStart: () => {
-                gc();
+                if (ENV === 'node') {
+                    gc();
+                }
             },
             onCycle: () => {
-                gc();
+                if (ENV === 'node') {
+                    gc();
+                }
             },
         }
     );
+
+    if (ENV === 'web') {
+        suite.add(
+            RELOAD_WORKAROUND,
+            async (deferred: Benchmark.Deferred) => {
+                await reload();
+                deferred.resolve();
+            },
+            {
+                async: true,
+                defer: true,
+                delay: 0,
+                maxTime: 0.01,
+                minSamples: 1,
+                minTime: 0.01,
+                onStart: () => {
+                    gc();
+                },
+                onCycle: () => {
+                    gc();
+                },
+            }
+        );
+    }
 });
+
+interface CycleEvent {
+    target: Benchmark;
+}
 
 const runSuite = async (suite: Suite) =>
     new Promise((resolve) => {
-        suite.on('cycle', async (event: Event) => {
-            console.log(String(event.target));
+        suite.on('cycle', async (event: CycleEvent) => {
+            if (event.target.name !== RELOAD_WORKAROUND) {
+                console.log(String(event.target));
+            }
         });
         suite.on('complete', resolve);
         suite.run({ async: true });
@@ -74,6 +109,7 @@ if (GITHUB_STEP_SUMMARY) {
 
     const benchmarks = [...suites.values()]
         .flatMap((suite): Benchmark[] => suite.slice(0, suite.length))
+        .filter((benchmark) => benchmark.name !== RELOAD_WORKAROUND)
         .sort((a, b) => a.hz - b.hz);
 
     const times = benchmarks.map(({ times }) => times!.elapsed);
@@ -181,3 +217,5 @@ if (GITHUB_STEP_SUMMARY) {
 
     writeFileSync(GITHUB_STEP_SUMMARY, summary);
 }
+
+process.exit(0);

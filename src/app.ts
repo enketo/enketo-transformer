@@ -1,7 +1,7 @@
 import bodyParser from 'body-parser';
 import express from 'express';
-import { config } from './config/build.shared';
-import { api } from './src/api';
+import config from '../config/config.json';
+import { api } from './api';
 
 const app = express();
 
@@ -18,4 +18,8 @@ app.use(
 
 api(app);
 
-export { app };
+const { port } = config;
+
+app.listen(port, () => {
+    console.warn(`enketo-transformer running on port ${port}!`);
+});
