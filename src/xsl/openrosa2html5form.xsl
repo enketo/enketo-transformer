@@ -109,15 +109,6 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
         <xsl:if test="not(function-available('exsl:node-set'))">
             <xsl:message terminate="yes">FATAL ERROR: exsl:node-set function is not available in this XSLT processor</xsl:message>
         </xsl:if>
-        <xsl:if test="not(function-available('str:replace'))">
-            <xsl:message terminate="yes">FATAL ERROR: str:replace function is not available in this XSLT processor</xsl:message>
-        </xsl:if>
-        <xsl:if test="not(function-available('dyn:evaluate'))">
-            <xsl:message terminate="yes">FATAL ERROR: dyn:evaluate function is not available in this XSLT processor</xsl:message>
-        </xsl:if>
-        <xsl:if test="not(function-available('str:tokenize'))">
-            <xsl:message terminate="yes">FATAL ERROR: str:tokenize function is not available in this XSLT processor</xsl:message>
-        </xsl:if>
         <xsl:for-each select="/h:html/h:head/xf:model/xf:bind">
             <xsl:if test="not(substring(./@nodeset, 1, 1) = '/')">
                 <xsl:message terminate="no">WARNING: Found binding(s) with relative nodeset attribute <!--on element: <xsl:value-of select="./@nodeset" />--> (form may work correctly if relative nodesets were used consistently throughout xml form in bindings as well as body, otherwise it will certainly be messed up). </xsl:message>
