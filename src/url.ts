@@ -4,14 +4,15 @@
  * @param value - a fully qualified URL, or a relative path
  */
 export const escapeURLPath = (value: string): string => {
-    const isFullyQualified = /^[a-z]+:/i.test(value);
+    const [scheme] = value.match(/^[a-z]+:/) ?? [];
+    const isFullyQualified = scheme != null;
     const urlString = isFullyQualified
-        ? value
-        : `file:///${value.replace(/^\//, '')}`;
+        ? value.replace(/^jr:\/*/, 'http://')
+        : `http://example.com/${value.replace(/^\//, '')}`;
     const url = new URL(urlString);
 
     if (isFullyQualified) {
-        return url.href;
+        return url.href.replace('http:', scheme);
     }
 
     const { pathname, search } = url;
