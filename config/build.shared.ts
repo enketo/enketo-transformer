@@ -2,7 +2,8 @@ import { createHash } from 'crypto';
 import { readFileSync } from 'fs';
 import pkg from '../package.json';
 
-export const ENV = process.env.ENV?.toLowerCase() === 'web' ? 'web' : 'node';
+export const TARGET_ENV =
+    process.env.ENV?.toLowerCase() === 'web' ? 'web' : 'node';
 
 const md5 = (message: string | Buffer) => {
     const hash = createHash('md5');
@@ -30,6 +31,6 @@ const BROWSER =
 export const define = {
     PACKAGE_VERSION: JSON.stringify(PACKAGE_VERSION),
     VERSION: JSON.stringify(VERSION),
-    ENV: JSON.stringify(ENV),
+    ENV: JSON.stringify(TARGET_ENV),
     BROWSER: JSON.stringify(BROWSER),
 };

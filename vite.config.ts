@@ -3,10 +3,10 @@ import type { LibraryFormats } from 'vite';
 import type { UserConfig } from 'vitest/config';
 import { defineConfig } from 'vitest/config';
 import config from './config/config.json';
-import { define, ENV } from './config/build.shared';
+import { define, TARGET_ENV } from './config/build.shared';
 
 export default defineConfig(async () => {
-    const isWeb = ENV === 'web';
+    const isWeb = TARGET_ENV === 'web';
     const entryNames = isWeb ? ['transformer'] : ['app', 'transformer'];
     const entry = entryNames.map((name) =>
         resolve(__dirname, `./src/${name}.ts`)
