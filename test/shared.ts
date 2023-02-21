@@ -3,23 +3,19 @@ import type { Attr } from 'linkedom/types/interface/attr';
 import type { Element as BaseElement } from 'linkedom/types/interface/element';
 import type { Node } from 'linkedom/types/interface/node';
 import { resolve } from 'path';
+import type { Page } from 'playwright';
 import { fileURLToPath } from 'url';
+import firefoxUserPrefs from '../config/firefox.json';
 import type { Survey, Transform, TransformedSurvey } from '../src/transformer';
 import { fixtures } from './fixtures';
 
 export { fixtures };
 
 // eslint-disable-next-line import/no-mutable-exports
-let reload: () => Promise<void>;
+let reload: () => Promise<Page | void>;
 
 // eslint-disable-next-line import/no-mutable-exports
 let transform: Transform;
-
-declare const enketo: {
-    transformer: {
-        transform: Transform;
-    };
-};
 
 if (ENV === 'node') {
     reload = () => Promise.resolve();
@@ -28,70 +24,94 @@ if (ENV === 'node') {
     const { createServer } = await import('vite');
     const root = fileURLToPath(new URL('..', import.meta.url));
     const configFile = resolve(root, './vite.config.ts');
-    const server = await createServer({
-        configFile,
-        define: {
-            PACKAGE_VERSION: JSON.stringify(PACKAGE_VERSION),
-            VERSION: JSON.stringify(VERSION),
-            ENV: JSON.stringify(ENV),
-            BROWSER: JSON.stringify(BROWSER),
-        },
-        root,
-    });
-
-    await server.listen();
-
-    server.printUrls();
 
     const playwright = await import('playwright');
     const browserType = playwright[BROWSER];
-    const browser = await browserType.launch();
 
-    let page = await browser.newPage();
+    const [server, browser] = await Promise.all([
+        createServer({
+            configFile,
+            // clearScreen: false,
+            define: {
+                PACKAGE_VERSION: JSON.stringify(PACKAGE_VERSION),
+                VERSION: JSON.stringify(VERSION),
+                ENV: JSON.stringify(ENV),
+                BROWSER: JSON.stringify(BROWSER),
+            },
+            root,
+        }),
+        browserType.launch({
+            firefoxUserPrefs,
+        }),
+    ]);
 
+    await server.listen();
+
+    const url = server.resolvedUrls!.local[0]!;
+
+    let page: Page | null = null;
     let isLoading = false;
 
-    page.on('console', async (message) => {
-        if (!isLoading) {
-            console.log(
-                ...(await Promise.all(
-                    message.args().map((arg) => arg.jsonValue())
-                ))
-            );
-        }
-    });
-
-    let isFirstLoad = true;
-
-    reload = async () => {
+    const load = async () => {
         isLoading = true;
-        const url = 'http://localhost:8085';
 
-        if (isFirstLoad) {
-            await page.goto(url);
-            isFirstLoad = false;
-        } else {
-            await page.close();
+        const [context] = await Promise.all([
+            browser.newContext(),
+            page?.close(),
+        ]);
 
-            const context = await browser.newContext();
+        page = await context.newPage();
 
-            page = await context.newPage();
-            await page.goto(url);
-        }
+        page.on('console', async (message) => {
+            // This basically just suppresses useless built-in Vite logging
+            if (!isLoading) {
+                let type = message.type();
 
+                if (type === 'warning') {
+                    type = 'warn';
+                }
+
+                const args = await Promise.all(
+                    message.args().map((arg) => arg.jsonValue())
+                );
+
+                if (type === 'trace') {
+                    type = 'log';
+                    args.push(message.location());
+                }
+
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore - even if the return type for `message.type` were more
+                // accurate, this would still fail because some console methods are
+                // not variadic. We just have to trust that Playwright is passing
+                // the correct arguments for whichever console method was called.
+                console[type](...args);
+            }
+        });
+
+        await page.goto(url);
         await page.waitForFunction(() => typeof enketo !== 'undefined');
 
         isLoading = false;
+
+        return page;
     };
 
-    await reload();
+    page = await load();
+
+    reload = load;
 
     transform = async <T extends Survey>(
         survey: T
     ): Promise<TransformedSurvey<T>> => {
+        // The *intent* here is that the global declaration will only affect web
+        // environments. Unfortunately, like TypeScript's DOM lib, there is no
+        // such thing as conditional global augmentation.
+        await import('./browser-env');
+
         delete survey.preprocess;
 
-        const { error, result } = await page.evaluate(
+        const { error, result } = await page!.evaluate(
             async ([input]) => {
                 try {
                     const result = await enketo.transformer.transform(input);

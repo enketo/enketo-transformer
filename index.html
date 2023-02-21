@@ -2,11 +2,10 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <link rel="icon" href="./icon.png" />
+        <!-- See https://stackoverflow.com/a/13416784 -->
+        <link rel="icon" href="data:;base64,=" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Enketo Transformer (web)</title>
-    </head>
-    <body>
         <script type="module">
             import { transform } from './src/transformer.ts';
 
@@ -14,5 +13,11 @@
                 transformer: { transform },
             };
         </script>
+    </head>
+    <body>
+        <p>
+            Nothing to see here! This page is used for running browser tests and
+            benchmarks.
+        </p>
     </body>
 </html>
