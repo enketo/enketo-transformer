@@ -1,21 +1,11 @@
-import { createHash } from 'crypto';
-import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import type { LibraryFormats } from 'vite';
 import type { UserConfig } from 'vitest/config';
 import { defineConfig } from 'vitest/config';
 import config from './config/config.json';
-import pkg from './package.json';
-
-const md5 = (message: string | Buffer) => {
-    const hash = createHash('md5');
-    hash.update(message);
-
-    return hash.digest('hex');
-};
+import { define, ENV } from './config/build.shared';
 
 export default defineConfig(async () => {
-    const ENV = process.env.ENV === 'web' ? 'web' : 'node';
     const isWeb = ENV === 'web';
     const entryNames = isWeb ? ['transformer'] : ['app', 'transformer'];
     const entry = entryNames.map((name) =>
@@ -61,28 +51,6 @@ export default defineConfig(async () => {
      * Use Vite's default {@link https://vitejs.dev/config/build-options.html#build-target `modules`} target for Vite runtimes (app.js, test) and web.
      */
     const target = isWeb || isViteRuntime ? 'modules' : 'node14';
-
-    const XSL_FORM = readFileSync('./src/xsl/openrosa2html5form.xsl', 'utf-8');
-    const XSL_MODEL = readFileSync('./src/xsl/openrosa2xmlmodel.xsl', 'utf-8');
-    const PACKAGE_VERSION = pkg.version;
-    const VERSION = md5(`${XSL_FORM}${XSL_MODEL}${PACKAGE_VERSION}`);
-
-    type Browser = 'firefox' | 'chromium' | 'webkit';
-
-    const browsers = new Map<Browser, Browser>([
-        ['firefox', 'firefox'],
-        ['chromium', 'chromium'],
-        ['webkit', 'webkit'],
-    ]);
-
-    const BROWSER = browsers.get(process.env.BROWSER as Browser) ?? 'firefox';
-
-    const define = {
-        PACKAGE_VERSION: JSON.stringify(PACKAGE_VERSION),
-        VERSION: JSON.stringify(VERSION),
-        ENV: JSON.stringify(ENV),
-        BROWSER: JSON.stringify(BROWSER),
-    };
 
     const alias = isWeb
         ? [
