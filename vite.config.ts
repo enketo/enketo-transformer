@@ -150,7 +150,7 @@ export default defineConfig(async () => {
                     // have explicit tests ensuring both the default and named
                     // exports are consistent with the existing public API.
                     exports: 'named',
-                    preserveModules: isWeb,
+                    preserveModules: !isWeb,
                 },
                 treeshake: true,
             },
