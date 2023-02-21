@@ -14,6 +14,7 @@ ODK XForms are based off of [W3C XForms](https://en.wikipedia.org/wiki/XForms) w
 Historically, forms with many questions or many translations were prohibitively slow to transform. Starting in Enketo Transformer v2.2.1 (Feb 2023), they are much faster.
 
 Our current primary goals are:
+
 -   Using standard DOM APIs so the transformation can be performed client-side.
 -   Identifying and addressing remaining performance bottlenecks to remove the need for server-side caching.
 
@@ -24,13 +25,9 @@ Longer term, we intend to rethink transformation to be as minimal as possible, i
 1. Volta (optional, but recommended)
 1. Node.js 16 and npm 6 (Node.js 14 is also supported)
 
-### Install as module
-
-```bash
-npm install enketo-transformer --save
-```
-
 ### Use as module
+
+#### Node
 
 ```ts
 import { transform } from 'enketo-transformer';
@@ -60,7 +57,45 @@ const result = await transform({
 // ... do something with result
 ```
 
+### Web
+
+Enketo Transformer may also be used on the web as an ESM module. It is exported as `enketo-transformer/web`:
+
+```ts
+import { transform } from 'enketo-transformer/web';
+
+const xformResponse = await fetch('https://url/to/xform.xml');
+const xform = await xformResponse.text();
+const result = await transform({
+    xform,
+    // ...
+});
+```
+
+**Note:** because `preprocess` depends on `libxmljs` which is only available for Node, `preprocess` is also not supported on the web. If you must preprocess an XForm before it is transformed, you may do that before calling `transform`.
+
 ### Development/local usage
+
+#### Install
+
+```sh
+npm install
+```
+
+#### Interactive web demo
+
+Enketo Transformer provides a simple web demo which allows you to select any of the XForms used as fixtures in its test suites to view their transformed output, as well as toggling several of the available transform options to see how they affect the transform. To run the demo:
+
+```sh
+cd ./demo
+npm install
+npm run demo
+```
+
+This will print out the demo URL (typically `http://localhost:3000`, unless that port is already in use).
+
+#### Test/dev server
+
 Enketo Transformer provides a simple server API. It may be used for testing locally, but isn't a robust or secure server implementation so it should not be used in production. You can start it in a local dev environment by running:
 
 ```sh
@@ -84,7 +119,7 @@ sample POST request:
 curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.png&media[this]=that" http://localhost:8085/transform
 ```
 
-#### Response format
+**Response format:**
 
 ```json
 {
@@ -95,7 +130,7 @@ curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.
 }
 ```
 
-### Test
+#### Test
 
 -   run tests with `npm test`
 -   run tests in watch mode with `npm run test:watch`
@@ -115,7 +150,7 @@ Optionally, you can add a keyboard shortcut to select launch tasks:
 2. Search for `workbench.action.debug.selectandstart`
 3. Click the + button to add your preferred keybinding keybinding
 
-### Develop
+#### Develop
 
 The script `npm run develop` runs the app on port 8085 and also serves test/forms on port 8081. You could test the transformation output by placing an XForm in test/forms and running
 http://localhost:8085/transform?xform=http://localhost:8081/autocomplete.xml
@@ -129,7 +164,7 @@ A vagrant configuration file and provisioning script is also included. Use DEBUG
 DEBUG=api,transformer,markdown,language node app.js
 ```
 
-### Release
+#### Release
 
 Releases are done each time a dependent tool needs an `enketo-transformer` change.
 
@@ -153,7 +188,7 @@ Releases are done each time a dependent tool needs an `enketo-transformer` chang
 
 See [license document](./LICENSE).
 
-In addition, any product that uses enketo-transformer or parts thereof is required to have a "Powered by Enketo" footer, according to the specifications below, on all screens in which the output of enketo-xslt, or parts thereof, are used, unless explicity exempted from this requirement by Enketo LLC in writing. Partners and sponsors of the Enketo Project, listed on [https://enketo.org/#about](https://enketo.org/#about) and on [https://github.com/enketo/enketo-core#sponsors](https://github.com/enketo/enketo-core#sponsors) are exempted from this requirements and so are contributors listed in [package.json](./package.json).
+In addition, any product that uses enketo-transformer or parts thereof is required to have a "Powered by Enketo" footer, according to the specifications below, on all screens in which the output of enketo-transformer, or parts thereof, are used, unless explicity exempted from this requirement by Enketo LLC in writing. Partners and sponsors of the Enketo Project, listed on [https://enketo.org/#about](https://enketo.org/#about) and on [https://github.com/enketo/enketo-core#sponsors](https://github.com/enketo/enketo-core#sponsors) are exempted from this requirements and so are contributors listed in [package.json](./package.json).
 
 The aim of this requirement is to force adopters to give something back to the Enketo project, by at least spreading the word and thereby encouraging further adoption.
 
