@@ -2,9 +2,8 @@ import { DOMParser } from 'linkedom';
 import type { Attr } from 'linkedom/types/interface/attr';
 import type { Element as BaseElement } from 'linkedom/types/interface/element';
 import type { Node } from 'linkedom/types/interface/node';
-import { resolve } from 'path';
 import type { Page } from 'playwright';
-import { fileURLToPath } from 'url';
+import { port } from '../config/config.json';
 import firefoxUserPrefs from '../config/firefox.json';
 import type { Survey, Transform, TransformedSurvey } from '../src/transformer';
 import { fixtures } from './fixtures';
@@ -21,33 +20,22 @@ if (ENV === 'node') {
     reload = () => Promise.resolve();
     transform = (await import('../src/transformer')).transform;
 } else {
-    const { createServer } = await import('vite');
-    const root = fileURLToPath(new URL('..', import.meta.url));
-    const configFile = resolve(root, './vite.config.ts');
-
     const playwright = await import('playwright');
     const browserType = playwright[BROWSER];
 
-    const [server, browser] = await Promise.all([
-        createServer({
-            configFile,
-            // clearScreen: false,
-            define: {
-                PACKAGE_VERSION: JSON.stringify(PACKAGE_VERSION),
-                VERSION: JSON.stringify(VERSION),
-                ENV: JSON.stringify(ENV),
-                BROWSER: JSON.stringify(BROWSER),
-            },
-            root,
-        }),
-        browserType.launch({
-            firefoxUserPrefs,
-        }),
-    ]);
+    const browser = await browserType.launch({
+        firefoxUserPrefs: BROWSER === 'firefox' ? firefoxUserPrefs : undefined,
+    });
 
-    await server.listen();
+    const url = `http://localhost:${port}`;
 
-    const url = server.resolvedUrls!.local[0]!;
+    interface EnketoGlobal {
+        transformer: {
+            transform: Transform;
+        };
+    }
+
+    let enketo!: EnketoGlobal;
 
     let page: Page | null = null;
     let isLoading = false;
@@ -104,11 +92,6 @@ if (ENV === 'node') {
     transform = async <T extends Survey>(
         survey: T
     ): Promise<TransformedSurvey<T>> => {
-        // The *intent* here is that the global declaration will only affect web
-        // environments. Unfortunately, like TypeScript's DOM lib, there is no
-        // such thing as conditional global augmentation.
-        await import('./browser-env');
-
         delete survey.preprocess;
 
         const { error, result } = await page!.evaluate(

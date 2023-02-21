@@ -3,7 +3,13 @@ import type Benchmark from 'benchmark';
 import { setFlagsFromString } from 'v8';
 import { runInNewContext } from 'vm';
 import { writeFileSync } from 'fs';
-import { fixtures, reload, transform } from './shared';
+import { setup } from './web/setup';
+
+if (ENV === 'web') {
+    await setup();
+}
+
+const { fixtures, reload, transform } = await import('./shared');
 
 /**
  * @see {@link https://stackoverflow.com/a/75007985}

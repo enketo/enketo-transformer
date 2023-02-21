@@ -14,6 +14,8 @@ export type TransformPreprocess = (
     doc: LibXMLJS.Document
 ) => LibXMLJS.Document;
 
+type NodeOnly<T> = [typeof ENV] extends ['web'] ? undefined : T;
+
 export interface Survey {
     xform: string;
     markdown?: boolean;
@@ -25,7 +27,7 @@ export interface Survey {
      *
      * Only supported in Node environments.
      */
-    preprocess?: TransformPreprocess;
+    preprocess?: NodeOnly<TransformPreprocess>;
 
     theme?: string;
 }
@@ -41,11 +43,23 @@ export type Transform = <T extends Survey>(
     survey: T
 ) => Promise<TransformedSurvey<T>>;
 
+const getPreprocess = (
+    survey: Survey
+): typeof ENV extends 'web' ? void : TransformPreprocess | void => {
+    if (String(ENV) === 'node' && typeof survey.preprocess === 'function') {
+        return survey.preprocess;
+    }
+};
+
+const isFunction = <T extends (...args: any[]) => any>(
+    value: unknown
+): value is T => typeof value === 'function';
+
 /**
  * Performs XSLT transformation on XForm and process the result.
  */
 export const transform: Transform = async (survey) => {
-    const { xform, markdown, media, openclinica, preprocess, theme } = survey;
+    const { xform, markdown, media, openclinica, theme } = survey;
 
     const xsltParams = openclinica
         ? {
@@ -61,7 +75,9 @@ export const transform: Transform = async (survey) => {
 
     let xformDoc: DOM.Document = domParser.parseFromString(xform, 'text/xml');
 
-    if (typeof preprocess === 'function' && ENV === 'node') {
+    const preprocess = getPreprocess(survey);
+
+    if (isFunction(preprocess)) {
         const { libxmljs } = await import('libxslt');
 
         xformDoc = preprocess.call(libxmljs, xformDoc as any);

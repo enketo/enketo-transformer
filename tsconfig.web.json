@@ -1,11 +1,15 @@
 {
     "extends": "./tsconfig.base.json",
     "compilerOptions": {
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "noEmit": false,
+        "outDir": "./dist/@enketo/transformer-web",
         "paths": {
-            "enketo-transformer/dom": ["src/dom/web/index"]
+            "enketo-transformer/dom": ["src/dom/web/index.ts"]
         }
     },
     "exclude": ["dist", "node_modules", "./typings/test.d.ts"],
     "include": ["config", "src", "typings"],
-    "files": ["./typings/env.d.ts"]
+    "files": ["./typings/env/web.d.ts"]
 }

@@ -2,4 +2,3 @@
 
 declare const PACKAGE_VERSION: string;
 declare const VERSION: string;
-declare const ENV: 'node' | 'web';

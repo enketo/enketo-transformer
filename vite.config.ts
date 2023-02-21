@@ -23,7 +23,6 @@ export default defineConfig(async () => {
     );
     const formats = (isWeb ? ['es'] : ['es', 'cjs']) satisfies LibraryFormats[];
     const emptyOutDir = process.env.EMPTY_OUT_DIR === 'true';
-    const minify = isWeb;
 
     const external = [
         'body-parser',
@@ -41,14 +40,14 @@ export default defineConfig(async () => {
         'vite',
     ];
 
-    if (isWeb) {
-        external.push('libxslt');
-    } else {
-        external.push('language-tags', 'string-direction');
+    const webDeps = ['language-tags', 'string-direction'];
+
+    if (!isWeb) {
+        external.push(...webDeps);
     }
 
     const input = isWeb
-        ? ['./src/transformer.ts', 'language-tags', 'string-direction']
+        ? ['./src/transformer.ts']
         : ['./src/app.ts', './src/transformer.ts', './config/config.json'];
 
     const isViteNodeRuntime = process.argv.some((arg) =>
@@ -84,9 +83,6 @@ export default defineConfig(async () => {
         ENV: JSON.stringify(ENV),
         BROWSER: JSON.stringify(BROWSER),
     };
-
-    const include = isWeb ? ['language-tags', 'string-direction'] : [];
-    const needsInterop = [...include];
 
     const alias = isWeb
         ? [
@@ -126,6 +122,10 @@ export default defineConfig(async () => {
                             .replace(
                                 'node_modules/.vite/deps_build-dist/',
                                 '@enketo/transformer-web/deps/'
+                            )
+                            .replace(
+                                'node_modules/',
+                                '@enketo/transformer-web/deps/'
                             );
 
                         return `${resolved}${extension}`;
@@ -138,7 +138,7 @@ export default defineConfig(async () => {
                 },
             },
             emptyOutDir,
-            minify,
+            minify: false,
             outDir: 'dist',
             rollupOptions: {
                 external,
@@ -150,7 +150,7 @@ export default defineConfig(async () => {
                     // have explicit tests ensuring both the default and named
                     // exports are consistent with the existing public API.
                     exports: 'named',
-                    preserveModules: true,
+                    preserveModules: isWeb,
                 },
                 treeshake: true,
             },
@@ -164,10 +164,7 @@ export default defineConfig(async () => {
             sourcemap: true,
         },
         optimizeDeps: {
-            disabled: !isWeb,
             exclude: external,
-            include,
-            needsInterop,
         },
         resolve: { alias },
         server: {
@@ -190,6 +187,7 @@ export default defineConfig(async () => {
             },
 
             globals: true,
+            globalSetup: 'test/web/setup.ts',
             include: ['test/**/*.spec.ts'],
             reporters: 'verbose',
             sequence: { shuffle: true },

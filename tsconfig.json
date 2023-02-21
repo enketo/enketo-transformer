@@ -1,11 +1,15 @@
 {
     "extends": "./tsconfig.base.json",
     "compilerOptions": {
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "noEmit": false,
+        "outDir": "./dist/types",
         "paths": {
-            "enketo-transformer/dom": ["src/dom/node"]
+            "enketo-transformer/dom": ["src/dom/node/index.ts"]
         }
     },
     "exclude": ["dist", "node_modules", "./src/dom/web", "./typings/test.d.ts"],
     "include": ["vite.config.ts", "config", "src", "typings"],
-    "files": ["./typings/env.d.ts"]
+    "files": ["./typings/env/node.d.ts"]
 }

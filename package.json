@@ -22,14 +22,12 @@
         "./dom": {
             "import": "./dist/enketo-transformer/dom/node/index.js",
             "require": "./dist/enketo-transformer/dom/node/index.cjs",
-            "browser": "./dist/@enketo/transformer-web/dom/web/index.js",
+            "browser": "./dist/dom/web/index.js",
             "types": "./dist/types/src/dom/node/index.d.ts"
         },
         "./web": {
             "default": "./dist/@enketo/transformer-web/transformer.js",
-            "import": "./dist/@enketo/transformer-web/transformer.js",
-            "browser": "./dist/@enketo/transformer-web/transformer.js",
-            "types": "./dist/types/src/transformer.d.ts"
+            "types": "./dist/@enketo/transformer-web/src/transformer.d.ts"
         }
     },
     "typesVersions": {
@@ -65,7 +63,7 @@
         "test:watch": "vitest",
         "test:watch:web": "ENV=web vitest",
         "develop": "DEBUG=api,transformer,markdown,language vite-node ./src/app.ts & http-server test/forms -p 8081",
-        "tsc": "tsc --project ./tsconfig.json && tsc --project ./tsconfig.web.json && tsc --project ./tsconfig.typedefs.json && tsc --project ./test/tsconfig.json"
+        "tsc": "tsc --project ./tsconfig.json && tsc --project ./tsconfig.web.json && tsc --project ./test/tsconfig.json"
     },
     "repository": {
         "type": "git",
