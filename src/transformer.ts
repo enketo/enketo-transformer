@@ -1,6 +1,5 @@
 import { DOMParser, XSLTProcessor } from 'enketo-transformer/dom';
 import type LibXMLJS from 'libxmljs';
-import { libxmljs } from 'libxslt';
 import type { DOM } from './dom/abstract';
 import { NodeTypes } from './dom/shared';
 import xslForm from './xsl/openrosa2html5form.xsl?raw';
@@ -63,6 +62,8 @@ export const transform: Transform = async (survey) => {
     let xformDoc: DOM.Document = domParser.parseFromString(xform, 'text/xml');
 
     if (typeof preprocess === 'function' && ENV === 'node') {
+        const { libxmljs } = await import('libxslt');
+
         xformDoc = preprocess.call(libxmljs, xformDoc as any);
     }
 

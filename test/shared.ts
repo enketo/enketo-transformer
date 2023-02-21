@@ -2,9 +2,12 @@ import { DOMParser } from 'linkedom';
 import type { Attr } from 'linkedom/types/interface/attr';
 import type { Element as BaseElement } from 'linkedom/types/interface/element';
 import type { Node } from 'linkedom/types/interface/node';
-import { basename, resolve } from 'path';
+import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import type { Survey, Transform, TransformedSurvey } from '../src/transformer';
+import { fixtures } from './fixtures';
+
+export { fixtures };
 
 // eslint-disable-next-line import/no-mutable-exports
 let reload: () => Promise<void>;
@@ -121,46 +124,6 @@ if (ENV === 'node') {
 }
 
 export { reload, transform };
-
-interface Fixture {
-    fileName: string;
-    origin: string;
-    fixturePath: string;
-    xform: string;
-}
-
-export const fixtures = (
-    await Promise.all(
-        Object.entries(
-            import.meta.glob('./**/*.xml', {
-                as: 'raw',
-                eager: false,
-            })
-        ).map(async ([fixturePath, importXForm]): Promise<Fixture> => {
-            const xform = await importXForm();
-            const origin =
-                fixturePath.match(/\/external-fixtures\/([^/]+)/)?.[1] ??
-                'enketo-transformer';
-            const fileName = basename(fixturePath);
-
-            return {
-                fileName,
-                origin,
-                fixturePath,
-                xform,
-            };
-        })
-    )
-).sort((A, B) => {
-    const a = A.fileName.toLowerCase().replace(/.*\/([^/]+)$/, '$1');
-    const b = B.fileName.toLowerCase().replace(/.*\/([^/]+)$/, '$1');
-
-    if (a > b) {
-        return 1;
-    }
-
-    return b > a ? -1 : 0;
-});
 
 const xformsByPath = Object.fromEntries(
     fixtures.flatMap(({ fileName, fixturePath, xform }) => [
