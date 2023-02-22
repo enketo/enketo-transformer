@@ -10,8 +10,6 @@ on:
 jobs:
     build:
         runs-on: ubuntu-latest
-        permissions:
-            pull-requests: write
         strategy:
             matrix:
                 target: ['Node']
@@ -47,16 +45,6 @@ jobs:
             - run: ENV=${{ matrix.target }} BROWSER=${{ matrix.browser }} npm test
             - id: benchmarks
               run: ENV=${{ matrix.target }} BROWSER=${{ matrix.browser }} npm run benchmarks
-            - uses: marocchino/sticky-pull-request-comment@v2
-              if: matrix.target == 'Node'
-              with:
-                  header: Node ${{ matrix.node }}
-                  path: ./.benchmarks.md
-            - uses: marocchino/sticky-pull-request-comment@v2
-              if: matrix.target == 'Web'
-              with:
-                  header: ${{ matrix.browser}}
-                  path: ./.benchmarks.md
             - if: github.event_name == 'release' && github.event.action == 'published' && matrix.node == '16' && matrix.target == 'node'
               run: npm publish
               env:
