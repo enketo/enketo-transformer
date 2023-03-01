@@ -246,15 +246,19 @@ function Demo() {
                         Theme
                     </label>
                 </div>
-                <div id="metrics">
-                    ⏲️{' '}
-                    <Switch>
-                        <Match when={duration() == null}>Transforming...</Match>
-                        <Match when={duration() != null}>
-                            Transformed in {duration()?.toFixed(2)} ms
-                        </Match>
-                    </Switch>
-                </div>
+                <Show when={transformed()}>
+                    <div id="metrics">
+                        ⏲️{' '}
+                        <Switch>
+                            <Match when={duration() == null}>
+                                Transforming...
+                            </Match>
+                            <Match when={duration() != null}>
+                                Transformed in {duration()?.toFixed(2)} ms
+                            </Match>
+                        </Switch>
+                    </div>
+                </Show>
             </form>
             <Show when={error()} keyed>
                 {(error) => (
