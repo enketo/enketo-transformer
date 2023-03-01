@@ -6,7 +6,7 @@
     "type": "module",
     "main": "./dist/enketo-transformer/transformer.cjs",
     "module": "./dist/enketo-transformer/enketo-transformer.js",
-    "browser": "./dist/@enketo/transformer-web/transformer.js",
+    "browser": "./dist/enketo-transformer/web/transformer.js",
     "types": "./dist/types/src/transformer.d.ts",
     "files": [
         "app.js",
@@ -16,7 +16,7 @@
         ".": {
             "import": "./dist/enketo-transformer/enketo-transformer.js",
             "require": "./dist/enketo-transformer/transformer.cjs",
-            "browser": "./dist/@enketo/transformer-web/transformer.js",
+            "browser": "./dist/enketo-transformer/web/transformer.js",
             "types": "./dist/types/src/transformer.d.ts"
         },
         "./dom": {
@@ -26,14 +26,14 @@
             "types": "./dist/types/src/dom/node/index.d.ts"
         },
         "./web": {
-            "default": "./dist/@enketo/transformer-web/transformer.js",
-            "types": "./dist/@enketo/transformer-web/src/transformer.d.ts"
+            "default": "./dist/enketo-transformer/web/transformer.js",
+            "types": "./dist/enketo-transformer/web/src/transformer.d.ts"
         }
     },
     "typesVersions": {
         "*": {
             "web": [
-                "./dist/types/src/transformer.d.ts"
+                "./dist/enketo-transformer/web/src/transformer.d.ts"
             ]
         }
     },

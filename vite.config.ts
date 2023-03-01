@@ -74,32 +74,20 @@ export default defineConfig(async () => {
               },
           ];
 
+    const baseName = isWeb ? 'enketo-transformer/web' : 'enketo-transformer';
+
     return {
         assetsInclude: ['**/*.xml', '**/*.xsl'],
         build: {
             lib: {
                 entry,
                 formats,
-                name: 'enketo-transformer',
+                name: baseName,
+                // Note: this is only called for Node builds.
                 fileName(format, entryName) {
                     const extension = format === 'es' ? '.js' : '.cjs';
 
-                    if (isWeb) {
-                        const resolved = entryName
-                            .replace('src/', '@enketo/transformer-web/')
-                            .replace(
-                                'node_modules/.vite/deps_build-dist/',
-                                '@enketo/transformer-web/deps/'
-                            )
-                            .replace(
-                                'node_modules/',
-                                '@enketo/transformer-web/deps/'
-                            );
-
-                        return `${resolved}${extension}`;
-                    }
-
-                    return `enketo-transformer/${entryName.replace(
+                    return `${baseName}/${entryName.replace(
                         'src/',
                         ''
                     )}${extension}`;

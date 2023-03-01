@@ -4,7 +4,7 @@
         "declaration": true,
         "emitDeclarationOnly": true,
         "noEmit": false,
-        "outDir": "./dist/@enketo/transformer-web",
+        "outDir": "./dist/enketo-transformer/web",
         "paths": {
             "enketo-transformer/dom": ["src/dom/web/index.ts"]
         }
