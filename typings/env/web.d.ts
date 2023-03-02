@@ -1,7 +1,5 @@
-/// <reference lib="dom" />
-/// <reference lib="dom.iterable" />
+import './shared';
 
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="./shared.d.ts" />
-
-declare const ENV: 'web';
+declare global {
+    const ENV: 'web';
+}

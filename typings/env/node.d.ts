@@ -1,4 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="./shared.d.ts" />
+import './shared';
 
-declare const ENV: 'node';
+declare global {
+    const ENV: 'node';
+}

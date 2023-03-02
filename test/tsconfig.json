@@ -7,5 +7,5 @@
     },
     "exclude": ["../node_modules", "../src/dom/web"],
     "include": [".", "../src", "../typings"],
-    "files": ["../typings/test.d.ts"]
+    "files": ["../typings/env/test.d.ts"]
 }
