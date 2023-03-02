@@ -706,24 +706,16 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
         </xsl:choose>
     </xsl:template>
 
-    <!-- Calls to this template will be injected by transformer.ts based on the itemsets in a given XForm -->
-    <xsl:template name="itemset-itext-labels">
-        <xsl:param name="valueRef" />
-        <xsl:param name="labelRef" />
-        <xsl:param name="itextPath" />
+    <xsl:template match="xf:itemset" mode="labels">
+        <xsl:variable name="valueRef" select="@valueRef" />
+        <xsl:variable name="labelRef" select="@labelRef" />
+        <xsl:variable name="itextPath" select="@itextPath" />
 
         <span class="itemset-labels">
             <xsl:attribute name="data-value-ref">
                 <xsl:value-of select="$valueRef"/>
             </xsl:attribute>
             <xsl:choose>
-                <!-- <xsl:when test="true()">
-                    <span class="dbg">
-                        valueRef: <xsl:value-of select="$valueRef" />
-                        labelRef: <xsl:value-of select="$labelRef" />
-                        itextPath: <xsl:value-of select="$itextPath" />
-                    </span>
-                </xsl:when> -->
                 <xsl:when test="contains($labelRef, 'jr:itext(')">
                     <xsl:attribute name="data-label-type">
                         <xsl:value-of select="'itext'"/>
@@ -734,9 +726,10 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                         <xsl:value-of select="$label-node-name"/>
                     </xsl:attribute>
 
-                    <xsl:for-each select="exsl:node-set($itextPath)">
+                    <xsl:for-each select="./*[local-name()=$label-node-name]">
                         <!-- so this is support for itext(node) (not itext(path/to/node)), but only 'ad-hoc' for itemset labels for now -->
-                        <xsl:variable name="id" select="./*[name()=$label-node-name]" />
+                        <xsl:variable name="id" select="." />
+
                         <xsl:call-template name="translations">
                             <xsl:with-param name="id" select="$id"/>
                             <xsl:with-param name="class" select="'option-label'"/>

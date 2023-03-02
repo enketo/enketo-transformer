@@ -84,7 +84,7 @@ export const transform: Transform = async (survey) => {
     }
 
     processBinaryDefaults(xformDoc, mediaMap);
-    injectItemsetTemplateCalls(xslFormDoc, xformDoc);
+    processItemsets(xformDoc);
 
     const htmlDoc = xslTransform(xslFormDoc, xformDoc, xsltParams);
 
@@ -580,11 +580,11 @@ const correctHTMLDocHierarchy = (doc: DOM.Document) => {
     }
 };
 
-/** @see {@link injectItemsetTemplateCalls} */
+/** @see {@link processItemsets} */
 const substringBefore = (haystack: string, needle: string) =>
     haystack.split(needle, 1)[0];
 
-/** @see {@link injectItemsetTemplateCalls} */
+/** @see {@link processItemsets} */
 const substringAfter = (haystack: string, needle: string) =>
     haystack.substring(haystack.indexOf(needle) + needle.length);
 
@@ -599,7 +599,7 @@ const substringAfter = (haystack: string, needle: string) =>
  * libXML kept the recursion in, even though it is not being used right now
  * ----------------------------------------------------------------------------
  *
- * Contrary to the JSDoc comment for @see {@link injectItemsetTemplateCalls},
+ * Contrary to the JSDoc comment for @see {@link processItemsets},
  * this implementation deviates from the original XSL logic, which uses
  * substrings and recursion, because it's (hopefully) much easier to understand
  * this way.
@@ -617,10 +617,7 @@ const stripFilter = (expression: string) => expression.replace(/\[.*?\]/g, '');
  * naming and semantics of the original XSL logic to ensure there is no
  * potential for regressions.
  */
-const injectItemsetTemplateCalls = (
-    xslDoc: DOM.Document,
-    xformDoc: DOM.Document
-) => {
+const processItemsets = (xformDoc: DOM.Document) => {
     const itemsets = getNodesByXPathExpression(
         xformDoc,
         '//xmlns:itemset',
@@ -631,7 +628,7 @@ const injectItemsetTemplateCalls = (
         return;
     }
 
-    const itemsetParameters = itemsets.map((itemset) => {
+    itemsets.forEach((itemset) => {
         const [valueEl] = getNodesByXPathExpression(
             itemset,
             './xmlns:value',
@@ -676,74 +673,26 @@ const injectItemsetTemplateCalls = (
         const instanceId = iwq.substring(1, iwq.length - 1);
         const itextPath = `/h:html/h:head/xf:model/xf:instance[@id="${instanceId}"]${instancePathNoFilter}`;
 
-        return {
-            valueRef,
-            labelRef,
-            itextPath,
-        };
-    });
+        itemset.setAttribute('valueRef', valueRef);
+        itemset.setAttribute('labelRef', labelRef);
+        itemset.setAttribute('itextPath', `${itextPath}`);
 
-    const ids: string[] = [];
+        const [, labelNodeName] = labelRef.match(/itext\((.*)\)/) ?? [];
 
-    itemsets.forEach((itemset, index) => {
-        let id = itemset.getAttribute('id');
+        if (labelNodeName != null) {
+            const labelPath = `${itextPath.replace(
+                /\/xf:/g,
+                '/xmlns:'
+            )}/*[name() = "${labelNodeName}"]`;
+            const items = getNodesByXPathExpression(
+                xformDoc,
+                labelPath,
+                NAMESPACES
+            );
 
-        if (id == null) {
-            id = `itemset-${index}`;
+            itemset.append(...items.map((item) => item.cloneNode(true)));
         }
-
-        itemset.setAttributeNS(null, 'id', id);
-        ids.push(id);
     });
-
-    const templateCalls = itemsetParameters.map((parameters, index) => {
-        const id = ids[index];
-        const match = `xf:itemset[@id = '${id}']`;
-
-        const template = xslDoc.createElementNS(NAMESPACES.xsl, 'xsl:template');
-
-        template.setAttribute('match', match);
-        template.setAttribute('mode', 'labels');
-
-        const callTemplate = xslDoc.createElementNS(
-            NAMESPACES.xsl,
-            'xsl:call-template'
-        );
-
-        callTemplate.setAttribute('name', 'itemset-itext-labels');
-
-        const withValueRef = xslDoc.createElementNS(
-            NAMESPACES.xsl,
-            'xsl:with-param'
-        );
-
-        withValueRef.setAttribute('name', 'valueRef');
-        withValueRef.setAttribute('select', `'${parameters.valueRef}'`);
-
-        const withLabelRef = xslDoc.createElementNS(
-            NAMESPACES.xsl,
-            'xsl:with-param'
-        );
-
-        withLabelRef.setAttribute('name', 'labelRef');
-        withLabelRef.setAttribute('select', `'${parameters.labelRef}'`);
-
-        const withItextPath = xslDoc.createElementNS(
-            NAMESPACES.xsl,
-            'xsl:with-param'
-        );
-
-        withItextPath.setAttribute('name', 'itextPath');
-        withItextPath.setAttribute('select', parameters.itextPath);
-
-        callTemplate.append(withValueRef, withLabelRef, withItextPath);
-
-        template.append(callTemplate);
-
-        return template;
-    });
-
-    xslDoc.documentElement.append(...templateCalls);
 };
 
 /**
