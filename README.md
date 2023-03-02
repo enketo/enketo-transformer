@@ -13,12 +13,12 @@ ODK XForms are based off of [W3C XForms](https://en.wikipedia.org/wiki/XForms) w
 
 Historically, forms with many questions or many translations were prohibitively slow to transform. Starting in Enketo Transformer v2.2.1 (Feb 2023), they are much faster.
 
+In v2.3.0 (Mar 2023), a web compatibility layer was introduced so that Enketo Transformer can be run in either a web browser using native DOM/web APIs, or in Node using a partial DOM compatibility layer wrapping equivalent `libxmljs` APIs/behavior. Each respective implementation is aliased as `enketo-transformer/dom`, resolved at build time to `src/dom/web/index.ts` or `src/dom/node/index.ts` respectively. Interfaces for the subset of DOM APIs in use are defined in `src/dom/abstract`, which ensures the Node compatibility layer conforms to the same browser-native interfaces.
+
 Our current primary goals are:
 
--   Using standard DOM APIs so the transformation can be performed client-side.
+-   Rethink transformation to be as minimal as possible, ideally without XSLT, and moving most (or all) of Enketo Transformer's current responsibilities to other parts of the Enketo stack.
 -   Identifying and addressing remaining performance bottlenecks to remove the need for server-side caching.
-
-Longer term, we intend to rethink transformation to be as minimal as possible, ideally without XSLT.
 
 ### Prerequisites
 
@@ -57,7 +57,7 @@ const result = await transform({
 // ... do something with result
 ```
 
-### Web
+#### Web
 
 Enketo Transformer may also be used on the web as an ESM module. It is exported as `enketo-transformer/web`:
 
@@ -129,6 +129,20 @@ curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.
     "languageMap": { "Français": "fr", "English": "en" }
 }
 ```
+
+### How Enketo Transformer is used by other Enketo projects
+
+Enketo Core uses the `transform` function directly to transform XForm fixtures used in development and test modes. It also currently uses the test/dev server in development mode to transform external XForms. It does not currently use any transformation functionality in production.
+
+Enketo Express uses the `transform` function to serve requests to its server-side transformation API endpoints, and caches transformed XForms in Redis. It also uses the `escapeURLPath` function (implemented in `url.ts`).
+
+Neither project currently uses the following functionality:
+
+-   Media URL mapping. Enketo Express has its own implementation of this functionality, so that dynamic media replacements are not cached. This functionality is maintained for backwards compatibility.
+
+-   The `openclinica` flag. This functionality is used by OpenClinica's fork of Enketo Express.
+
+-   The deprecated `preprocess` option. This functionality _may_ be used to update XForms with deprecated content, but its use is discouraged as users can achieve the same thing by preprocessing their XForms before calling `transform`.
 
 #### Test
 
