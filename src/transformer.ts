@@ -1,4 +1,4 @@
-import { DOMParser, XSLTProcessor } from 'enketo-transformer/dom';
+import { DOMParser, XPathResult, XSLTProcessor } from 'enketo-transformer/dom';
 import type LibXMLJS from 'libxmljs';
 import type { DOM } from './dom/abstract';
 import { NodeTypes } from './dom/shared';
@@ -151,14 +151,12 @@ const getNamespaceResolver = (namespaces: Record<string, string>) => ({
 const isDocument = (node: DOM.Node | DOM.Document): node is DOM.Document =>
     node.nodeType === NodeTypes.DOCUMENT_NODE;
 
-const getNodesByXPathExpression = <
-    T extends DOM.Element | DOM.Attr = DOM.Element
->(
+const evaluateXPathExpression = (
     context: DOM.Document | DOM.Element,
     expression: string,
+    resultType: DOM.XPathResultType,
     namespaces?: Record<string, string>
 ) => {
-    const results: T[] = [];
     const namespaceResolver =
         namespaces == null ? null : getNamespaceResolver(namespaces);
     const doc = isDocument(context) ? context : context.ownerDocument;
@@ -167,13 +165,46 @@ const getNodesByXPathExpression = <
         throw new Error('Could not find owner document');
     }
 
-    const result = doc.evaluate(expression, context, namespaceResolver, 6);
+    return doc.evaluate(expression, context, namespaceResolver, resultType);
+};
+
+const getNodesByXPathExpression = <
+    T extends DOM.Element | DOM.Attr = DOM.Element
+>(
+    context: DOM.Document | DOM.Element,
+    expression: string,
+    namespaces?: Record<string, string>
+) => {
+    const results: T[] = [];
+    const result = evaluateXPathExpression(
+        context,
+        expression,
+        XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+        namespaces
+    );
 
     for (let i = 0; i < (result.snapshotLength ?? 0); i += 1) {
-        results.push(result.snapshotItem?.(i) as T);
+        results.push(result.snapshotItem?.(i) as DOM.Node as T);
     }
 
     return results;
+};
+
+const getNodeByXPathExpression = <
+    T extends DOM.Element | DOM.Attr = DOM.Element
+>(
+    context: DOM.Document | DOM.Element,
+    expression: string,
+    namespaces?: Record<string, string>
+) => {
+    const { singleNodeValue } = evaluateXPathExpression(
+        context,
+        expression,
+        XPathResult.FIRST_ORDERED_NODE_TYPE,
+        namespaces
+    );
+
+    return singleNodeValue as T | null;
 };
 
 const processBinaryDefaults = (
@@ -192,7 +223,7 @@ const processBinaryDefaults = (
                 /\//g,
                 '/xmlns:'
             )}`;
-            const [dataNode] = getNodesByXPathExpression(doc, path, NAMESPACES);
+            const dataNode = getNodeByXPathExpression(doc, path, NAMESPACES);
 
             if (dataNode) {
                 const text = dataNode.textContent ?? '';
@@ -249,7 +280,7 @@ const correctAction = (
         `//label[contains(@class, "${localName}")]/input[@data-${localName}]`
     ).forEach((setValueEl) => {
         const name = setValueEl.getAttribute('name');
-        const [questionSameName] = getNodesByXPathExpression(
+        const questionSameName = getNodeByXPathExpression(
             doc,
             `//*[@name="${name}" and ( contains(../@class, 'question') or contains(../../@class, 'option-wrapper')) and not(@type='hidden')]`
         );
@@ -273,7 +304,12 @@ const replaceTheme = (doc: DOM.Document, theme?: string) => {
         return;
     }
 
-    const [form] = getNodesByXPathExpression(doc.documentElement, '/root/form');
+    const form = getNodeByXPathExpression(doc.documentElement, '/root/form');
+
+    if (form == null) {
+        throw new Error('Form is missing');
+    }
+
     const formClass = form.getAttribute('class');
 
     if (formClass != null && HAS_THEME.test(formClass)) {
@@ -312,7 +348,7 @@ const replaceMediaSources = (
 
     // add form logo <img> element if applicable
     const formLogo = mediaMap['form_logo.png'];
-    const [formLogoEl] = getNodesByXPathExpression(
+    const formLogoEl = getNodeByXPathExpression(
         root,
         '//*[@class="form-logo"]'
     );
@@ -379,7 +415,7 @@ const replaceLanguageTags = (doc: DOM.Document) => {
     });
 
     // correct default lang attribute
-    const [langSelectorElement] = getNodesByXPathExpression(
+    const langSelectorElement = getNodeByXPathExpression(
         doc,
         '/root/form/*[@data-default-lang]'
     );
@@ -407,15 +443,15 @@ const replaceLanguageTags = (doc: DOM.Document) => {
 const getLanguageSampleText = (doc: DOM.Document, language: string) => {
     // First find non-empty text content of a hint with that lang attribute.
     // If not found, find any span with that lang attribute.
-    const [langSampleEl] = getNodesByXPathExpression(
-        doc,
-        `/root/form//span[contains(@class, "or-hint") and @lang="${language}" and normalize-space() and not(./text() = '-')]`
-    ).concat(
-        getNodesByXPathExpression(
+    const langSampleEl =
+        getNodeByXPathExpression(
+            doc,
+            `/root/form//span[contains(@class, "or-hint") and @lang="${language}" and normalize-space() and not(./text() = '-')]`
+        ) ||
+        getNodeByXPathExpression(
             doc,
             `/root/form//span[@lang="${language}" and normalize-space() and not(./text() = '-')]`
-        )
-    );
+        );
 
     return langSampleEl?.textContent?.trim() || 'nothing';
 };
@@ -429,19 +465,19 @@ const addInstanceIdNodeIfMissing = (doc: DOM.Document) => {
         '/xmlns:root/xmlns:model/xmlns:instance/*/xmlns:meta/xmlns:instanceID';
     const openrosaPath =
         '/xmlns:root/xmlns:model/xmlns:instance/*/orx:meta/orx:instanceID';
-    const [instanceIdEl] = getNodesByXPathExpression(
+    const instanceIdEl = getNodeByXPathExpression(
         doc,
         `${xformsPath} | ${openrosaPath}`,
         NAMESPACES
     );
 
     if (!instanceIdEl) {
-        const [rootEl] = getNodesByXPathExpression(
+        const rootEl = getNodeByXPathExpression(
             doc,
             '/xmlns:root/xmlns:model/xmlns:instance/*',
             NAMESPACES
         );
-        const [metaEl] = getNodesByXPathExpression(
+        const metaEl = getNodeByXPathExpression(
             doc,
             '/xmlns:root/xmlns:model/xmlns:instance/*/xmlns:meta',
             NAMESPACES
@@ -574,7 +610,11 @@ const correctHTMLDocHierarchy = (doc: DOM.Document) => {
     const { documentElement } = doc;
 
     if (documentElement.nodeName.toLowerCase() === 'html') {
-        const [root] = getNodesByXPathExpression(doc, '/html/body/root');
+        const root = getNodeByXPathExpression(doc, '/html/body/root');
+
+        if (root == null) {
+            throw new Error('Missing root node.');
+        }
 
         documentElement.replaceWith(root);
     }
@@ -624,23 +664,19 @@ const processItemsets = (xformDoc: DOM.Document) => {
         NAMESPACES
     );
 
-    if (itemsets.length === 0) {
-        return;
-    }
-
     itemsets.forEach((itemset) => {
-        const [valueEl] = getNodesByXPathExpression(
+        const valueEl = getNodeByXPathExpression(
             itemset,
             './xmlns:value',
             NAMESPACES
         );
-        const valueRef = valueEl.getAttribute('ref') ?? '';
-        const [labelEl] = getNodesByXPathExpression(
+        const valueRef = valueEl?.getAttribute('ref') ?? '';
+        const labelEl = getNodeByXPathExpression(
             itemset,
             './xmlns:label',
             NAMESPACES
         );
-        const labelRef = labelEl.getAttribute('ref') ?? '';
+        const labelRef = labelEl?.getAttribute('ref') ?? '';
         const nodeset = itemset.getAttribute('nodeset') ?? '';
         const iwq = substringBefore(substringAfter(nodeset, 'instance('), ')');
 
@@ -814,7 +850,7 @@ const correctModelNamespaces = (
         NAMESPACES
     );
     const model = instanceRoots[0].parentElement?.parentElement;
-    const [xformModel] = getNodesByXPathExpression(
+    const xformModel = getNodeByXPathExpression(
         xformDoc,
         '/h:html/h:head/xmlns:model',
         NAMESPACES

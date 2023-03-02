@@ -1,17 +1,10 @@
-import type { ParentNode } from 'libxmljs';
 import { libxmljs } from 'libxslt';
 import { NAMESPACES } from '../../shared';
 import type { DOM } from '../abstract';
 import { NodeTypes } from '../shared';
+import { XPathResult } from './XPathResult';
 
 const { Document, Element } = libxmljs;
-
-/** @package */
-export const XPathResult = {
-    ORDERED_NODE_SNAPSHOT_TYPE: 6 as const,
-    snapshotItem: () => null,
-    snapshotLength: 0,
-} satisfies DOM.XPathResult;
 
 /** @package */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -53,13 +46,10 @@ export class DOMExtendedDocument implements DOM.Document {
     evaluate(
         this: Document & DOMExtendedDocument,
         xpathExpression: string,
-        contextNode: ParentNode,
+        contextNode: Document | Element,
         namespaceResolver: DOM.NamespaceResolver | null,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore - this is part of the interface!
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        resultType: XPathResult['ORDERED_NODE_SNAPSHOT_TYPE']
-    ) {
+        resultType: number
+    ): DOM.XPathResult {
         const namespaces =
             namespaceResolver == null
                 ? undefined
@@ -71,19 +61,28 @@ export class DOMExtendedDocument implements DOM.Document {
                       )
                   );
 
-        const results = (contextNode ?? this).find(xpathExpression, namespaces);
+        if (resultType === XPathResult.FIRST_ORDERED_NODE_TYPE) {
+            const result = (contextNode ?? this).get(
+                xpathExpression,
+                namespaces
+            ) as (Node & DOM.Node) | null;
+            const results = result == null ? [] : [result];
 
-        return {
-            snapshotItem: (index: number) => results[index],
-            snapshotLength: results.length,
-        };
+            return new XPathResult(results);
+        }
+
+        const results = (contextNode ?? this).find(
+            xpathExpression,
+            namespaces
+        ) as Array<Node & Element & DOM.Node>;
+
+        return new XPathResult(results);
     }
 }
 
 /* eslint-disable @typescript-eslint/no-redeclare */
 type Document = InstanceType<typeof Document>;
 type Element = InstanceType<typeof Element>;
-export type XPathResult = typeof XPathResult;
 /* eslint-enable @typescript-eslint/no-redeclare */
 
 const { constructor: _, ...descriptors } = Object.getOwnPropertyDescriptors(

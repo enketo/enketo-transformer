@@ -1,17 +1,6 @@
 import type { Element } from './Element';
 import type { Node } from './Node';
-
-/** @package */
-export interface NamespaceResolver {
-    lookupNamespaceURI(prefix: string): string | null;
-}
-
-/** @package */
-export interface XPathResult {
-    ORDERED_NODE_SNAPSHOT_TYPE?: number;
-    snapshotItem?(index: number): Node | null;
-    snapshotLength?: number;
-}
+import type { XPathResult } from './XPathResult';
 
 /** @package */
 export interface Document {
@@ -27,7 +16,7 @@ export interface Document {
     createElementNS(namespaceURI: string | null, name: string): Element;
     evaluate(
         xpathExpression: string,
-        contextNode: Node | Document,
+        contextNode: Node,
         namespaceResolver: NamespaceResolver | null,
         resultType: number
     ): XPathResult;
