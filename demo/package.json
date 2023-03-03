@@ -1,4 +1,5 @@
 {
+    "type": "module",
     "private": true,
     "engines": {
         "node": ">=14 <17",
@@ -10,6 +11,7 @@
     },
     "scripts": {
         "demo": "vite",
+        "dev": "ENV=dev vite",
         "postinstall": "NPM_BIN=`which npm`; ($NPM_BIN explore enketo-transformer -- $NPM_BIN run build)"
     },
     "dependencies": {

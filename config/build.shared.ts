@@ -1,5 +1,7 @@
 import { createHash } from 'crypto';
 import { readFileSync } from 'fs';
+import { resolve } from 'path';
+import { fileURLToPath } from 'url';
 import pkg from '../package.json';
 
 export const TARGET_ENV =
@@ -12,8 +14,15 @@ const md5 = (message: string | Buffer) => {
     return hash.digest('hex');
 };
 
-const XSL_FORM = readFileSync('./src/xsl/openrosa2html5form.xsl', 'utf-8');
-const XSL_MODEL = readFileSync('./src/xsl/openrosa2xmlmodel.xsl', 'utf-8');
+const basePath = fileURLToPath(new URL('..', import.meta.url));
+const XSL_FORM = readFileSync(
+    resolve(basePath, './src/xsl/openrosa2html5form.xsl'),
+    'utf-8'
+);
+const XSL_MODEL = readFileSync(
+    resolve(basePath, './src/xsl/openrosa2xmlmodel.xsl'),
+    'utf-8'
+);
 const PACKAGE_VERSION = pkg.version;
 const VERSION = md5(`${XSL_FORM}${XSL_MODEL}${PACKAGE_VERSION}`);
 

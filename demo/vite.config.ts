@@ -1,5 +1,10 @@
 import { defineConfig } from 'vite';
+import type { AliasOptions, ResolveOptions } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
+
+import { define } from '../config/build.shared';
+
+const { ENV } = process.env;
 
 const external = [
     '../src/api.ts',
@@ -8,8 +13,23 @@ const external = [
     'path',
 ];
 
+interface Resolve extends ResolveOptions {
+    alias?: AliasOptions;
+}
+
+const resolve: Resolve =
+    ENV === 'dev'
+        ? {
+              alias: {
+                  'enketo-transformer/dom': '../src/dom/web/index.ts',
+                  'enketo-transformer/web': '../src/transformer.ts',
+              },
+          }
+        : {};
+
 export default defineConfig({
     appType: 'spa',
+    assetsInclude: ['**/*.xml', '**/*.xsl', '../**/*.xml', '../**/*.xsl'],
     build: {
         rollupOptions: {
             external,
@@ -18,10 +38,9 @@ export default defineConfig({
         },
         target: 'esnext',
     },
-    optimizeDeps: {
-        disabled: true,
-    },
+    define,
     plugins: [solidPlugin()],
+    resolve,
     server: {
         port: 3000,
     },

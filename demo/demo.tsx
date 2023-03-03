@@ -116,22 +116,30 @@ function Demo() {
         }
 
         const start = performance.now();
-        const result = await transform({
-            xform: selected,
-            media: logo() ? { 'form_logo.png': '/icon.png' } : {},
-            openclinica: openclinica() ? 1 : 0,
-            markdown: markdown(),
-            theme: theme() ? 'mytheme' : undefined,
-        });
 
-        setDuration(performance.now() - start);
+        try {
+            const result = await transform({
+                xform: selected,
+                media: logo() ? { 'form_logo.png': '/icon.png' } : {},
+                openclinica: openclinica() ? 1 : 0,
+                markdown: markdown(),
+                theme: theme() ? 'mytheme' : undefined,
+            });
 
-        return result;
+            setDuration(performance.now() - start);
+
+            return result;
+        } catch (error) {
+            console.error('error', error);
+
+            setError(error as Error);
+            setTransformed.mutate(undefined);
+        }
     });
 
     createEffect(
         on(
-            [key, xform, error, logo, openclinica, markdown, theme],
+            [key, xform, logo, openclinica, markdown, theme],
             async () => {
                 setError(null);
                 setLanguage(null);
@@ -158,7 +166,6 @@ function Demo() {
                         onChange={(event) => {
                             const { key: xform } =
                                 fixtures[Number(event.currentTarget.value)];
-                            setError(null);
                             setParams({
                                 ...params,
                                 xform,
@@ -246,7 +253,7 @@ function Demo() {
                         Theme
                     </label>
                 </div>
-                <Show when={transformed()}>
+                <Show when={error() == null && key() != null}>
                     <div id="metrics">
                         ⏲️{' '}
                         <Switch>
@@ -265,11 +272,7 @@ function Demo() {
                     <div id="error">
                         <h2>Error</h2>
 
-                        <CodeBlock id="dump">
-                            {error.message}
-                            {'\n'}
-                            {error.stack}
-                        </CodeBlock>
+                        <pre>{error.stack}</pre>
                     </div>
                 )}
             </Show>
