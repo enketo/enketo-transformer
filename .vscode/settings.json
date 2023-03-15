@@ -22,7 +22,10 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         "editor.formatOnSave": true
     },
-
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
     // Note: it would be nice to reverse this! But it's currently preventing a *ton* of whitespace diff noise
     "[xml]": {
         "editor.formatOnSave": false
@@ -32,5 +35,6 @@
     },
 
     // Code navigation
-    "javascript.referencesCodeLens.enabled": true
+    "javascript.referencesCodeLens.enabled": true,
+    "typescript.tsdk": "node_modules/typescript/lib"
 }

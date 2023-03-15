@@ -1,12 +1,12 @@
-import { transform } from '../src/transformer';
+import type { Survey, TransformedSurvey } from '../src/transformer';
 import {
     getTransformedForm,
     getTransformedFormDocument,
     getXForm,
     parser,
+    transform,
 } from './shared';
 
-import type { TransformedSurvey } from '../src/transformer';
 import type { Document } from './shared';
 
 function findElementByName(
@@ -64,6 +64,60 @@ describe('transformer', () => {
         modelNamespace = await getTransformedForm('model-namespace.xml');
         widgetsXForm = await getXForm('widgets.xml');
         widgets = await getTransformedForm('widgets.xml');
+    });
+
+    // These tests ensure the API of `transform` remains consistent, out of an
+    // abundance of caution after breaking compatibility in previous attempts to
+    // refactor it.
+    describe('API stability', () => {
+        interface ExtraneousProperty {
+            extraneous: 'property';
+        }
+
+        let survey: ExtraneousProperty & Survey;
+        let transformed: TransformedSurvey<ExtraneousProperty>;
+
+        beforeAll(async () => {
+            survey = {
+                xform: widgetsXForm,
+                media: { 'form_logo.png': 'http://example.com/form_logo.png' },
+                preprocess(doc) {
+                    return doc;
+                },
+                markdown: true,
+                openclinica: 1,
+                extraneous: 'property',
+            };
+            transformed = await transform(survey);
+        });
+
+        it('does not return properties of the explicit `Survey` type', () => {
+            const keys = [
+                'xform',
+                'media',
+                'preprocess',
+                'markdown',
+                'openclinica',
+            ];
+
+            expect(keys.every((key) => !(key in transformed))).to.be.true;
+
+            keys.forEach((key) => {
+                expect(key in transformed).to.be.false;
+
+                // @ts-expect-error - This checks that the return type matches the runtime value
+                expect(transformed[key]).to.be.undefined;
+            });
+        });
+
+        it('preserves properties not explicitly on the `Survey` type', () => {
+            expect(transformed.extraneous).to.equal('property');
+        });
+
+        it('returns a reference to the `survey` input object', () => {
+            // @ts-expect-error - TypeScript rightly does not agree that these types are assignable
+            expect(transformed === survey).to.be.true;
+        });
     });
 
     describe('transforms valid XForms', () => {
@@ -810,14 +864,14 @@ describe('transformer', () => {
             // eliminate some acceptable differences:
             const modifiedSelectMinimalResult = results[0].form
                 .replace('or-appearance-minimal', '')
-                .replace(/data-type-xml=".+" /, '')
-                .replace(/data-name=".+" /, '');
+                .replace(/data-type-xml=".+"[ >]/, '')
+                .replace(/data-name=".+"[ >]/, '');
             const modifiedRangePickerResult = results[1].form
                 .replace('or-appearance-picker', '')
-                .replace(/data-type-xml=".+" /, '')
-                .replace(/min=".+" /, '')
-                .replace(/max=".+" /, '')
-                .replace(/step=".+" /, '');
+                .replace(/data-type-xml=".+"[ >]/, '')
+                .replace(/min=".+"[ >]/, '')
+                .replace(/max=".+"[ >]/, '')
+                .replace(/step=".+"[ >]/, '');
 
             expect(modifiedSelectMinimalResult).to.equal(
                 modifiedRangePickerResult
@@ -978,7 +1032,6 @@ describe('transformer', () => {
             const { form } = await transform({
                 xform: xform2,
             });
-            // console.log('form', form);
             const doc = parser.parseFromString(form, 'text/html');
             const target = findElementByName(
                 doc,

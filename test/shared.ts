@@ -2,50 +2,131 @@ import { DOMParser } from 'linkedom';
 import type { Attr } from 'linkedom/types/interface/attr';
 import type { Element as BaseElement } from 'linkedom/types/interface/element';
 import type { Node } from 'linkedom/types/interface/node';
-import { basename } from 'path';
-import { transform } from '../src/transformer';
+import type { Page } from 'playwright';
+import { port } from '../config/config.json';
+import firefoxUserPrefs from '../config/firefox.json';
+import type { Survey, Transform, TransformedSurvey } from '../src/transformer';
+import { fixtures } from './fixtures';
 
-import type { Survey } from '../src/transformer';
+export { fixtures };
 
-interface Fixture {
-    fileName: string;
-    origin: string;
-    fixturePath: string;
-    xform: string;
-}
+// eslint-disable-next-line import/no-mutable-exports
+let reload: () => Promise<Page | void>;
 
-export const fixtures = (
-    await Promise.all(
-        Object.entries(
-            import.meta.glob('./**/*.xml', {
-                as: 'raw',
-                eager: false,
-            })
-        ).map(async ([fixturePath, importXForm]): Promise<Fixture> => {
-            const xform = await importXForm();
-            const origin =
-                fixturePath.match(/\/external-fixtures\/([^/]+)/)?.[1] ??
-                'enketo-transformer';
-            const fileName = basename(fixturePath);
+// eslint-disable-next-line import/no-mutable-exports
+let transform: Transform;
 
-            return {
-                fileName,
-                origin,
-                fixturePath,
-                xform,
-            };
-        })
-    )
-).sort((A, B) => {
-    const a = A.fileName.toLowerCase().replace(/.*\/([^/]+)$/, '$1');
-    const b = B.fileName.toLowerCase().replace(/.*\/([^/]+)$/, '$1');
+if (ENV === 'node') {
+    reload = () => Promise.resolve();
+    transform = (await import('../src/transformer')).transform;
+} else {
+    const playwright = await import('playwright');
+    const browserType = playwright[BROWSER];
 
-    if (a > b) {
-        return 1;
+    const browser = await browserType.launch({
+        firefoxUserPrefs: BROWSER === 'firefox' ? firefoxUserPrefs : undefined,
+    });
+
+    const url = `http://localhost:${port}`;
+
+    interface EnketoGlobal {
+        transformer: {
+            transform: Transform;
+        };
     }
 
-    return b > a ? -1 : 0;
-});
+    let enketo!: EnketoGlobal;
+
+    let page: Page | null = null;
+    let isLoading = false;
+
+    const load = async () => {
+        isLoading = true;
+
+        const [context] = await Promise.all([
+            browser.newContext(),
+            page?.close(),
+        ]);
+
+        page = await context.newPage();
+
+        page.on('console', async (message) => {
+            // This basically just suppresses useless built-in Vite logging
+            if (!isLoading) {
+                let type = message.type();
+
+                if (type === 'warning') {
+                    type = 'warn';
+                }
+
+                const args = await Promise.all(
+                    message.args().map((arg) => arg.jsonValue())
+                );
+
+                if (type === 'trace') {
+                    type = 'log';
+                    args.push(message.location());
+                }
+
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore - even if the return type for `message.type` were more
+                // accurate, this would still fail because some console methods are
+                // not variadic. We just have to trust that Playwright is passing
+                // the correct arguments for whichever console method was called.
+                console[type](...args);
+            }
+        });
+
+        await page.goto(url);
+        await page.waitForFunction(() => typeof enketo !== 'undefined');
+
+        isLoading = false;
+
+        return page;
+    };
+
+    page = await load();
+
+    reload = load;
+
+    transform = async <T extends Survey>(
+        survey: T
+    ): Promise<TransformedSurvey<T>> => {
+        delete survey.preprocess;
+
+        const { error, result } = await page!.evaluate(
+            async ([input]) => {
+                try {
+                    const result = await enketo.transformer.transform(input);
+
+                    return { result };
+                } catch (error) {
+                    const { message, stack } =
+                        error instanceof Error
+                            ? error
+                            : new Error(String(error));
+
+                    return { error: { message, stack } };
+                }
+            },
+            [survey]
+        );
+
+        if (error == null) {
+            Object.keys(survey).forEach((key) => {
+                if (!Object.prototype.hasOwnProperty.call(result, key)) {
+                    delete survey[key as keyof Survey];
+                }
+            });
+
+            return Object.assign(survey, result);
+        }
+
+        throw error;
+    };
+}
+
+export { reload, transform };
 
 const xformsByPath = Object.fromEntries(
     fixtures.flatMap(({ fileName, fixturePath, xform }) => [

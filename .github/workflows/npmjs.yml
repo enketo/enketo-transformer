@@ -12,24 +12,40 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
+                target: ['Node']
                 node: ['14', '16']
+                include:
+                    - target: Web
+                      node: 16
+                      browser: Firefox
+                    - target: Web
+                      node: 16
+                      browser: Chromium
+                    - target: Web
+                      node: 16
+                      browser: WebKit
         steps:
-            - uses: actions/checkout@v2
-            - uses: actions/cache@v2
+            - uses: actions/checkout@v3
+            - uses: actions/cache@v3
               id: cache
               with:
-                  path: node_modules
+                  path: |
+                      node_modules
+                      ~/.cache/ms-playwright
                   key: ${{ matrix.node }}-${{ hashFiles('**/package-lock.json') }}
-            - uses: actions/setup-node@v2
+            - uses: actions/setup-node@v3
               with:
                   node-version: ${{ matrix.node }}
                   registry-url: https://registry.npmjs.org/
             - run: npm install -g npm@^6
             - if: steps.cache.outputs.cache-hit != 'true'
               run: npm ci
-            - run: npm test
-            - run: npm run benchmarks
-            - if: github.event_name == 'release' && github.event.action == 'published' && matrix.node == '16'
+            - if: matrix.node == '16' && matrix.browser == 'webkit'
+              run: sudo npx playwright install-deps
+            - run: ENV=${{ matrix.target }} BROWSER=${{ matrix.browser }} npm test
+            - id: benchmarks
+              run: ENV=${{ matrix.target }} BROWSER=${{ matrix.browser }} npm run benchmarks
+            - if: github.event_name == 'release' && github.event.action == 'published' && matrix.node == '16' && matrix.target == 'node'
               run: npm publish
               env:
                   NODE_AUTH_TOKEN: ${{secrets.npm_token}}

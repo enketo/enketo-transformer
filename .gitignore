@@ -11,3 +11,4 @@ Thumbs.db
 test-coverage
 coverage.shield.badge.md
 dist
+.benchmarks.md

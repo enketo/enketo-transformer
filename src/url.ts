@@ -1,17 +1,28 @@
+const TEMPORARY_HOST = 'http://example.com';
+
 /**
  * @package
  *
  * @param value - a fully qualified URL, or a relative path
  */
 export const escapeURLPath = (value: string): string => {
-    const isFullyQualified = /^[a-z]+:/i.test(value);
+    const [scheme] = value.match(/^[a-z]+:/) ?? [];
+    const isFullyQualified = scheme != null;
+
+    /**
+     * Browser implementations of `URL` do not escape URLs with unknown schemes
+     * like `jr:, nor do they escape known URLs without a domain like `file:`.
+     * To work around this limitation, we use a temporary HTTP host to escape
+     * `jr:` URL paths.
+     */
     const urlString = isFullyQualified
-        ? value
-        : `file:///${value.replace(/^\//, '')}`;
+        ? value.replace(/^jr:\/*/, 'http://')
+        : `${TEMPORARY_HOST}/${value.replace(/^\//, '')}`;
+
     const url = new URL(urlString);
 
     if (isFullyQualified) {
-        return url.href;
+        return url.href.replace('http:', scheme);
     }
 
     const { pathname, search } = url;

@@ -109,15 +109,6 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
         <xsl:if test="not(function-available('exsl:node-set'))">
             <xsl:message terminate="yes">FATAL ERROR: exsl:node-set function is not available in this XSLT processor</xsl:message>
         </xsl:if>
-        <xsl:if test="not(function-available('str:replace'))">
-            <xsl:message terminate="yes">FATAL ERROR: str:replace function is not available in this XSLT processor</xsl:message>
-        </xsl:if>
-        <xsl:if test="not(function-available('dyn:evaluate'))">
-            <xsl:message terminate="yes">FATAL ERROR: dyn:evaluate function is not available in this XSLT processor</xsl:message>
-        </xsl:if>
-        <xsl:if test="not(function-available('str:tokenize'))">
-            <xsl:message terminate="yes">FATAL ERROR: str:tokenize function is not available in this XSLT processor</xsl:message>
-        </xsl:if>
         <xsl:for-each select="/h:html/h:head/xf:model/xf:bind">
             <xsl:if test="not(substring(./@nodeset, 1, 1) = '/')">
                 <xsl:message terminate="no">WARNING: Found binding(s) with relative nodeset attribute <!--on element: <xsl:value-of select="./@nodeset" />--> (form may work correctly if relative nodesets were used consistently throughout xml form in bindings as well as body, otherwise it will certainly be messed up). </xsl:message>
@@ -304,7 +295,9 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                 <xsl:if test="$binding/@relevant">
                     <xsl:value-of select="'or-branch pre-init '"/>
                 </xsl:if>
-                <xsl:call-template name="appearance" />
+                <xsl:if test="@appearance or @rows">
+                    <xsl:value-of select="'or-appearances-placeholder '"></xsl:value-of>
+                </xsl:if>
                 <!-- Workaround for XLSForm limitation: add "compact" to group if the immediate repeat child has this appearance -->
                 <!-- This should actually be fixed in pyxform instead -->
                 <xsl:if test="contains(./xf:repeat/@appearance, 'compact')">
@@ -315,6 +308,7 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                     <xsl:value-of select="'or-appearance-no-collapse '"/>
                 </xsl:if>
             </xsl:attribute>
+            <xsl:call-template name="appearance" />
 
             <xsl:if test="string($nodeset)">
                 <!--<xsl:variable name="nodeset" select="@ref" />-->
@@ -375,8 +369,11 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                 <!--<xsl:if test="$binding/@relevant">
                     <xsl:value-of select="'or-branch pre-init '"/>
                 </xsl:if>-->
-                <xsl:call-template name="appearance" />
+                <xsl:if test="@appearance or @rows">
+                    <xsl:value-of select="'or-appearances-placeholder '"></xsl:value-of>
+                </xsl:if>
             </xsl:attribute>
+            <xsl:call-template name="appearance" />
             <xsl:attribute name="name">
                 <xsl:value-of select="$nodeset"/>
             </xsl:attribute>
@@ -412,38 +409,18 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
     </xsl:template>
 
     <xsl:template name="appearance">
-        <xsl:variable name="select-type">
-            <xsl:if test="local-name() = 'select' or local-name() = 'select1'">
-                <xsl:value-of select="'true'"/>
-            </xsl:if>
-        </xsl:variable>
-        <xsl:if test="@appearance">
-            <xsl:variable name="appearances" select="str:tokenize(@appearance)" />
-            <xsl:for-each select="exsl:node-set($appearances)">
-                <xsl:variable name="appearance">
-                    <xsl:value-of select="normalize-space(translate(., $upper-case, $lower-case))"/>
-                </xsl:variable>
-                <xsl:value-of select="concat('or-appearance-', $appearance, ' ')"/>
-                <!-- convert deprecated appearances, but leave the deprecated ones -->
-                <xsl:if test="$select-type = 'true'">
-                    <xsl:if test="$appearance = 'horizontal'">
-                        <xsl:value-of select="'or-appearance-columns '" />
-                    </xsl:if>
-                    <xsl:if test="$appearance = 'horizontal-compact'">
-                        <xsl:value-of select="'or-appearance-columns-pack '" />
-                    </xsl:if>
-                    <xsl:if test="$appearance = 'compact'">
-                        <xsl:value-of select="'or-appearance-columns-pack or-appearance-no-buttons '" />
-                    </xsl:if>
-                    <xsl:if test="starts-with($appearance, 'compact-')">
-                        <xsl:value-of select="concat('or-appearance-columns-', substring-after($appearance, '-'), ' or-appearance-no-buttons ')" />
-                    </xsl:if>
-                </xsl:if>
-            </xsl:for-each>
+        <xsl:variable name="rows" select="./@rows" />
+        <xsl:if test="local-name() = 'select' or local-name() = 'select1'">
+            <xsl:attribute name="data-appearances-select-type" />
         </xsl:if>
-        <!-- turn rows attribute into an appearance (which is what it should have been in the first place imho)-->
-        <xsl:if test="./@rows">
-            <xsl:value-of select="concat('or-appearance-rows-', ./@rows, ' ')" />
+        <xsl:if test="@appearance or @rows">
+            <xsl:attribute name="data-appearances">
+                <xsl:value-of select="@appearance" />
+                <!-- turn rows attribute into an appearance (which is what it should have been in the first place imho) -->
+                <xsl:if test="$rows">
+                    <xsl:value-of select="concat(' rows-', $rows)" />
+                </xsl:if>
+            </xsl:attribute>
         </xsl:if>
     </xsl:template>
 
@@ -506,8 +483,11 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                             <xsl:if test="local-name() != 'item'">
                                 <xsl:value-of select="'non-select '"/>
                             </xsl:if>
-                            <xsl:call-template name="appearance" />
+                            <xsl:if test="@appearance or @rows">
+                                <xsl:value-of select="'or-appearances-placeholder '"></xsl:value-of>
+                            </xsl:if>
                         </xsl:attribute>
+                        <xsl:call-template name="appearance" />
 
                         <xsl:apply-templates select="./@kb:image-customization"/>
 
@@ -727,48 +707,29 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
     </xsl:template>
 
     <xsl:template match="xf:itemset" mode="labels">
-        <xsl:variable name="value-ref" select="./xf:value/@ref" />
-        <xsl:variable name="label-ref" select="./xf:label/@ref" />
-        <xsl:variable name="iwq" select="substring-before(substring-after(@nodeset, 'instance('),')/')" />
-        <!-- Needs to also deal with randomize(instance("id")/path/to/node), randomize(instance("id")/path/to/node, 3) -->
-        <!-- Super inelegant and not robust without regexp:match -->
-        <xsl:variable name="instance-path-temp">
-            <xsl:choose>
-                <xsl:when test="contains(@nodeset, 'randomize(') and contains(@nodeset, ',')">
-                    <xsl:value-of select="substring-before(substring-after(@nodeset, ')'), ',')"/>
-                </xsl:when>
-                <xsl:when test="contains(@nodeset, 'randomize(')">
-                    <xsl:value-of select="substring-before(substring-after(@nodeset, ')'), ')')"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="substring-after(@nodeset, ')')"/>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
-        <xsl:variable name="instance-path" select="str:replace($instance-path-temp, '/', '/xf:')" />
-        <xsl:variable name="instance-path-nofilter">
-            <xsl:call-template name="strip-filter">
-                <xsl:with-param name="string" select="$instance-path"/>
-            </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="instance-id" select="substring($iwq, 2, string-length($iwq)-2)" />
+        <xsl:variable name="valueRef" select="@valueRef" />
+        <xsl:variable name="labelRef" select="@labelRef" />
+        <xsl:variable name="itextPath" select="@itextPath" />
+
         <span class="itemset-labels">
             <xsl:attribute name="data-value-ref">
-                <xsl:value-of select="$value-ref"/>
+                <xsl:value-of select="$valueRef"/>
             </xsl:attribute>
             <xsl:choose>
-                <xsl:when test="contains($label-ref, 'jr:itext(')">
+                <xsl:when test="contains($labelRef, 'jr:itext(')">
                     <xsl:attribute name="data-label-type">
                         <xsl:value-of select="'itext'"/>
                     </xsl:attribute>
                     <xsl:variable name="label-node-name"
-                        select="substring(substring-after($label-ref, 'itext('),1,string-length(substring-after($label-ref, 'itext('))-1)"/>
+                        select="substring(substring-after($labelRef, 'itext('),1,string-length(substring-after($labelRef, 'itext('))-1)"/>
                     <xsl:attribute name="data-label-ref">
                         <xsl:value-of select="$label-node-name"/>
                     </xsl:attribute>
-                    <xsl:for-each select="dyn:evaluate(concat('/h:html/h:head/xf:model/xf:instance[@id=&quot;', $instance-id, '&quot;]', $instance-path-nofilter))">
+
+                    <xsl:for-each select="./*[local-name()=$label-node-name]">
                         <!-- so this is support for itext(node) (not itext(path/to/node)), but only 'ad-hoc' for itemset labels for now -->
-                        <xsl:variable name="id" select="./*[name()=$label-node-name]" />
+                        <xsl:variable name="id" select="." />
+
                         <xsl:call-template name="translations">
                             <xsl:with-param name="id" select="$id"/>
                             <xsl:with-param name="class" select="'option-label'"/>
@@ -777,36 +738,12 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:attribute name="data-label-ref">
-                        <xsl:value-of select="$label-ref"/>
+                        <xsl:value-of select="$labelRef"/>
                     </xsl:attribute>
                 </xsl:otherwise>
             </xsl:choose>
-            <xsl:text>
-            </xsl:text>
+            <xsl:text> <!-- This preserves whitespace which affects snapshot tests. --></xsl:text>
         </span>
-    </xsl:template>
-
-    <!--
-        turns: /path/to/node[value=/some/other/node] into: /path/to/node
-        this function is probably way too aggressive but will work for xls-form generated forms
-        to do this properly a regexp:replace is required, but not supported in libXML
-        kept the recursion in, even though it is not being used right now
-    -->
-    <xsl:template name="strip-filter">
-        <xsl:param name="string"/>
-        <xsl:choose>
-            <xsl:when test="contains($string, '[') and contains($string, ']')">
-                <xsl:value-of select="substring-before($string, '[')"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="$string"/>
-            </xsl:otherwise>
-        </xsl:choose>
-        <xsl:if test="string-length(substring-after($string, ']')) > 0">
-            <xsl:call-template name="strip-filter">
-                <xsl:with-param name="string" select="substring-after($string,']')"/>
-            </xsl:call-template>
-        </xsl:if>
     </xsl:template>
 
     <!--
@@ -868,13 +805,14 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
         <label>
             <xsl:attribute name="class">
                 <xsl:value-of select="'question '"/>
-                <xsl:if test="./@appearance">
-                    <xsl:call-template name="appearance" />
+                <xsl:if test="./@appearance or ./@rows">
+                    <xsl:value-of select="'or-appearances-placeholder '" />
                 </xsl:if>
                 <xsl:if test="$binding/@relevant">
                     <xsl:value-of select="' or-branch pre-init '"/>
                 </xsl:if>
             </xsl:attribute>
+            <xsl:call-template name="appearance" />
             <xsl:apply-templates select="./@kb:image-customization"/>
             <xsl:apply-templates select="xf:label" />
             <xsl:apply-templates select="$binding/@required"/>
@@ -968,9 +906,12 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
                     <xsl:value-of select="'or-branch pre-init '"/>
                 </xsl:if>
                 <xsl:if test="@appearance">
-                    <xsl:call-template name="appearance" />
+                    <xsl:value-of select="'or-appearances-placeholder '"></xsl:value-of>
                 </xsl:if>
             </xsl:attribute>
+            <xsl:if test="@appearance">
+                <xsl:call-template name="appearance" />
+            </xsl:if>
             <xsl:apply-templates select="./@kb:image-customization"/>
             <xsl:apply-templates select="./@kb:flash"/>
             <fieldset>
@@ -1430,10 +1371,19 @@ XSLT Stylesheet that transforms OpenRosa style (X)Forms into valid HTMl5 forms
     </xsl:template>
 
     <xsl:template name="text-content">
-        <xsl:if test="string-length(.) = 0">
-            <xsl:text><!-- avoids self-closing tags on empty elements --> </xsl:text>
-        </xsl:if>
-        <xsl:apply-templates /><!-- call xf:output template if output is present -->
+        <xsl:choose>
+            <xsl:when test="string-length(.) = 0">
+                <xsl:text><!-- avoids self-closing tags on empty elements --> </xsl:text>
+                <xsl:apply-templates />
+            </xsl:when>
+            <!-- Firefox does not apply templates to these attributes -->
+            <xsl:when test="name() = 'jr:constraintMsg' or name() = 'jr:requiredMsg' or ($openclinica = 1 and starts-with(name(), 'oc:') and substring(name(), string-length(name()) - string-length('Msg') + 1) = 'Msg' )">
+                <xsl:value-of select="." />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:apply-templates />
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template name="translations">

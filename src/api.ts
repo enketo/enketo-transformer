@@ -10,7 +10,10 @@
  */
 
 import express from 'express';
+import { readFileSync } from 'fs';
+import { dirname, resolve } from 'path';
 import { request } from 'undici';
+import { fileURLToPath } from 'url';
 import { transform } from './transformer';
 
 const router = express.Router();
@@ -25,17 +28,42 @@ class FetchError extends Error {
 }
 
 const getXForm = async (req: express.Request) => {
-    const url = req.query.xform;
+    const { xform } = req.query;
 
     try {
-        if (typeof url !== 'string') {
+        if (typeof xform !== 'string') {
             throw new FetchError(
                 400,
                 'An `xform` query parameter is required.'
             );
         }
 
-        const response = await request(url, {
+        if (!xform.includes('/')) {
+            const basePath = resolve(
+                dirname(fileURLToPath(import.meta.url)),
+                '../'
+            );
+            const paths = [
+                resolve(basePath, './test/forms', xform),
+                resolve(
+                    basePath,
+                    './test/external-fixtures/enketo-core',
+                    xform
+                ),
+            ];
+
+            for (const path of paths) {
+                try {
+                    return readFileSync(path, 'utf-8');
+                } catch {
+                    // Try next path...
+                }
+            }
+
+            throw new FetchError(400, `Could not find XForm: ${xform}`);
+        }
+
+        const response = await request(xform, {
             headers: {
                 'X-OpenRosa-Version': '1.0',
             },
@@ -50,12 +78,12 @@ const getXForm = async (req: express.Request) => {
         }
 
         if (statusCode < 200 || statusCode >= 300) {
-            throw new FetchError(statusCode, `Request to ${url} failed.`);
+            throw new FetchError(statusCode, `Request to ${xform} failed.`);
         }
 
         return response.body.text();
     } catch (error) {
-        console.error(`Error occurred when requesting ${url}`, error);
+        console.error(`Error occurred when requesting ${xform}`, error);
 
         if (error instanceof Error && !(error instanceof FetchError)) {
             throw new FetchError(500, error.message ?? 'Unknown error.');

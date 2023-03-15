@@ -11,14 +11,15 @@ import prettier from 'prettier';
 import { format as prettyFormat } from 'pretty-format';
 import type { Options as PrettierOptions } from 'prettier';
 import prettierPluginXML from '@prettier/plugin-xml';
-import { NAMESPACES, PACKAGE_VERSION, transform } from '../src/transformer';
+import { NAMESPACES } from '../src/shared';
 import type { TransformedSurvey } from '../src/transformer';
 import {
+    DOMMimeType,
+    Element,
     getTransformedForm,
     parser,
     serializer,
-    DOMMimeType,
-    Element,
+    transform,
 } from './shared';
 
 describe('Snapshots', () => {
@@ -364,41 +365,55 @@ describe('Snapshots', () => {
                 expect(result).toMatchSnapshot();
             }, 60_000);
 
-            it(`transforms ${fileName} consistently with a preprocess function`, async () => {
-                const result = await getTransformedForm(formPath, {
-                    preprocess: (document) => {
-                        const body = document.get('/h:html/h:body', NAMESPACES);
+            it.runIf(ENV === 'node')(
+                `transforms ${fileName} consistently with a preprocess function`,
+                async () => {
+                    const result = await getTransformedForm(formPath, {
+                        preprocess: (document) => {
+                            const body = document.get(
+                                '/h:html/h:body',
+                                NAMESPACES
+                            );
 
-                        body!.attr('snapshot', 'snapshot value');
+                            body!.attr('snapshot', 'snapshot value');
 
-                        return document;
-                    },
-                });
+                            return document;
+                        },
+                    });
 
-                expect(result).toMatchSnapshot();
-            }, 60_000);
+                    expect(result).toMatchSnapshot();
+                },
+                60_000
+            );
 
-            it(`transforms ${fileName} consistently with a preprocess method referencing libxmljs as the 'this' variable`, async () => {
-                const result = await getTransformedForm(formPath, {
-                    preprocess(document) {
-                        const model = document.get(
-                            '/h:html/h:head/xmlns:model',
-                            NAMESPACES
-                        );
-                        const instance = new this.Element(document, 'instance')
-                            .namespace(NAMESPACES.xmlns)
-                            .attr({
-                                id: 'snapshot',
-                            });
+            it.runIf(ENV === 'node')(
+                `transforms ${fileName} consistently with a preprocess method referencing libxmljs as the 'this' variable`,
+                async () => {
+                    const result = await getTransformedForm(formPath, {
+                        preprocess(document) {
+                            const model = document.get(
+                                '/h:html/h:head/xmlns:model',
+                                NAMESPACES
+                            );
+                            const instance = new this.Element(
+                                document,
+                                'instance'
+                            )
+                                .namespace(NAMESPACES.xmlns)
+                                .attr({
+                                    id: 'snapshot',
+                                });
 
-                        model?.addChild(instance);
+                            model?.addChild(instance);
 
-                        return document;
-                    },
-                });
+                            return document;
+                        },
+                    });
 
-                expect(result).toMatchSnapshot();
-            }, 60_000);
+                    expect(result).toMatchSnapshot();
+                },
+                60_000
+            );
 
             it(`transforms ${fileName} consistently with a theme`, async () => {
                 const result = await getTransformedForm(formPath, {

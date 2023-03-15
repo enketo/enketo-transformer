@@ -14,6 +14,8 @@ declare module 'libxslt' {
         );
 
     interface XSLTStylesheet {
+        apply(doc: XMLJSDocument, params: Record<string, any>): XMLJSDocument;
+
         apply(
             doc: XMLJSDocument,
             params: Record<string, any>,
@@ -21,8 +23,10 @@ declare module 'libxslt' {
         ): void;
     }
 
-    export const parse: (
-        xsl: string,
-        callback: ResultCallback<XSLTStylesheet>
-    ) => void;
+    interface Parse {
+        (xsl: string, callback: ResultCallback<XSLTStylesheet>): void;
+        (xsl: XMLJSDocument): XSLTStylesheet;
+    }
+
+    export const parse: Parse;
 }
