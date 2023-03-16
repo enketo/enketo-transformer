@@ -32,7 +32,7 @@ Neither project currently uses the following functionality:
 
 -   The `openclinica` flag. This functionality is used by OpenClinica's fork of Enketo Express.
 
--   The deprecated `preprocess` option. This functionality _may_ be used to update XForms with deprecated content, but its use is discouraged as users can achieve the same thing by preprocessing their XForms before calling `transform`.
+-   The deprecated `preprocess` option. This functionality _may_ be used to update XForms before the standard transform, but its use is discouraged as users can achieve the same thing by preprocessing their XForms with entirely custom code before calling `transform`.
 
 ## Interactive web demo
 
