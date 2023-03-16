@@ -14,7 +14,7 @@ export class XPathResult implements DOM.XPathResult {
         return this.results.length;
     }
 
-    constructor(private results: Node[]) {}
+    constructor(private results: DOM.Node[]) {}
 
     snapshotItem(index: number) {
         return this.results[index];

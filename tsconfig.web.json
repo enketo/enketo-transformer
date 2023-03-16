@@ -13,6 +13,7 @@
     "exclude": [
         "dist",
         "node_modules",
+        "src/dom/node/*",
         "./typings/env/node.d.ts",
         "./typings/env/test.d.ts"
     ],

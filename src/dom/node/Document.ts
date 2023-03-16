@@ -4,6 +4,8 @@ import type { DOM } from '../abstract';
 import { NodeTypes } from '../shared';
 import { XPathResult } from './XPathResult';
 
+type Node = typeof libxmljs.Node;
+
 const { Document, Element } = libxmljs;
 
 /** @package */
