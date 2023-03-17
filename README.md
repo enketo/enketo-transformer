@@ -34,6 +34,11 @@ Neither project currently uses the following functionality:
 
 -   The deprecated `preprocess` option. This functionality _may_ be used to update XForms before the standard transform, but its use is discouraged as users can achieve the same thing by preprocessing their XForms with entirely custom code before calling `transform`.
 
+## Prerequisites
+
+1. Node.js 16 and npm 6 (Node.js 14 is also supported)
+1. [Volta](https://volta.sh/) is recommended for development
+
 ## Interactive web demo
 
 Enketo Transformer provides a simple web demo which allows you to select any of the XForms used as fixtures in its test suites to view their transformed output, as well as toggling several of the available transform options to see how they affect the transform. To run the demo:
@@ -48,14 +53,13 @@ This will print out the demo URL (typically `http://localhost:3000`, unless that
 
 ## Use as module
 
+Install Enketo Transformer with:
+
+```sh
+npm install enketo-transformer
+```
+
 ### Node
-
-#### Prerequisites
-
-1. Volta (optional, but recommended)
-1. Node.js 16 and npm 6 (Node.js 14 is also supported)
-
-#### Example
 
 ```ts
 import { transform } from 'enketo-transformer';
@@ -179,7 +183,6 @@ Optionally, you can add a keyboard shortcut to select launch tasks:
 1. Open the keyboard shortcuts settings (cmd+k cmd+s on Mac, ctrl+k ctrl+s on other OSes)
 2. Search for `workbench.action.debug.selectandstart`
 3. Click the + button to add your preferred keybinding keybinding
-
 
 ## Release
 
