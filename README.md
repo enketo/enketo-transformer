@@ -5,7 +5,7 @@
 
 NodeJS library that transforms [ODK forms](https://docs.getodk.org/form-design-intro/) for use by [Enketo Core](https://github.com/enketo/enketo-core). Both Transformer and Core are most commonly used as part of [Enketo Express](https://github.com/enketo/enketo-express). Transformer can also be embedded into different backend web applications (e.g. a form server) or wrapped by a robust API to make a standalone service. A simple testing server API is provided in this repository.
 
-### Project status
+## Project status
 
 Enketo Transformer is maintained by [the ODK team](https://getodk.org/about/team.html) (primarily [Trevor Schmidt](https://github.com/eyelidlessness/)). Broader context is available in [the Enketo Express repository](https://github.com/enketo/enketo-express#project-status).
 
@@ -20,14 +20,46 @@ Our current primary goals are:
 -   Rethink transformation to be as minimal as possible, ideally without XSLT, and moving most (or all) of Enketo Transformer's current responsibilities to other parts of the Enketo stack.
 -   Identifying and addressing remaining performance bottlenecks to remove the need for server-side caching.
 
-### Prerequisites
+## How Enketo Transformer is used by other Enketo projects
 
-1. Volta (optional, but recommended)
+Enketo Core uses the `transform` function directly to transform XForm fixtures used in development and test modes. It also currently uses the test/dev server in development mode to transform external XForms. It does not currently use any transformation functionality in production.
+
+Enketo Express uses the `transform` function to serve requests to its server-side transformation API endpoints, and caches transformed XForms in Redis. It also uses the `escapeURLPath` function (implemented in `url.ts`).
+
+Neither project currently uses the following functionality:
+
+-   Media URL mapping. Enketo Express has its own implementation of this functionality, so that dynamic media replacements are not cached. This functionality is maintained for backwards compatibility.
+
+-   The `openclinica` flag. This functionality is used by OpenClinica's fork of Enketo Express.
+
+-   The deprecated `preprocess` option. This functionality _may_ be used to update XForms before the standard transform, but its use is discouraged as users can achieve the same thing by preprocessing their XForms with entirely custom code before calling `transform`.
+
+## Prerequisites
+
 1. Node.js 16 and npm 6 (Node.js 14 is also supported)
+1. [Volta](https://volta.sh/) is recommended for development
 
-### Use as module
+## Interactive web demo
 
-#### Node
+Enketo Transformer provides a simple web demo which allows you to select any of the XForms used as fixtures in its test suites to view their transformed output, as well as toggling several of the available transform options to see how they affect the transform. To run the demo:
+
+```sh
+cd ./demo
+npm install
+npm run demo
+```
+
+This will print out the demo URL (typically `http://localhost:3000`, unless that port is already in use).
+
+## Use as module
+
+Install Enketo Transformer with:
+
+```sh
+npm install enketo-transformer
+```
+
+### Node
 
 ```ts
 import { transform } from 'enketo-transformer';
@@ -57,7 +89,7 @@ const result = await transform({
 // ... do something with result
 ```
 
-#### Web
+### Web
 
 Enketo Transformer may also be used on the web as an ESM module. It is exported as `enketo-transformer/web`:
 
@@ -74,27 +106,15 @@ const result = await transform({
 
 **Note:** because `preprocess` depends on `libxmljs` which is only available for Node, `preprocess` is also not supported on the web. If you must preprocess an XForm before it is transformed, you may do that before calling `transform`.
 
-### Development/local usage
+## Development/local usage
 
-#### Install
+### Install
 
 ```sh
 npm install
 ```
 
-#### Interactive web demo
-
-Enketo Transformer provides a simple web demo which allows you to select any of the XForms used as fixtures in its test suites to view their transformed output, as well as toggling several of the available transform options to see how they affect the transform. To run the demo:
-
-```sh
-cd ./demo
-npm install
-npm run demo
-```
-
-This will print out the demo URL (typically `http://localhost:3000`, unless that port is already in use).
-
-#### Test/dev server
+### Test/dev server
 
 Enketo Transformer provides a simple server API. It may be used for testing locally, but isn't a robust or secure server implementation so it should not be used in production. You can start it in a local dev environment by running:
 
@@ -130,21 +150,21 @@ curl -d "xform=<xform>x</xform>&theme=plain&media[myfile.png]=/path/to/somefile.
 }
 ```
 
-### How Enketo Transformer is used by other Enketo projects
+### Develop
 
-Enketo Core uses the `transform` function directly to transform XForm fixtures used in development and test modes. It also currently uses the test/dev server in development mode to transform external XForms. It does not currently use any transformation functionality in production.
+The script `npm run develop` runs the app on port 8085 and also serves test/forms on port 8081. You could test the transformation output by placing an XForm in test/forms and running
+http://localhost:8085/transform?xform=http://localhost:8081/autocomplete.xml
 
-Enketo Express uses the `transform` function to serve requests to its server-side transformation API endpoints, and caches transformed XForms in Redis. It also uses the `escapeURLPath` function (implemented in `url.ts`).
+There is also a helpful **GET /transform/htmlform** endpoint to easily inspect the HTML form output in the developer console. Example:
+http://localhost:8085/transform/htmlform?xform=http://localhost:8081/autocomplete.xml
 
-Neither project currently uses the following functionality:
+A vagrant configuration file and provisioning script is also included. Use DEBUG environment variable to see debug terminal output, e.g.:
 
--   Media URL mapping. Enketo Express has its own implementation of this functionality, so that dynamic media replacements are not cached. This functionality is maintained for backwards compatibility.
+```bash
+DEBUG=api,transformer,markdown,language node app.js
+```
 
--   The `openclinica` flag. This functionality is used by OpenClinica's fork of Enketo Express.
-
--   The deprecated `preprocess` option. This functionality _may_ be used to update XForms with deprecated content, but its use is discouraged as users can achieve the same thing by preprocessing their XForms before calling `transform`.
-
-#### Test
+### Test
 
 -   run tests with `npm test`
 -   run tests in watch mode with `npm run test:watch`
@@ -164,21 +184,7 @@ Optionally, you can add a keyboard shortcut to select launch tasks:
 2. Search for `workbench.action.debug.selectandstart`
 3. Click the + button to add your preferred keybinding keybinding
 
-#### Develop
-
-The script `npm run develop` runs the app on port 8085 and also serves test/forms on port 8081. You could test the transformation output by placing an XForm in test/forms and running
-http://localhost:8085/transform?xform=http://localhost:8081/autocomplete.xml
-
-There is also a helpful **GET /transform/htmlform** endpoint to easily inspect the HTML form output in the developer console. Example:
-http://localhost:8085/transform/htmlform?xform=http://localhost:8081/autocomplete.xml
-
-A vagrant configuration file and provisioning script is also included. Use DEBUG environment variable to see debug terminal output, e.g.:
-
-```bash
-DEBUG=api,transformer,markdown,language node app.js
-```
-
-#### Release
+## Release
 
 Releases are done each time a dependent tool needs an `enketo-transformer` change.
 
@@ -198,7 +204,7 @@ Releases are done each time a dependent tool needs an `enketo-transformer` chang
 1. Tag and publish the release
     - GitHub Action will publish it to npm
 
-### License
+## License
 
 See [license document](./LICENSE).
 
@@ -217,6 +223,6 @@ Example:
 
 Powered by <a href="https://enketo.org"><img height="16" style="height: 16px;" src="https://enketo.org/media/images/logos/enketo_bare_150x56.png" /></a>
 
-### Change Log
+## Change Log
 
 See [change log](https://github.com/enketo/enketo-transformer/blob/master/CHANGELOG.md)
