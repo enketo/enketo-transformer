@@ -38,6 +38,8 @@ Neither project currently uses the following functionality:
 
 1. Node.js 16 and npm 6 (Node.js 14 is also supported)
 1. [Volta](https://volta.sh/) is recommended for development
+1. Python (at least 3.7, but less than 3.11)
+1. An appropriate [C++ build toolchain for your machine](https://github.com/nodejs/node-gyp#on-unix)
 
 ## Interactive web demo
 
@@ -58,6 +60,8 @@ Install Enketo Transformer with:
 ```sh
 npm install enketo-transformer
 ```
+
+*If you face issues during installation:* Verify that [these requirements](https://github.com/nodejs/node-gyp#on-unix) are met. We depend on upstream XSLT and XML C++ libraries that require compilation upon installation using [node-gyp](https://github.com/nodejs/node-gyp).
 
 ### Node
 
