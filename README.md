@@ -36,10 +36,12 @@ Neither project currently uses the following functionality:
 
 ## Prerequisites
 
-1. Node.js 16 and npm 6 (Node.js 14 is also supported)
-1. [Volta](https://volta.sh/) is recommended for development
-1. Python (at least 3.7, but less than 3.11)
-1. An appropriate [C++ build toolchain for your machine](https://github.com/nodejs/node-gyp#on-unix)
+-   Node.js 16 and npm 6 (Node.js 14 is also supported)
+-   [Volta](https://volta.sh/) is recommended for development
+-   For Node/server-side transforms:
+    -   Python (at least 3.7, but less than 3.11)
+    -   An appropriate [C++ build toolchain for your machine](https://github.com/nodejs/node-gyp#on-unix)
+    -   The `libxslt` library is now a peer dependency, and must be installed alongside `enketo-transformer`
 
 ## Interactive web demo
 
