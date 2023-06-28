@@ -82,7 +82,6 @@
         "css.escape": "^1.5.1",
         "express": "^4.18.2",
         "language-tags": "1.0.5",
-        "libxslt": "0.10.0",
         "linkedom": "^0.14.25",
         "prettier": "^2.8.4",
         "string-direction": "0.1.x",
@@ -118,6 +117,7 @@
         "grunt": "^1.6.1",
         "http-server": "^13.1.0",
         "istanbul-reporter-shield-badge": "^1.2.1",
+        "libxslt": "0.10.0",
         "markdown-eslint-parser": "^1.2.1",
         "microtime": "^3.1.1",
         "playwright": "1.25.0",
@@ -128,6 +128,14 @@
         "vite-node": "^0.28.5",
         "vite-plugin-node": "^1.0.0",
         "vitest": "^0.26.3"
+    },
+    "peerDependencies": {
+        "libxslt": "0.10.0"
+    },
+    "peerDependenciesMeta": {
+        "libxslt": {
+            "optional": true
+        }
     },
     "volta": {
         "node": "16.5.0",
