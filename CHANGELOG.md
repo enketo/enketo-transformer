@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.0.0] - 2023-07-03
+
+##### Changed
+
+-   Move libxslt to (optional) peerDependencies, devDependencies (#181)
+
 ## [2.3.0] - 2023-03-16
 
 ##### Added
