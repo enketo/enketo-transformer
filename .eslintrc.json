@@ -54,7 +54,7 @@
                     "test/**/*.ts"
                 ],
                 "optionalDependencies": false,
-                "peerDependencies": false
+                "peerDependencies": true
             }
         ],
         "import/no-unresolved": [
