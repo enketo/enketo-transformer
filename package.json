@@ -26,8 +26,8 @@
             "types": "./dist/types/src/dom/node/index.d.ts"
         },
         "./web": {
-            "default": "./dist/enketo-transformer/web/transformer.js",
-            "types": "./dist/enketo-transformer/web/src/transformer.d.ts"
+            "types": "./dist/enketo-transformer/web/src/transformer.d.ts",
+            "default": "./dist/enketo-transformer/web/transformer.js"
         }
     },
     "typesVersions": {
