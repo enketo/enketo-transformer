@@ -135,6 +135,14 @@ export default defineConfig(async () => {
             // functionality which depends on libxmljs/libxslt.
             threads: false,
 
+            // For future reference: Vitest version 0.29.0+
+            // would require the `singleThread` setting instead
+            // of `threads`. We decided not to update past
+            // 0.28.5 in the 3.0.1 release, as newer releases
+            // also caused problems with changes to the
+            // snapshot format.
+            // singleThread: true,
+
             coverage: {
                 provider: 'istanbul',
                 include: ['src/**/*.ts'],
