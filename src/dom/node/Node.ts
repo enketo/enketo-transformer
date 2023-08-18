@@ -59,7 +59,6 @@ export class DOMExtendedNode implements DOM.Node {
         ).parent() as Element | null;
     }
 
-    // @ts-expect-error - TypeScript correctly objects to this type, which is also unfortunately accurate!
     get textContent(): string | null {
         return (this as any as DOMExtendedNode & Node).text();
     }
