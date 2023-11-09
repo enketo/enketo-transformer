@@ -110,6 +110,8 @@ const result = await transform({
 
 **Note:** because `preprocess` depends on `libxmljs` which is only available for Node, `preprocess` is also not supported on the web. If you must preprocess an XForm before it is transformed, you may do that before calling `transform`.
 
+If your project uses Webpack or another bundler, you may need to [tell it to ignore the `libxslt` package](https://github.com/enketo/enketo-transformer/issues/185#issuecomment-1802426670).
+
 ## Development/local usage
 
 ### Install
