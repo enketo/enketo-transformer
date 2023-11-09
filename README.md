@@ -63,8 +63,6 @@ Install Enketo Transformer with:
 npm install enketo-transformer
 ```
 
-*If you face issues during installation:* Verify that [these requirements](https://github.com/nodejs/node-gyp#on-unix) are met. We depend on upstream XSLT and XML C++ libraries that require compilation upon installation using [node-gyp](https://github.com/nodejs/node-gyp).
-
 ### Node
 
 ```ts
