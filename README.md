@@ -3,6 +3,10 @@
 
 # Enketo Transformer
 
+### ⚠️ Enketo Transformer code and issues have moved to [the Enketo monorepo](https://github.com/enketo/enketo) ⚠️
+
+***
+
 NodeJS library that transforms [ODK forms](https://docs.getodk.org/form-design-intro/) for use by [Enketo Core](https://github.com/enketo/enketo-core). Both Transformer and Core are most commonly used as part of [Enketo Express](https://github.com/enketo/enketo-express). Transformer can also be embedded into different backend web applications (e.g. a form server) or wrapped by a robust API to make a standalone service. A simple testing server API is provided in this repository.
 
 ## Project status
